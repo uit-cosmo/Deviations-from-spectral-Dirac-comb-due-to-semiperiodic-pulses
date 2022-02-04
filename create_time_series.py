@@ -1,4 +1,4 @@
-"""This module computes the time series used in manuscript arXiv:2106.15904"""
+"""This module computes the time series of Lorenz system used in manuscript arXiv:2106.15904"""
 
 import numpy as np
 from scipy.integrate import solve_ivp

@@ -130,3 +130,6 @@ dmypy.json
 
 # .npz data
 *.npz
+
+# .eps files
+*.eps
