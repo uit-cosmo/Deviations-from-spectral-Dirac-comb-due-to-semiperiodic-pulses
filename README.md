@@ -6,6 +6,7 @@ Contains python scripts to generate and plot data of Lorenz system used in Manus
  - `numpy`
  - `scipy`
  - `matplotlib`
+ - `click`
  - `uit_scripts` (optional, specifies plotting parameters) 
 
  # Use
@@ -18,6 +19,6 @@ python create_time_series.py
 
 Plots are created by 
 ```console
-python create_time_series.py 
+python plot_time_series.py       # Figure 1
+python plot_time_series.py --fit # Figure 5
 ```
-Set `fit=False` for Figure 1 and  `fit=False` for Figure 5 in the main function of `create_time_series.py `.

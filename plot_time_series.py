@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks, welch, fftconvolve
 from scipy.optimize import minimize
+import click
 
 
 def load_system(regime):
@@ -162,7 +163,9 @@ def plot_spectral_density(regime, f, S, fit, f_fit, S_fit, symbols, fitrange):
         plt.savefig("PSD_" + regime + ".eps", bbox_inches="tight")
 
 
-def main(fit=True):
+@click.command()
+@click.option("--fit/--no-fit", default=False, help="Fit function in figure 1&5 ")
+def create_figures(fit):
     """Creates figure 1 and 5 in manuscript arXiv:2106.15904"""
 
     regimes = ["rho=28", "rho=220", "rho=350"]
@@ -194,4 +197,4 @@ def main(fit=True):
 
 
 if __name__ == "__main__":
-    main(fit=True)
+    create_figures()
