@@ -78,14 +78,14 @@ def create_fit(regime, f, dt, S, normalized_data, T):
 
     duration_time = calculate_duration_time(f[fitrange], S[fitrange])
 
-    kernrad = 2 ** 18
+    kernrad = 2**18
     time_kern = np.arange(-kernrad, kernrad + 1) * dt
 
     def obj_fun(x):
         return 0.5 * np.sum(
             (
                 generate_fpp(x, normalized_data, time_kern, dt, duration_time, T) ** 2
-                - normalized_data ** 2
+                - normalized_data**2
             )
             ** 2
         )
@@ -185,12 +185,12 @@ def create_figures(fit):
         normalizes_time_series = (data - data.mean()) / data.std()
 
         dt = 1e-3
-        f, S = welch(normalizes_time_series, 1.0 / dt, nperseg=2 ** 20)
+        f, S = welch(normalizes_time_series, 1.0 / dt, nperseg=2**20)
 
         time_series_fit, fitrange, symbols = create_fit(
             regime, f, dt, S, normalizes_time_series, T
         )
-        f_fit, S_fit = welch(time_series_fit, 1.0 / dt, nperseg=2 ** 20)
+        f_fit, S_fit = welch(time_series_fit, 1.0 / dt, nperseg=2**20)
 
         plot_spectral_density(regime, f, S, fit, f_fit, S_fit, symbols, fitrange)
         plot_time_series(regime, T, normalizes_time_series, fit, time_series_fit)
