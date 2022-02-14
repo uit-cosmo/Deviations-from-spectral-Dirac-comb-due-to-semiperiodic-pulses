@@ -55,11 +55,11 @@ def main():
     }
 
     for regime in regimes:
-        dname = "lorenz_" + regime + ".npz"
-        print("starting " + dname, flush=True)
+        dname = f"lorenz_{regime}.npz"
+        print(f"starting {dname}", flush=True)
         T, res = integrate_system(regime, params, init, N=2**21)
         np.savez(dname, tb=T, res=res["y"])
-        print(dname + " done", flush=True)
+        print(f"{dname} done", flush=True)
 
 
 if __name__ == "__main__":

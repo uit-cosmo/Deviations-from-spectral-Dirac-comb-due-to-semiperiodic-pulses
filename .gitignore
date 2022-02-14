@@ -136,3 +136,6 @@ dmypy.json
 
 # discontiued modules 
 amplitude_fit.py
+
+# local vscode parameters
+.vscode

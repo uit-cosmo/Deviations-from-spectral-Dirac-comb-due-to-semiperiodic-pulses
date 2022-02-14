@@ -44,6 +44,47 @@ def corr_fun(X, Y, dt, norm=True, biased=True, method="auto"):
     return tb, R
 
 
+def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=None, seed=None):
+    """
+    Use:
+        sample_asymm_laplace(alpha=1., kappa=0.5, size=None)
+    Random samples drawn from the asymmetric Laplace distribution
+    using inverse sampling. The distribution is given by
+    F(A;alpha,kappa) = 1-(1-kappa)*Exp(-A/(2*alpha*(1-kappa))), A>0
+                       kappa*Exp[A/(2*alpha*kappa)], A<0
+    where F is the CDF of A, alpha is a scale parameter and
+    kappa is the asymmetry parameter.
+    Input:
+        alpha: scale parameter. ......................... float, alpha>0
+        kappa: shape (asymmetry) parameter .............. float, 0<=kappa<=1
+        size: number of points to draw. 1 by default. ... int, size>0
+        seed: specify a random seed. .................... int
+    Output:
+        X: Array of randomly distributed values. ........ (size,) np array
+    """
+    import numpy as np
+
+    assert alpha > 0.0
+    assert (kappa >= 0.0) & (kappa <= 1.0)
+    if size:
+        assert size > 0
+    prng = np.random.RandomState(seed=seed)
+    U = prng.uniform(size=size)
+    X = np.zeros(size)
+    X[U > kappa] = -2 * alpha * (1 - kappa) * np.log((1 - U[U > kappa]) / (1 - kappa))
+    X[U < kappa] = 2 * alpha * kappa * np.log(U[U < kappa] / kappa)
+
+    return X
+
+
+def Lorentz_pulse(theta):
+    return 4 * (4 + theta**2) ** (-1)
+
+
+def Lorentz_PSD(theta):
+    return 2 * np.pi * np.exp(-2 * np.abs(theta))
+
+
 def find_nearest(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
@@ -65,10 +106,6 @@ def PSD_periodic_arrivals(w, td, gamma, Arms, Am, S):
     return tmp / S.std() ** 2
 
 
-def Lorentz_PSD(theta):
-    return 2 * np.pi * np.exp(-2 * np.abs(theta))
-
-
 def autocorr_periodic_arrivals(t, gamma, Arms, td, Am):
     tmp = 0
     I_2 = 1 / (2 * np.pi)
@@ -77,10 +114,6 @@ def autocorr_periodic_arrivals(t, gamma, Arms, td, Am):
         tmp += gamma * Am**2 * I_2 * Lorentz_pulse(i / gamma + t / td)
 
     return tmp
-
-
-def Lorentz_pulse(theta):
-    return 4 * (4 + theta**2) ** (-1)
 
 
 def calculate_R_an(mean_A, Arms, gamma):
@@ -96,35 +129,3 @@ def calculate_R_an(mean_A, Arms, gamma):
     anPhi = 0.2 * mean_A * 1
     R_an = autocorr_periodic_arrivals(t, gamma=0.2, Arms=Arms, td=1, Am=mean_A)
     return t, (R_an - anPhi**2) / an_rms**2
-
-def sample_asymm_laplace(
-        alpha=1., kappa=0.5, size=None, seed=None):
-    """
-    Use:
-        sample_asymm_laplace(alpha=1., kappa=0.5, size=None)
-    Random samples drawn from the asymmetric Laplace distribution
-    using inverse sampling. The distribution is given by
-    F(A;alpha,kappa) = 1-(1-kappa)*Exp(-A/(2*alpha*(1-kappa))), A>0
-                       kappa*Exp[A/(2*alpha*kappa)], A<0
-    where F is the CDF of A, alpha is a scale parameter and
-    kappa is the asymmetry parameter.
-    Input:
-        alpha: scale parameter. ......................... float, alpha>0
-        kappa: shape (asymmetry) parameter .............. float, 0<=kappa<=1
-        size: number of points to draw. 1 by default. ... int, size>0
-        seed: specify a random seed. .................... int
-    Output:
-        X: Array of randomly distributed values. ........ (size,) np array
-    """
-    import numpy as np
-    assert(alpha > 0.)
-    assert((kappa >= 0.) & (kappa <= 1.))
-    if size:
-        assert(size > 0)
-    prng = np.random.RandomState(seed=seed)
-    U = prng.uniform(size=size)
-    X = np.zeros(size)
-    X[U > kappa] = -2*alpha*(1-kappa)*np.log((1-U[U > kappa])/(1-kappa))
-    X[U < kappa] = 2*alpha*kappa*np.log(U[U < kappa]/kappa)
-
-    return X

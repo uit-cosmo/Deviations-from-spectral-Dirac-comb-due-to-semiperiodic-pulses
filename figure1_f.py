@@ -2,13 +2,13 @@ import matplotlib.pyplot as plt
 from uit_scripts.shotnoise import make_signal
 import numpy as np
 from scipy import signal
-from uit_scripts.plotting import figure_defs
+import cosmoplots
 from support_functions import *
 import model.forcing as frc
 import model.point_model as pm
 import model.pulse_shape as ps
 
-axes_size = figure_defs.set_rcparams_aip(plt.rcParams, num_cols=1, ls="thin")
+axes_size = cosmoplots.set_rcparams_aip(plt.rcParams, num_cols=1, ls="thin")
 fig_PSD = plt.figure()
 ax1 = fig_PSD.add_axes(axes_size)
 fig_AC = plt.figure()
@@ -21,7 +21,7 @@ class ExpAmp(frc.ForcingGenerator):
 
     def get_forcing(self, times: np.ndarray, gamma: float) -> frc.Forcing:
         total_pulses = int(max(times) * gamma)
-        arrival_time_indx = np.arange(start=0, stop=9994, step=5) * 100
+        arrival_time_indx = np.arange(start=0, stop=99994, step=5) * 100
         amplitudes = np.random.default_rng().exponential(scale=1.0, size=total_pulses)
         durations = np.ones(shape=total_pulses)
         return frc.Forcing(
@@ -38,8 +38,9 @@ class ExpAmp(frc.ForcingGenerator):
         pass
 
 
-model = pm.PointModel(gamma=0.2, total_duration=10000, dt=0.01)
-model.set_pulse_shape(ps.StandardPulseGenerator("lorentz"))
+model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
+# model.set_pulse_shape(ps.StandardPulseGenerator("lorentz"))
+model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 model.set_custom_forcing_generator(ExpAmp())
 
 T, S = model.make_realization()
@@ -90,8 +91,9 @@ class AsymLaplaceAmp(frc.ForcingGenerator):
         pass
 
 
-model = pm.PointModel(gamma=0.2, total_duration=10000, dt=0.01)
-model.set_pulse_shape(ps.StandardPulseGenerator("lorentz"))
+model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
+# model.set_pulse_shape(ps.StandardPulseGenerator("lorentz"))
+model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 model.set_custom_forcing_generator(AsymLaplaceAmp())
 
 T, S = model.make_realization()
@@ -130,7 +132,7 @@ ax2.set_xlim(0, 50)
 ax2.set_xlabel(r"$t$")
 ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t)$")
 ax2.legend()
-# fig_PSD.savefig("PSD_exp_lap.eps", bbox_inches="tight")
-# fig_AC.savefig("AC_exp_lap.eps", bbox_inches="tight")
+fig_PSD.savefig("PSD_exp_lap.eps", bbox_inches="tight")
+fig_AC.savefig("AC_exp_lap.eps", bbox_inches="tight")
 
 plt.show()

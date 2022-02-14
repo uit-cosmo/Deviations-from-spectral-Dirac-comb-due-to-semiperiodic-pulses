@@ -7,7 +7,8 @@ Contains python scripts to generate and plot data of Lorenz system used in Manus
  - `scipy`
  - `matplotlib`
  - `click`
- - `uit_scripts` (optional, specifies plotting parameters) 
+ - `superposed-pulses`
+ - `cosmoplots`
 
  # Use
 
