@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import find_peaks, welch, fftconvolve
 from scipy.optimize import minimize
 import click
+import cosmoplots
 
 
 def load_system(regime):
@@ -173,13 +174,7 @@ def create_figures(fit):
 
     regimes = ["rho=28", "rho=220", "rho=350"]
 
-    # use plotting parameters defined for UiT if available
-    try:
-        from cosmoplots import figure_defs
-
-        axes_size = figure_defs.set_rcparams_aip(plt.rcParams, num_cols=1, ls="thin")
-    except:
-        pass
+    axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
     for regime in regimes:
         T, res = load_system(regime)
