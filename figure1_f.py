@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from uit_scripts.shotnoise import make_signal
 import numpy as np
 from scipy import signal
 import cosmoplots
@@ -8,7 +7,8 @@ import model.forcing as frc
 import model.point_model as pm
 import model.pulse_shape as ps
 
-axes_size = cosmoplots.set_rcparams_aip(plt.rcParams, num_cols=1, ls="thin")
+axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
+
 fig_PSD = plt.figure()
 ax1 = fig_PSD.add_axes(axes_size)
 fig_AC = plt.figure()
@@ -132,6 +132,8 @@ ax2.set_xlim(0, 50)
 ax2.set_xlabel(r"$t$")
 ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t)$")
 ax2.legend()
+cosmoplots.change_log_axis_base(ax1, "y", base=10)
+
 fig_PSD.savefig("PSD_exp_lap.eps", bbox_inches="tight")
 fig_AC.savefig("AC_exp_lap.eps", bbox_inches="tight")
 
