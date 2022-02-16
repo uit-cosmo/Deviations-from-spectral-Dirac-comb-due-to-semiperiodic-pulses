@@ -21,7 +21,9 @@ class ExpAmp(frc.ForcingGenerator):
 
     def get_forcing(self, times: np.ndarray, gamma: float) -> frc.Forcing:
         total_pulses = int(max(times) * gamma)
-        arrival_time_indx = np.arange(start=0, stop=99994, step=5) * 100
+        arrival_time_indx = (
+            np.arange(start=0, stop=99994, step=5) * 100
+        )  # multiplied with inverse dt
         amplitudes = np.random.default_rng().exponential(scale=1.0, size=total_pulses)
         durations = np.ones(shape=total_pulses)
         return frc.Forcing(
@@ -39,12 +41,12 @@ class ExpAmp(frc.ForcingGenerator):
 
 
 model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
-# model.set_pulse_shape(ps.StandardPulseGenerator("lorentz"))
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 model.set_custom_forcing_generator(ExpAmp())
 
 T, S = model.make_realization()
-amp = np.random.default_rng().exponential(scale=1.0, size=1999)
+forcing = model.get_last_used_forcing()
+amp = forcing.amplitudes
 
 S_norm = (S - S.mean()) / S.std()
 t, R_an = calculate_R_an(1, 1, 0.2)
@@ -92,17 +94,12 @@ class AsymLaplaceAmp(frc.ForcingGenerator):
 
 
 model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
-# model.set_pulse_shape(ps.StandardPulseGenerator("lorentz"))
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 model.set_custom_forcing_generator(AsymLaplaceAmp())
 
 T, S = model.make_realization()
-kappa = 0.5
-amp = sample_asymm_laplace(
-    alpha=0.5 / np.sqrt(1.0 - 2.0 * kappa * (1.0 - kappa)),
-    kappa=kappa,
-    size=10000,
-)
+forcing = model.get_last_used_forcing()
+amp = forcing.amplitudes
 
 S_norm = (S - S.mean()) / S.std()
 t, R_an = calculate_R_an(0, 1, 0.2)
