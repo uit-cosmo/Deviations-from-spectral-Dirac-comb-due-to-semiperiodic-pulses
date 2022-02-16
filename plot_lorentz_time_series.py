@@ -5,11 +5,12 @@ import matplotlib.pyplot as plt
 from scipy.signal import find_peaks, welch, fftconvolve
 from scipy.optimize import minimize
 import click
+import cosmoplots
 
 
 def load_system(regime):
     """loads in Lorentz system time series created with create_time_series.py"""
-    dname = "lorenz_" + regime + ".npz"
+    dname = f"lorenz_{regime}.npz"
     F = np.load(dname)
     return F["tb"], F["res"]
 
@@ -78,14 +79,14 @@ def create_fit(regime, f, dt, S, normalized_data, T):
 
     duration_time = calculate_duration_time(f[fitrange], S[fitrange])
 
-    kernrad = 2 ** 18
+    kernrad = 2**18
     time_kern = np.arange(-kernrad, kernrad + 1) * dt
 
     def obj_fun(x):
         return 0.5 * np.sum(
             (
                 generate_fpp(x, normalized_data, time_kern, dt, duration_time, T) ** 2
-                - normalized_data ** 2
+                - normalized_data**2
             )
             ** 2
         )
@@ -103,11 +104,10 @@ def create_fit(regime, f, dt, S, normalized_data, T):
 
 def plot_time_series(regime, T, time_series, fit, time_series_fit):
     """creates plots of time series"""
-    plt.figure(regime + " time series x compare skew lorenz")
+    plt.figure(f"{regime} time series x compare skew lorenz")
 
     plt.xlim(0, 10)
     plt.ylim(-2.2, 2.4)
-    plt.xlabel(r"$t$")
     plt.ylabel(r"$\widetilde{x}$")
 
     if regime == "rho=28":
@@ -116,27 +116,31 @@ def plot_time_series(regime, T, time_series, fit, time_series_fit):
         plt.text(x=8.25, y=2.1, s=r"$\rho = 28$")
         if fit:
             plt.plot(T - 10, time_series_fit, "--")
+        plt.xlabel(r"$t \, \texttt{+} \, 10$")
 
     if regime == "rho=220":
         plt.plot(T, time_series, label=r"$\rho = 220$")
         plt.text(x=8.25, y=2.1, s=r"$\rho = 220$")
         if fit:
             plt.plot(T, time_series_fit, "--")
+        plt.xlabel(r"$t$")
 
     if regime == "rho=350":
         plt.plot(T, time_series, label=r"$\rho = 350$")
         plt.text(x=8.25, y=2.1, s=r"$\rho = 350$")
         if fit:
             plt.plot(T, time_series_fit, "--")
+        plt.xlabel(r"$t$")
+
     if fit:
-        plt.savefig("time_series_" + regime + "_fit.eps", bbox_inches="tight")
+        plt.savefig(f"time_series_{regime}_fit.eps", bbox_inches="tight")
     else:
-        plt.savefig("time_series_" + regime + ".eps", bbox_inches="tight")
+        plt.savefig(f"time_series_{regime}.eps", bbox_inches="tight")
 
 
 def plot_spectral_density(regime, f, S, fit, f_fit, S_fit, symbols, fitrange):
     """creates plots of power spectral density"""
-    plt.figure(regime + " PSD x fit td")
+    plt.figure(f"{regime} PSD x fit td")
 
     plt.semilogy(f, S, c="tab:blue")
 
@@ -158,9 +162,9 @@ def plot_spectral_density(regime, f, S, fit, f_fit, S_fit, symbols, fitrange):
         plt.text(x=31.5, y=2, s=r"$\rho = 350$")
 
     if fit:
-        plt.savefig("PSD_" + regime + "_fit.eps", bbox_inches="tight")
+        plt.savefig(f"PSD_{regime}_fit.eps", bbox_inches="tight")
     else:
-        plt.savefig("PSD_" + regime + ".eps", bbox_inches="tight")
+        plt.savefig(f"PSD_{regime}.eps", bbox_inches="tight")
 
 
 @click.command()
@@ -170,13 +174,7 @@ def create_figures(fit):
 
     regimes = ["rho=28", "rho=220", "rho=350"]
 
-    # use plotting parameters defined for UiT if available
-    try:
-        from uit_scripts.plotting import figure_defs
-
-        axes_size = figure_defs.set_rcparams_aip(plt.rcParams, num_cols=1, ls="thin")
-    except:
-        pass
+    axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
     for regime in regimes:
         T, res = load_system(regime)
@@ -185,12 +183,12 @@ def create_figures(fit):
         normalizes_time_series = (data - data.mean()) / data.std()
 
         dt = 1e-3
-        f, S = welch(normalizes_time_series, 1.0 / dt, nperseg=2 ** 20)
+        f, S = welch(normalizes_time_series, 1.0 / dt, nperseg=2**20)
 
         time_series_fit, fitrange, symbols = create_fit(
             regime, f, dt, S, normalizes_time_series, T
         )
-        f_fit, S_fit = welch(time_series_fit, 1.0 / dt, nperseg=2 ** 20)
+        f_fit, S_fit = welch(time_series_fit, 1.0 / dt, nperseg=2**20)
 
         plot_spectral_density(regime, f, S, fit, f_fit, S_fit, symbols, fitrange)
         plot_time_series(regime, T, normalizes_time_series, fit, time_series_fit)

@@ -133,3 +133,9 @@ dmypy.json
 
 # .eps files
 *.eps
+
+# discontiued modules 
+amplitude_fit.py
+
+# local vscode parameters
+.vscode

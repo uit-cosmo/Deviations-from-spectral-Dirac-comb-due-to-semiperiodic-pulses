@@ -10,7 +10,11 @@ def lorenz_system(time, state, rho, sigma, beta):
 
 
 def integrate_system(
-    regime, params, init, dt=1e-3, N=2 ** 12,
+    regime,
+    params,
+    init,
+    dt=1e-3,
+    N=2**12,
 ):
     """
     This function numerically integrates a system of
@@ -51,11 +55,11 @@ def main():
     }
 
     for regime in regimes:
-        dname = "lorenz_" + regime + ".npz"
-        print("starting " + dname, flush=True)
-        T, res = integrate_system(regime, params, init, N=2 ** 21)
+        dname = f"lorenz_{regime}.npz"
+        print(f"starting {dname}", flush=True)
+        T, res = integrate_system(regime, params, init, N=2**21)
         np.savez(dname, tb=T, res=res["y"])
-        print(dname + " done", flush=True)
+        print(f"{dname} done", flush=True)
 
 
 if __name__ == "__main__":
