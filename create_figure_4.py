@@ -15,18 +15,18 @@ fig_AC = plt.figure()
 ax2 = fig_AC.add_axes(axes_size)
 
 
-class ForcingGammaDistribution(frc.ForcingGenerator):
-    def __init__(self, beta):
-        self.beta = beta
+class ForcingQuasiPeriodic(frc.ForcingGenerator):
+    def __init__(self, kappa):
+        self.kappa = kappa
 
     def get_forcing(self, times: np.ndarray, gamma: float) -> frc.Forcing:
         total_pulses = int(max(times) * gamma)
         waiting_times = (
-            np.random.gamma(
-                self.beta, scale=(gamma * self.beta) ** (-1), size=total_pulses
+            np.random.uniform(
+                low=1 - self.kappa / 2, high=1 + self.kappa / 2, size=total_pulses
             )
             * 100  # multiplied with inverse dt
-        )
+        ) / gamma
         arrival_times = np.add.accumulate(waiting_times)
         arrival_time_indx = np.rint(arrival_times).astype(int)
         arrival_time_indx -= arrival_time_indx[0]  # set first pulse to t = 0
@@ -58,9 +58,8 @@ class ForcingGammaDistribution(frc.ForcingGenerator):
 model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 
-
-for beta in [1000, 100, 10]:
-    model.set_custom_forcing_generator(ForcingGammaDistribution(beta=beta))
+for kappa in [0.1, 0.4, 1.0]:
+    model.set_custom_forcing_generator(ForcingQuasiPeriodic(kappa=kappa))
 
     T, S = model.make_realization()
     forcing = model.get_last_used_forcing()
@@ -70,27 +69,22 @@ for beta in [1000, 100, 10]:
 
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
 
-    ax1.semilogy(f, Pxx, label=rf"$\beta = {beta}$")
+    ax1.semilogy(f, Pxx, label=rf"$\kappa = {kappa}$")
     PSD = PSD_periodic_arrivals(
         2 * np.pi * f, td=1, gamma=0.2, Arms=amp.std(), Am=np.mean(amp), S=S
     )
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
-    ax2.plot(tb, R, label=r"$\beta = 1000$")
-
+    ax2.plot(tb, R, label=rf"$\kappa = {kappa}$")
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, Arms=1, Am=1, S=S)
-
 ax1.semilogy(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(f)$")
-
 t, R_an = calculate_R_an(1, 1, 0.2)
-
-
 ax2.plot(t, R_an, "--k", label=r"$R_{\widetilde{\Phi}}(t)$")
 
-ax1.set_xlim(-0.03, 1)
-ax1.set_ylim(1e-4, 1e2)
 ax1.set_xlabel(r"$f$")
 ax1.set_ylabel(r"$S_{\widetilde{\Phi}}(f)$")
+ax1.set_xlim(-0.03, 1)
+ax1.set_ylim(1e-4, 1e2)
 ax1.legend()
 
 ax2.set_xlim(0, 50)
@@ -99,7 +93,7 @@ ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t)$")
 ax2.legend()
 cosmoplots.change_log_axis_base(ax1, "y", base=10)
 
-fig_PSD.savefig("PSD_different_gamma.eps", bbox_inches="tight")
-fig_AC.savefig("AC_different_gamma.eps", bbox_inches="tight")
+fig_PSD.savefig("PSD_different_kappa.eps", bbox_inches="tight")
+fig_AC.savefig("AC_different_kappa.eps", bbox_inches="tight")
 
 plt.show()
