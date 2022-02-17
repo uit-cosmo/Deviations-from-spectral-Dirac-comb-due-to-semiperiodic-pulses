@@ -1,4 +1,4 @@
-Contains python scripts to generate and plot data used in Manuscript "Dirac comb and exponential frequency spectra in nonlinear dynamics" (arXiv:2106.15904).
+Python scripts to generate and plot data used in Manuscript "Dirac comb and exponential frequency spectra in nonlinear dynamics" (arXiv:2106.15904).
 
 ### Requirements
  - `numpy = 1.21.2`
