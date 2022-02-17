@@ -26,5 +26,6 @@ python plot_lorentz_time_series.py       # Figure 1
 python create_figure_2.py                # Figure 2
 python create_figure_3.py                # Figure 3
 python create_figure_4.py                # Figure 4
-python plot_lorentz_time_series.py --fit # Figure 5
+python create_figure_5.py                # Figure 5
+python plot_lorentz_time_series.py --fit # Figure 6
 ```
