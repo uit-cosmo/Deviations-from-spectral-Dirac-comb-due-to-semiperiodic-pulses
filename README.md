@@ -3,12 +3,14 @@
 Contains python scripts to generate and plot data used in Manuscript "Dirac comb and exponential frequency spectra in nonlinear dynamics" (arXiv:2106.15904).
 
 # Requirements
- - `numpy >= 1.21.2`
- - `scipy >= 1.7.3`
- - `matplotlib >= 3.5.0`
- - `click >= 8.0.3`
- - `superposed-pulses >= 1.2`
- - `cosmoplots >= 0.1.3`
+ - `numpy = 1.21.2`
+ - `scipy = 1.7.3`
+ - `matplotlib = 3.5.0`
+ - `click = 8.0.3`
+ - `superposed-pulses = 1.2`
+ - `cosmoplots = 0.1.3`
+
+Compatibility with other package version is not tested.
 
  # Use
 
