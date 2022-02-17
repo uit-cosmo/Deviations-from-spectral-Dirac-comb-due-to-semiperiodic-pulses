@@ -71,7 +71,9 @@ class AsymLaplaceAmp(frc.ForcingGenerator):
 
     def get_forcing(self, times: np.ndarray, gamma: float) -> frc.Forcing:
         total_pulses = int(max(times) * gamma)
-        arrival_time_indx = np.random.randint(0, len(times), size=total_pulses)
+        arrival_time_indx = (
+            np.arange(start=0, stop=99994, step=5) * 100
+        )  # multiplied with inverse dt
         kappa = 0.5
         amplitudes = sample_asymm_laplace(
             alpha=0.5 / np.sqrt(1.0 - 2.0 * kappa * (1.0 - kappa)),
