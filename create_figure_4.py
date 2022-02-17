@@ -78,9 +78,7 @@ for beta in [1000, 100, 10]:
     ax2.plot(tb, R, label=r"$\beta = 1000$")
 
 
-PSD = PSD_periodic_arrivals(
-    2 * np.pi * f, td=1, gamma=0.2, Arms=amp.std(), Am=np.mean(amp), S=S
-)
+PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, Arms=1, Am=1, S=S)
 
 ax1.semilogy(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(f)$")
 

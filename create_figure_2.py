@@ -53,9 +53,7 @@ t, R_an = calculate_R_an(1, 1, 0.2)
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 
 ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Exp}$")
-PSD = PSD_periodic_arrivals(
-    2 * np.pi * f, td=1, gamma=0.2, Arms=amp.std(), Am=np.mean(amp), S=S
-)
+PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, Arms=1, Am=1, S=S)
 ax1.semilogy(
     f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(f), \, \langle A \rangle \ne 0$"
 )
@@ -108,9 +106,7 @@ t, R_an = calculate_R_an(0, 1, 0.2)
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 
 ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Laplace}$")
-PSD = PSD_periodic_arrivals(
-    2 * np.pi * f, td=1, gamma=0.2, Arms=amp.std(), Am=np.mean(amp), S=S
-)
+PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, Arms=1, Am=0, S=S)
 ax1.semilogy(
     f, PSD, "--g", label=r"$S_{\widetilde{\Phi}}(f), \, \langle A \rangle = 0$"
 )
