@@ -109,6 +109,7 @@ def plot_time_series(regime, T, time_series, fit, time_series_fit):
     plt.xlim(0, 10)
     plt.ylim(-2.2, 2.4)
     plt.ylabel(r"$\widetilde{x}$")
+    plt.xlabel(r"$t$")
 
     if regime == "rho=28":
         # x-axis is shifted by 10 for illustrative purposes
@@ -116,21 +117,18 @@ def plot_time_series(regime, T, time_series, fit, time_series_fit):
         plt.text(x=8.25, y=2.1, s=r"$\rho = 28$")
         if fit:
             plt.plot(T - 10, time_series_fit, "--")
-        plt.xlabel(r"$t \, \texttt{+} \, 10$")
 
     if regime == "rho=220":
         plt.plot(T, time_series, label=r"$\rho = 220$")
         plt.text(x=8.25, y=2.1, s=r"$\rho = 220$")
         if fit:
             plt.plot(T, time_series_fit, "--")
-        plt.xlabel(r"$t$")
 
     if regime == "rho=350":
         plt.plot(T, time_series, label=r"$\rho = 350$")
         plt.text(x=8.25, y=2.1, s=r"$\rho = 350$")
         if fit:
             plt.plot(T, time_series_fit, "--")
-        plt.xlabel(r"$t$")
 
     if fit:
         plt.savefig(f"time_series_{regime}_fit.eps", bbox_inches="tight")
