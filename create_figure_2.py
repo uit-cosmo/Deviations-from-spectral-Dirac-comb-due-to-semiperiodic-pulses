@@ -49,7 +49,8 @@ forcing = model.get_last_used_forcing()
 amp = forcing.amplitudes
 
 S_norm = (S - S.mean()) / S.std()
-t, R_an = calculate_R_an(1, 1, 0.2)
+t = np.linspace(0, 50, 1000)
+t, R_an = calculate_R_an(t, 1, 1, 0.2)
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 
 ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Exp}$")
@@ -102,7 +103,7 @@ forcing = model.get_last_used_forcing()
 amp = forcing.amplitudes
 
 S_norm = (S - S.mean()) / S.std()
-t, R_an = calculate_R_an(0, 1, 0.2)
+t, R_an = calculate_R_an(t, 0, 1, 0.2)
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 
 ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Laplace}$")

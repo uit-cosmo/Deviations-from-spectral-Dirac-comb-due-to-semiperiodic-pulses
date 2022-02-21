@@ -81,8 +81,8 @@ for beta in [1000, 100, 10]:
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, Arms=1, Am=1, S=S)
 
 ax1.semilogy(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(f)$")
-
-t, R_an = calculate_R_an(1, 1, 0.2)
+t = np.linspace(0, 50, 1000)
+t, R_an = calculate_R_an(t, 1, 1, 0.2)
 
 
 ax2.plot(t, R_an, "--k", label=r"$R_{\widetilde{\Phi}}(t)$")

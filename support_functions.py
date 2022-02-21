@@ -106,26 +106,29 @@ def PSD_periodic_arrivals(w, td, gamma, Arms, Am, S):
     return tmp / S.std() ** 2
 
 
-def autocorr_periodic_arrivals(t, gamma, Arms, td, Am):
-    tmp = 0
+def autocorr_periodic_arrivals(t, gamma, A_rms, td, A_mean):
     I_2 = 1 / (2 * np.pi)
-    tmp += gamma * Arms**2 * I_2 * Lorentz_pulse(t / td)
-    for i in range(-1000, 1000):
-        tmp += gamma * Am**2 * I_2 * Lorentz_pulse(i / gamma + t / td)
+    central_peak = gamma * A_rms**2 * I_2 * Lorentz_pulse(t / td)
+    oscillation = (
+        gamma
+        * np.pi
+        * (
+            1 / np.tanh(2 * np.pi * gamma - 1j * gamma * np.pi * t / td)
+            + 1 / np.tanh(2 * np.pi * gamma + 1j * gamma * np.pi * t / td)
+        )
+    )
+    return central_peak + gamma * A_mean**2 * I_2 * oscillation.astype("float64")
 
-    return tmp
 
-
-def calculate_R_an(mean_A, Arms, gamma):
+def calculate_R_an(t, A_mean, A_rms, gamma):
     I_2 = 1 / (2 * np.pi)
-    an_rms = (
-        gamma * Arms**2 * I_2
+    Phi_rms = (
+        gamma * A_rms**2 * I_2
         + gamma
-        * mean_A**2
+        * A_mean**2
         * I_2
         * (2 * np.pi * gamma * (1 / np.tanh(2 * np.pi * gamma)) - gamma / I_2)
     ) ** 0.5
-    t = np.linspace(0, 50, 1000)
-    anPhi = 0.2 * mean_A * 1
-    R_an = autocorr_periodic_arrivals(t, gamma=0.2, Arms=Arms, td=1, Am=mean_A)
-    return t, (R_an - anPhi**2) / an_rms**2
+    Phi_mean = 0.2 * A_mean * 1
+    R = autocorr_periodic_arrivals(t, gamma=0.2, A_rms=A_rms, td=1, A_mean=A_mean)
+    return t, (R - Phi_mean**2) / Phi_rms**2
