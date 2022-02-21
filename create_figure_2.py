@@ -50,11 +50,11 @@ amp = forcing.amplitudes
 
 S_norm = (S - S.mean()) / S.std()
 t = np.linspace(0, 50, 1000)
-t, R_an = calculate_R_an(t, 1, 1, 0.2)
+R_an = autocorr_periodic_arrivals(t, gamma=0.2, A_mean=1, A_rms=1, td=1, norm=True)
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 
 ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Exp}$")
-PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, Arms=1, Am=1, S=S)
+PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
 ax1.semilogy(
     f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(f), \, \langle A \rangle \ne 0$"
 )
@@ -103,11 +103,11 @@ forcing = model.get_last_used_forcing()
 amp = forcing.amplitudes
 
 S_norm = (S - S.mean()) / S.std()
-t, R_an = calculate_R_an(t, 0, 1, 0.2)
+R_an = autocorr_periodic_arrivals(t, gamma=0.2, A_mean=0, A_rms=1, td=1, norm=True)
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 
 ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Laplace}$")
-PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, Arms=1, Am=0, S=S)
+PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=0, dt=0.01)
 ax1.semilogy(
     f, PSD, "--g", label=r"$S_{\widetilde{\Phi}}(f), \, \langle A \rangle = 0$"
 )

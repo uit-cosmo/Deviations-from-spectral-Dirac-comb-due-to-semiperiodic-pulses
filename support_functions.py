@@ -91,22 +91,31 @@ def find_nearest(array, value):
     return array[idx]
 
 
-def PSD_periodic_arrivals(w, td, gamma, Arms, Am, S):
-    lpsd = td * gamma * Arms**2 / (2 * np.pi) * Lorentz_PSD(td * w)
-    tmp = np.zeros(w.size)
+def PSD_periodic_arrivals(omega, td, gamma, A_rms, A_mean, dt, norm=True):
+    I_2 = 1 / (2 * np.pi)
+    first_term = td * gamma * A_rms**2 * I_2 * Lorentz_PSD(td * omega)
+    tmp = np.zeros(omega.size)
     index = np.zeros(1000)
-    for i in range(1, 1000):
-        index = 2 * np.pi * gamma * i
-        tmp = np.where(np.abs(w - find_nearest(w, index)) > 0.001, tmp, 1)
+    for n in range(1, 1000):
+        index = 2 * np.pi * n * gamma
+        tmp = np.where(np.abs(omega - find_nearest(omega, index)) > 0.001, tmp, 1)
 
-    tmp = tmp * td * gamma**2 * Am**2 * Lorentz_PSD(td * w)
+    PSD = (
+        2 * np.pi * td * gamma**2 * A_mean**2 * I_2 * Lorentz_PSD(td * omega) * tmp
+    )
 
-    tmp = 2 * (lpsd + 100 * tmp)
-    tmp[0] = tmp[0] - S.mean() ** 2 * 2 * np.pi
-    return tmp / S.std() ** 2
+    # imitate finite amplitude in PSD  due to numerical discretization
+    PSD = 2 * (first_term + PSD / dt)
+
+    if norm:
+        Phi_rms = Phi_rms_periodic_lorentz(gamma, A_rms, A_mean)
+        Phi_mean = Phi_mean_periodic_lorentz(gamma, A_mean)
+        PSD[0] = PSD[0] - Phi_mean**2 * 2 * np.pi
+        return PSD / Phi_rms**2
+    return PSD
 
 
-def autocorr_periodic_arrivals(t, gamma, A_rms, td, A_mean):
+def autocorr_periodic_arrivals(t, gamma, A_mean, A_rms, td, norm=True):
     I_2 = 1 / (2 * np.pi)
     central_peak = gamma * A_rms**2 * I_2 * Lorentz_pulse(t / td)
     oscillation = (
@@ -117,18 +126,25 @@ def autocorr_periodic_arrivals(t, gamma, A_rms, td, A_mean):
             + 1 / np.tanh(2 * np.pi * gamma + 1j * gamma * np.pi * t / td)
         )
     )
-    return central_peak + gamma * A_mean**2 * I_2 * oscillation.astype("float64")
+    R = central_peak + gamma * A_mean**2 * I_2 * oscillation.astype("float64")
+    if norm:
+        Phi_rms = Phi_rms_periodic_lorentz(gamma, A_rms, A_mean)
+        Phi_mean = Phi_mean_periodic_lorentz(gamma, A_mean)
+        return (R - Phi_mean**2) / Phi_rms**2
+    return R
 
 
-def calculate_R_an(t, A_mean, A_rms, gamma):
+def Phi_rms_periodic_lorentz(gamma, A_rms, A_mean):
     I_2 = 1 / (2 * np.pi)
-    Phi_rms = (
+    return (
         gamma * A_rms**2 * I_2
         + gamma
         * A_mean**2
         * I_2
         * (2 * np.pi * gamma * (1 / np.tanh(2 * np.pi * gamma)) - gamma / I_2)
     ) ** 0.5
-    Phi_mean = 0.2 * A_mean * 1
-    R = autocorr_periodic_arrivals(t, gamma=0.2, A_rms=A_rms, td=1, A_mean=A_mean)
-    return t, (R - Phi_mean**2) / Phi_rms**2
+
+
+def Phi_mean_periodic_lorentz(gamma, A_mean):
+    I_1 = 1
+    return gamma * A_mean * I_1

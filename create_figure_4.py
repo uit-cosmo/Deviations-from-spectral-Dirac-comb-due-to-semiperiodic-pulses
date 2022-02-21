@@ -71,15 +71,15 @@ for kappa in [0.1, 0.4, 1.0]:
 
     ax1.semilogy(f, Pxx, label=rf"$\kappa = {kappa}$")
     PSD = PSD_periodic_arrivals(
-        2 * np.pi * f, td=1, gamma=0.2, Arms=amp.std(), Am=np.mean(amp), S=S
+        2 * np.pi * f, td=1, gamma=0.2, A_rms=amp.std(), A_mean=np.mean(amp), dt=0.01
     )
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
     ax2.plot(tb, R, label=rf"$\kappa = {kappa}$")
 
-PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, Arms=1, Am=1, S=S)
+PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
 ax1.semilogy(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(f)$")
 t = np.linspace(0, 50, 1000)
-t, R_an = calculate_R_an(t, 1, 1, 0.2)
+R_an = autocorr_periodic_arrivals(t, 0.2, 1, 1, 1)
 ax2.plot(t, R_an, "--k", label=r"$R_{\widetilde{\Phi}}(t)$")
 
 ax1.set_xlabel(r"$f$")

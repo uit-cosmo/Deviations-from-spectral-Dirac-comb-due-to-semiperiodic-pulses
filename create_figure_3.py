@@ -65,7 +65,7 @@ for control_parameter in [0.2, 0.4, 0.45, 0.48]:
 
     ax1.semilogy(f, Pxx, label=rf"$\lambda = {control_parameter}$")
     PSD = PSD_periodic_arrivals(
-        2 * np.pi * f, td=1, gamma=0.2, Arms=amp.std(), Am=np.mean(amp), S=S
+        2 * np.pi * f, td=1, gamma=0.2, A_rms=amp.std(), A_mean=np.mean(amp), dt=0.01
     )
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
     ax2.plot(tb, R, label=rf"$\lambda = {control_parameter}$")
