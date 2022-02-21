@@ -6,6 +6,7 @@ from support_functions import *
 import model.forcing as frc
 import model.point_model as pm
 import model.pulse_shape as ps
+from closedexpressions import PSD_periodic_arrivals, autocorr_periodic_arrivals
 
 axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
@@ -49,11 +50,10 @@ forcing = model.get_last_used_forcing()
 amp = forcing.amplitudes
 
 S_norm = (S - S.mean()) / S.std()
-t = np.linspace(0, 50, 1000)
-R_an = autocorr_periodic_arrivals(t, gamma=0.2, A_mean=1, A_rms=1, td=1, norm=True)
-f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 
+f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Exp}$")
+
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
 ax1.semilogy(
     f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(f), \, \langle A \rangle \ne 0$"
@@ -61,6 +61,9 @@ ax1.semilogy(
 
 tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
 ax2.plot(tb, R, label=r"$A \sim \mathrm{Exp}$")
+
+t = np.linspace(0, 50, 1000)
+R_an = autocorr_periodic_arrivals(t, gamma=0.2, A_mean=1, A_rms=1, norm=True)
 ax2.plot(t, R_an, "--k", label=r"$R_{\widetilde{\Phi}}(t),\, \langle A \rangle \ne 0$")
 
 
@@ -103,10 +106,10 @@ forcing = model.get_last_used_forcing()
 amp = forcing.amplitudes
 
 S_norm = (S - S.mean()) / S.std()
-R_an = autocorr_periodic_arrivals(t, gamma=0.2, A_mean=0, A_rms=1, td=1, norm=True)
-f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 
+f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Laplace}$")
+
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=0, dt=0.01)
 ax1.semilogy(
     f, PSD, "--g", label=r"$S_{\widetilde{\Phi}}(f), \, \langle A \rangle = 0$"
@@ -114,6 +117,8 @@ ax1.semilogy(
 
 tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
 ax2.plot(tb, R, label=r"$A \sim \mathrm{Laplace}$")
+
+R_an = autocorr_periodic_arrivals(t, gamma=0.2, A_mean=0, A_rms=1, norm=True)
 ax2.plot(t, R_an, "--g", label=r"$R_{\widetilde{\Phi}}(t), \, \langle A \rangle = 0$")
 
 ax1.set_xlim(-0.2, 12)
