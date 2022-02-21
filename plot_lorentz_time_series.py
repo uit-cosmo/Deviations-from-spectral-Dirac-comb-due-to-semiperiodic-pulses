@@ -49,7 +49,7 @@ def generate_fpp(var, normalized_data, tkern, dt, td, T):
     return time_series_fit
 
 
-def calculate_fitrange(regime, f, dt, S):
+def calculate_fitrange(regime, f, dt, PSD):
     """calculates frequency range used for fit"""
     if regime == "rho=28":
         fitrange = (f > 2) & (f < 25)
@@ -61,7 +61,7 @@ def calculate_fitrange(regime, f, dt, S):
         height = {"rho=220": [1e-11, 1e3], "rho=350": [2e-16, 1e3]}
 
         fitrange = find_peaks(
-            S[fitrange[regime]], distance=distance[regime], height=height[regime]
+            PSD[fitrange[regime]], distance=distance[regime], height=height[regime]
         )[0]
         symbols = "o"
     return fitrange, symbols
@@ -73,11 +73,11 @@ def calculate_duration_time(f, S):
     return -p[0] / (4 * np.pi)
 
 
-def create_fit(regime, f, dt, S, normalized_data, T):
+def create_fit(regime, f, dt, PSD, normalized_data, T):
     """calculates fit for Lorenz system time series"""
-    fitrange, symbols = calculate_fitrange(regime, f, dt, S)
+    fitrange, symbols = calculate_fitrange(regime, f, dt, PSD)
 
-    duration_time = calculate_duration_time(f[fitrange], S[fitrange])
+    duration_time = calculate_duration_time(f[fitrange], PSD[fitrange])
 
     kernrad = 2**18
     time_kern = np.arange(-kernrad, kernrad + 1) * dt
@@ -136,16 +136,16 @@ def plot_time_series(regime, T, time_series, fit, time_series_fit):
         plt.savefig(f"time_series_{regime}.eps", bbox_inches="tight")
 
 
-def plot_spectral_density(regime, f, S, fit, f_fit, S_fit, symbols, fitrange):
+def plot_spectral_density(regime, f, PSD, fit, f_fit, PSD_fit, symbols, fitrange):
     """creates plots of power spectral density"""
     plt.figure(f"{regime} PSD x fit td")
 
-    plt.semilogy(f, S, c="tab:blue")
+    plt.semilogy(f, PSD, c="tab:blue")
 
     if fit:
-        plt.semilogy(f[fitrange], S[fitrange], symbols, c="tab:blue")
-        plt.semilogy(f_fit[fitrange], S_fit[fitrange], symbols, c="tab:orange")
-        plt.semilogy(f_fit, S_fit, c="tab:orange")
+        plt.semilogy(f[fitrange], PSD[fitrange], symbols, c="tab:blue")
+        plt.semilogy(f_fit[fitrange], PSD_fit[fitrange], symbols, c="tab:orange")
+        plt.semilogy(f_fit, PSD_fit, c="tab:orange")
 
     plt.xlim(-2, 40)
     plt.ylim(1e-23, 1e4)
@@ -181,14 +181,14 @@ def create_figures(fit):
         normalizes_time_series = (data - data.mean()) / data.std()
 
         dt = 1e-3
-        f, S = welch(normalizes_time_series, 1.0 / dt, nperseg=2**20)
+        f, PSD = welch(normalizes_time_series, 1.0 / dt, nperseg=2**20)
 
         time_series_fit, fitrange, symbols = create_fit(
-            regime, f, dt, S, normalizes_time_series, T
+            regime, f, dt, PSD, normalizes_time_series, T
         )
-        f_fit, S_fit = welch(time_series_fit, 1.0 / dt, nperseg=2**20)
+        f_fit, PSD_fit = welch(time_series_fit, 1.0 / dt, nperseg=2**20)
 
-        plot_spectral_density(regime, f, S, fit, f_fit, S_fit, symbols, fitrange)
+        plot_spectral_density(regime, f, PSD, fit, f_fit, PSD_fit, symbols, fitrange)
         plot_time_series(regime, T, normalizes_time_series, fit, time_series_fit)
 
 
