@@ -6,6 +6,7 @@ from support_functions import *
 import model.forcing as frc
 import model.point_model as pm
 import model.pulse_shape as ps
+from scipy.signal import find_peaks
 
 axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
@@ -50,7 +51,9 @@ class AsymLaplaceAmp(frc.ForcingGenerator):
 model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 
-for control_parameter in [0.2, 0.4, 0.45, 0.48]:
+plot_colors = ["tab:blue", "tab:orange", "tab:green", "tab:red"]
+
+for control_parameter, color in zip([0.2, 0.4, 0.45, 0.48], plot_colors):
     model.set_custom_forcing_generator(
         AsymLaplaceAmp(control_parameter=control_parameter)
     )
@@ -62,20 +65,13 @@ for control_parameter in [0.2, 0.4, 0.45, 0.48]:
     S_norm = (S - S.mean()) / S.std()
 
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
+    ax1.semilogy(f, Pxx, label=rf"$\lambda = {control_parameter}$", c=color)
 
-    ax1.semilogy(f, Pxx, label=rf"$\lambda = {control_parameter}$")
-    PSD = PSD_periodic_arrivals(
-        2 * np.pi * f, td=1, gamma=0.2, A_rms=amp.std(), A_mean=np.mean(amp), dt=0.01
-    )
+    fitrange = find_peaks(Pxx[(f < 1)], distance=500, height=[5e-4, 1e3])[0]
+    ax1.semilogy(f[fitrange][1:], Pxx[fitrange][1:], "o", c=color)
+
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
-    ax2.plot(tb, R, label=rf"$\lambda = {control_parameter}$")
-
-# t, R_an = calculate_R_an(0, 1, 0.2)
-
-# PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, Arms=1, Am=0, S=S)
-# ax1.semilogy(f, PSD, "--k", label=r"$\alpha=0.5$")
-
-# ax2.plot(t, R_an, "--k", label=r"$\alpha=0.5$")
+    ax2.plot(tb, R, label=rf"$\lambda = {control_parameter}$", c=color)
 
 ax1.set_xlim(-0.2, 12)
 ax1.set_ylim(1e-14, 1e3)
