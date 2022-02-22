@@ -24,6 +24,7 @@ python plot_lorentz_time_series.py --fit # Figure 6
  - `matplotlib = 3.5.0`
  - `click = 8.0.3`
  - `superposed-pulses = 1.2`
- - `cosmoplots = 0.1.3`
+ - `cosmoplots = 0.1.5`
+ - `closedexpressions = 0.1.1`
 
 Compatibility with other package version is not tested.
