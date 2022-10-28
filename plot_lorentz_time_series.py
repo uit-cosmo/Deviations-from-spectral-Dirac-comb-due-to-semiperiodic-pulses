@@ -49,18 +49,6 @@ def generate_fpp(var, normalized_data, tkern, dt, td, T):
     return time_series_fit
 
 
-def generate_forcing(var, normalized_data, T):
-    """generated forcing of normalized filtered point process as a fit for given data"""
-    pos_peak_loc = find_peaks(normalized_data, height=1)[0]
-    neg_peak_loc = find_peaks(-normalized_data, height=1)[0]
-    pos_scale, neg_scale, _, _ = var
-    forcing = np.zeros(T.size)
-    forcing[pos_peak_loc] = normalized_data[pos_peak_loc] * pos_scale
-    forcing[neg_peak_loc] = normalized_data[neg_peak_loc] * neg_scale
-
-    return forcing
-
-
 def calculate_fitrange(regime, f, dt, PSD):
     """calculates frequency range used for fit"""
     if regime == "rho=28":

@@ -140,3 +140,6 @@ plot_forcing.py
 
 # local vscode parameters
 .vscode
+
+# .png plots
+*.png
