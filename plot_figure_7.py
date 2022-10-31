@@ -71,14 +71,22 @@ def create_figures(fit=True):
         time_series_fit, _, _ = create_fit(
             regime, f, dt, PSD, normalizes_time_series, T, constant_amplitudes=False
         )
-        f_fit, PSD_fit = welch(time_series_fit, 1.0 / dt, nperseg=2**19)
+
+        normalized_forcing_fit = (
+            time_series_fit - time_series_fit.mean()
+        ) / time_series_fit.std()
+
+        f_fit, PSD_fit = welch(normalized_forcing_fit, 1.0 / dt, nperseg=2**19)
 
         plt.semilogy(f_fit, PSD_fit, c="tab:blue")
 
         time_series_fit, _, _ = create_fit(
             regime, f, dt, PSD, normalizes_time_series, T, constant_amplitudes=True
         )
-        f_fit, PSD_fit = welch(time_series_fit, 1.0 / dt, nperseg=2**19)
+        normalized_forcing_fit = (
+            time_series_fit - time_series_fit.mean()
+        ) / time_series_fit.std()
+        f_fit, PSD_fit = welch(normalized_forcing_fit, 1.0 / dt, nperseg=2**19)
         plt.semilogy(
             f_fit,
             PSD_fit,
