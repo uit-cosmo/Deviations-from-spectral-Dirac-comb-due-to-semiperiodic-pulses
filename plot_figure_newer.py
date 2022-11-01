@@ -52,10 +52,15 @@ def generate_forcing(var, normalized_data, T, constant_amplitudes):
     return forcing
 
 
+def extract_waiting_times(T, forcing):
+    arrival_times = T[forcing != 0]
+    return np.diff(arrival_times)
+
+
 def create_figures(fit=True):
     """Creates figure 1 and 5 in manuscript arXiv:2106.15904"""
 
-    regimes = ["rho=350"]
+    regimes = ["rho=28"]
 
     _ = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
@@ -71,6 +76,12 @@ def create_figures(fit=True):
         time_series_fit, _, _ = create_fit(
             regime, f, dt, PSD, normalizes_time_series, T, constant_amplitudes=False
         )
+        waiting_times = extract_waiting_times(T, time_series_fit)
+        plt.hist(waiting_times, bins=64, density=True)
+        plt.xlabel(r"$\tau_w$")
+        plt.ylabel(r"$P(\tau_w)$")
+        plt.title(regimes)
+        plt.show()
 
         normalized_forcing_fit = (
             time_series_fit - time_series_fit.mean()
