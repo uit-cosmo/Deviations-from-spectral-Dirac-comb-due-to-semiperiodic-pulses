@@ -8,7 +8,7 @@ from plot_lorentz_time_series import (
     calculate_fitrange,
 )
 from scipy.optimize import minimize, curve_fit
-from fppanalysis import get_hist
+from fppanalysis import get_hist, joint_pdf
 import scipy as sp
 
 
@@ -54,10 +54,6 @@ def generate_forcing(var, normalized_data, T, constant_amplitudes):
     return forcing
 
 
-def gamma_wrapper(bins, a, scale, loc):
-    return sp.stats.gamma.pdf(bins, a=a, scale=scale, loc=loc)
-
-
 def lognormal_wrapper(bins, s, scale, loc):
     return sp.stats.lognorm.pdf(bins, s=s, scale=scale, loc=0.6)
 
@@ -65,6 +61,10 @@ def lognormal_wrapper(bins, s, scale, loc):
 def extract_waiting_times(T, forcing):
     arrival_times = T[forcing != 0]
     return np.diff(arrival_times)
+
+
+def extract_amplitudes(forcing):
+    return forcing[forcing != 0]
 
 
 def create_figures(fit=True):
@@ -87,27 +87,34 @@ def create_figures(fit=True):
             regime, f, dt, PSD, normalizes_time_series, T, constant_amplitudes=False
         )
         waiting_times = extract_waiting_times(T, time_series_fit)
-        bin_centers, waiting_times_hist = get_hist(waiting_times, 64)
-        # param_gamma, _ = curve_fit(gamma_wrapper, bin_centers, waiting_times_hist)
-        param_lognorm, _ = curve_fit(lognormal_wrapper, bin_centers, waiting_times_hist)
-        # print(param_gamma)
-        print(param_lognorm)
-        plt.plot(bin_centers, waiting_times_hist)
-        # plt.plot(
-        #     bin_centers,
-        #     gamma_wrapper(bin_centers, *param_gamma),
-        #     label="gamma dist",
-        # )
-        plt.plot(
-            bin_centers,
-            lognormal_wrapper(bin_centers, *param_lognorm),
-            label="lognorm dist shape=0.74, scale=0.13, loc=0.6",
-        )
-        plt.xlabel(r"$\tau_w$")
-        plt.ylabel(r"$P(\tau_w)$")
-        plt.title(regimes)
+        amplitudes = extract_amplitudes(time_series_fit)
+
+        plt.scatter(amplitudes[1:], waiting_times, label="A")
+        plt.scatter(-amplitudes[1:], waiting_times, label="-A")
+        plt.xlabel(r"$A$")
+        plt.ylabel(r"$\tau_w$")
         plt.legend()
         plt.show()
+
+        # H, xx, yy = joint_pdf(waiting_times, amplitudes[1:], N=64, pdfs=False)
+        # # X, Y = np.meshgrid(xx, yy)
+        # plt.contourf(xx, yy, H)
+        # plt.xlabel(r"$\tau_w$")
+        # plt.ylabel(r"$A$")
+        # plt.show()
+        # bin_centers, waiting_times_hist = get_hist(waiting_times, 64)
+        # param_lognorm, _ = curve_fit(lognormal_wrapper, bin_centers, waiting_times_hist)
+        # plt.plot(bin_centers, waiting_times_hist)
+        # plt.plot(
+        #     bin_centers,
+        #     lognormal_wrapper(bin_centers, *param_lognorm),
+        #     label="lognorm dist shape=0.74, scale=0.13, loc=0.6",
+        # )
+        # plt.xlabel(r"$\tau_w$")
+        # plt.ylabel(r"$P(\tau_w)$")
+        # plt.title(regimes)
+        # plt.legend()
+        # plt.show()
 
         normalized_forcing_fit = (
             time_series_fit - time_series_fit.mean()
