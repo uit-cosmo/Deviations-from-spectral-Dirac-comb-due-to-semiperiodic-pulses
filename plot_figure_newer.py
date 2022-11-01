@@ -7,7 +7,9 @@ from plot_lorentz_time_series import (
     calculate_duration_time,
     calculate_fitrange,
 )
-from scipy.optimize import minimize
+from scipy.optimize import minimize, curve_fit
+from fppanalysis import get_hist
+import scipy as sp
 
 
 def create_fit(regime, f, dt, PSD, normalized_data, T, constant_amplitudes):
@@ -52,6 +54,14 @@ def generate_forcing(var, normalized_data, T, constant_amplitudes):
     return forcing
 
 
+def gamma_wrapper(bins, a, scale, loc):
+    return sp.stats.gamma.pdf(bins, a=a, scale=scale, loc=loc)
+
+
+def lognormal_wrapper(bins, s, scale, loc):
+    return sp.stats.lognorm.pdf(bins, s=s, scale=scale, loc=0.6)
+
+
 def extract_waiting_times(T, forcing):
     arrival_times = T[forcing != 0]
     return np.diff(arrival_times)
@@ -77,10 +87,26 @@ def create_figures(fit=True):
             regime, f, dt, PSD, normalizes_time_series, T, constant_amplitudes=False
         )
         waiting_times = extract_waiting_times(T, time_series_fit)
-        plt.hist(waiting_times, bins=64, density=True)
+        bin_centers, waiting_times_hist = get_hist(waiting_times, 64)
+        # param_gamma, _ = curve_fit(gamma_wrapper, bin_centers, waiting_times_hist)
+        param_lognorm, _ = curve_fit(lognormal_wrapper, bin_centers, waiting_times_hist)
+        # print(param_gamma)
+        print(param_lognorm)
+        plt.plot(bin_centers, waiting_times_hist)
+        # plt.plot(
+        #     bin_centers,
+        #     gamma_wrapper(bin_centers, *param_gamma),
+        #     label="gamma dist",
+        # )
+        plt.plot(
+            bin_centers,
+            lognormal_wrapper(bin_centers, *param_lognorm),
+            label="lognorm dist shape=0.74, scale=0.13, loc=0.6",
+        )
         plt.xlabel(r"$\tau_w$")
         plt.ylabel(r"$P(\tau_w)$")
         plt.title(regimes)
+        plt.legend()
         plt.show()
 
         normalized_forcing_fit = (
