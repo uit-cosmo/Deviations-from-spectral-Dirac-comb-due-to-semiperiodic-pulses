@@ -8,7 +8,7 @@ from plot_lorentz_time_series import (
     calculate_fitrange,
 )
 from scipy.optimize import minimize, curve_fit
-from fppanalysis import get_hist, joint_pdf
+from fppanalysis import get_hist, joint_pdf, corr_fun
 import scipy as sp
 
 
@@ -88,13 +88,21 @@ def create_figures(fit=True):
         )
         waiting_times = extract_waiting_times(T, time_series_fit)
         amplitudes = extract_amplitudes(time_series_fit)
+        print(amplitudes)
+        tb, R = corr_fun(amplitudes, amplitudes, 1)
 
-        plt.scatter(amplitudes[1:], waiting_times, label="A")
-        plt.scatter(-amplitudes[1:], waiting_times, label="-A")
-        plt.xlabel(r"$A$")
-        plt.ylabel(r"$\tau_w$")
-        plt.legend()
+        plt.plot(tb, R, "--o")
+        plt.xlabel(r"$n$")
+        plt.ylabel(r"$R(A_n)$")
+        plt.xlim(0, 20)
         plt.show()
+
+        # plt.scatter(amplitudes[1:], waiting_times, label="A")
+        # plt.scatter(-amplitudes[1:], waiting_times, label="-A")
+        # plt.xlabel(r"$A$")
+        # plt.ylabel(r"$\tau_w$")
+        # plt.legend()
+        # plt.show()
 
         # H, xx, yy = joint_pdf(waiting_times, amplitudes[1:], N=64, pdfs=False)
         # # X, Y = np.meshgrid(xx, yy)
