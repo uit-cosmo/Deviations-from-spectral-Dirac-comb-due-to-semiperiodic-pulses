@@ -70,84 +70,83 @@ def extract_amplitudes(forcing):
 def create_figures(fit=True):
     """Creates figure 1 and 5 in manuscript arXiv:2106.15904"""
 
-    regimes = ["rho=28"]
+    regime = "rho=28"
 
     _ = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
-    for regime in regimes:
-        T, res = load_system(regime)
-        # Choose x-variable for Lorenz
-        data = res[0, :]
-        normalizes_time_series = (data - data.mean()) / data.std()
+    T, res = load_system(regime)
+    # Choose x-variable for Lorenz
+    data = res[0, :]
+    normalizes_time_series = (data - data.mean()) / data.std()
 
-        dt = 1e-3
-        f, PSD = welch(normalizes_time_series, 1.0 / dt, nperseg=2**19)
+    dt = 1e-3
+    f, PSD = welch(normalizes_time_series, 1.0 / dt, nperseg=2**19)
 
-        time_series_fit, _, _ = create_fit(
-            regime, f, dt, PSD, normalizes_time_series, T, constant_amplitudes=False
-        )
-        waiting_times = extract_waiting_times(T, time_series_fit)
-        amplitudes = extract_amplitudes(time_series_fit)
-        print(amplitudes)
-        tb, R = corr_fun(amplitudes, amplitudes, 1)
+    time_series_fit, _, _ = create_fit(
+        regime, f, dt, PSD, normalizes_time_series, T, constant_amplitudes=False
+    )
+    waiting_times = extract_waiting_times(T, time_series_fit)
+    amplitudes = extract_amplitudes(time_series_fit)
+    tb, R = corr_fun(amplitudes, amplitudes, 1)
 
-        plt.plot(tb, R, "--o")
-        plt.xlabel(r"$n$")
-        plt.ylabel(r"$R(A_n)$")
-        plt.xlim(0, 20)
-        plt.savefig("Corr_A.eps", bbox_inches="tight")
+    plt.plot(tb, R, "--o", linewidth=1.5, markersize=5)
+    plt.xlabel(r"$n$")
+    plt.ylabel(r"$R(A_n)$")
+    plt.xlim(0, 20)
+    plt.savefig("Corr_A.eps", bbox_inches="tight")
 
-        plt.figure()
-        plt.scatter(amplitudes[1:], waiting_times, label="A")
-        plt.scatter(-amplitudes[1:], waiting_times, label="-A")
-        plt.xlabel(r"$A$")
-        plt.ylabel(r"$\tau_w$")
-        plt.legend()
-        plt.savefig("scatter_A_-A.eps", bbox_inches="tight")
+    plt.figure()
+    plt.scatter(amplitudes[1:], waiting_times, label="A")
+    plt.scatter(-amplitudes[1:], waiting_times, label="-A")
+    plt.xlabel(r"$A$")
+    plt.ylabel(r"$\tau_w$")
+    plt.legend()
+    plt.savefig("scatter_A_-A.eps", bbox_inches="tight")
 
-        plt.figure()
-        bin_centers, waiting_times_hist = get_hist(waiting_times, 64)
-        param_lognorm, _ = curve_fit(lognormal_wrapper, bin_centers, waiting_times_hist)
-        plt.plot(bin_centers, waiting_times_hist)
-        plt.plot(
-            bin_centers,
-            lognormal_wrapper(bin_centers, *param_lognorm),
-            label="lognorm dist shape=0.74, scale=0.13, loc=0.6",
-        )
-        plt.xlabel(r"$\tau_w$")
-        plt.ylabel(r"$P(\tau_w)$")
-        plt.legend()
-        plt.ylim(-0.2, 7)
-        plt.savefig("lognorm_fit.eps", bbox_inches="tight")
+    plt.figure()
+    bin_centers, waiting_times_hist = get_hist(waiting_times, 64)
+    param_lognorm, _ = curve_fit(lognormal_wrapper, bin_centers, waiting_times_hist)
+    plt.plot(bin_centers, waiting_times_hist, linewidth=1.5)
+    plt.plot(
+        bin_centers,
+        lognormal_wrapper(bin_centers, *param_lognorm),
+        label="lognorm dist shape=0.74, scale=0.13, loc=0.6",
+        linewidth=1.5,
+    )
+    plt.xlabel(r"$\tau_w$")
+    plt.ylabel(r"$P(\tau_w)$")
+    plt.legend()
+    plt.ylim(-0.2, 7)
+    plt.savefig("lognorm_fit.eps", bbox_inches="tight")
 
-        plt.figure()
-        normalized_forcing_fit = (
-            time_series_fit - time_series_fit.mean()
-        ) / time_series_fit.std()
+    plt.figure()
+    normalized_forcing_fit = (
+        time_series_fit - time_series_fit.mean()
+    ) / time_series_fit.std()
 
-        f_fit, PSD_fit = welch(normalized_forcing_fit, 1.0 / dt, nperseg=2**19)
+    f_fit, PSD_fit = welch(normalized_forcing_fit, 1.0 / dt, nperseg=2**19)
 
-        plt.semilogy(f_fit, PSD_fit, c="tab:blue")
+    plt.semilogy(f_fit, PSD_fit, c="tab:blue")
 
-        time_series_fit, _, _ = create_fit(
-            regime, f, dt, PSD, normalizes_time_series, T, constant_amplitudes=True
-        )
-        normalized_forcing_fit = (
-            time_series_fit - time_series_fit.mean()
-        ) / time_series_fit.std()
-        f_fit, PSD_fit = welch(normalized_forcing_fit, 1.0 / dt, nperseg=2**19)
-        plt.semilogy(
-            f_fit,
-            PSD_fit,
-            c="tab:orange",
-            label=r"constant $A$",
-        )
+    time_series_fit, _, _ = create_fit(
+        regime, f, dt, PSD, normalizes_time_series, T, constant_amplitudes=True
+    )
+    normalized_forcing_fit = (
+        time_series_fit - time_series_fit.mean()
+    ) / time_series_fit.std()
+    f_fit, PSD_fit = welch(normalized_forcing_fit, 1.0 / dt, nperseg=2**19)
+    plt.semilogy(
+        f_fit,
+        PSD_fit,
+        c="tab:orange",
+        label=r"constant $A$",
+    )
 
-        plt.xlabel(r"$f$")
-        plt.ylabel(r"$S_{\widetilde{x}}(f)$")
-        plt.xlim(0, 20)
-        plt.legend()
-        plt.savefig("forcing_spectrum_2e19_rho_28.eps", bbox_inches="tight")
+    plt.xlabel(r"$f$")
+    plt.ylabel(r"$S_{\widetilde{x}}(f)$")
+    plt.xlim(0, 20)
+    plt.legend()
+    plt.savefig("forcing_spectrum_2e19_rho_28.eps", bbox_inches="tight")
 
 
 if __name__ == "__main__":
