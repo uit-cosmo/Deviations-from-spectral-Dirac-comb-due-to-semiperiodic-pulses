@@ -95,35 +95,32 @@ def create_figures(fit=True):
         plt.xlabel(r"$n$")
         plt.ylabel(r"$R(A_n)$")
         plt.xlim(0, 20)
-        plt.show()
+        plt.savefig("Corr_A.eps", bbox_inches="tight")
 
-        # plt.scatter(amplitudes[1:], waiting_times, label="A")
-        # plt.scatter(-amplitudes[1:], waiting_times, label="-A")
-        # plt.xlabel(r"$A$")
-        # plt.ylabel(r"$\tau_w$")
-        # plt.legend()
-        # plt.show()
+        plt.figure()
+        plt.scatter(amplitudes[1:], waiting_times, label="A")
+        plt.scatter(-amplitudes[1:], waiting_times, label="-A")
+        plt.xlabel(r"$A$")
+        plt.ylabel(r"$\tau_w$")
+        plt.legend()
+        plt.savefig("scatter_A_-A.eps", bbox_inches="tight")
 
-        # H, xx, yy = joint_pdf(waiting_times, amplitudes[1:], N=64, pdfs=False)
-        # # X, Y = np.meshgrid(xx, yy)
-        # plt.contourf(xx, yy, H)
-        # plt.xlabel(r"$\tau_w$")
-        # plt.ylabel(r"$A$")
-        # plt.show()
-        # bin_centers, waiting_times_hist = get_hist(waiting_times, 64)
-        # param_lognorm, _ = curve_fit(lognormal_wrapper, bin_centers, waiting_times_hist)
-        # plt.plot(bin_centers, waiting_times_hist)
-        # plt.plot(
-        #     bin_centers,
-        #     lognormal_wrapper(bin_centers, *param_lognorm),
-        #     label="lognorm dist shape=0.74, scale=0.13, loc=0.6",
-        # )
-        # plt.xlabel(r"$\tau_w$")
-        # plt.ylabel(r"$P(\tau_w)$")
-        # plt.title(regimes)
-        # plt.legend()
-        # plt.show()
+        plt.figure()
+        bin_centers, waiting_times_hist = get_hist(waiting_times, 64)
+        param_lognorm, _ = curve_fit(lognormal_wrapper, bin_centers, waiting_times_hist)
+        plt.plot(bin_centers, waiting_times_hist)
+        plt.plot(
+            bin_centers,
+            lognormal_wrapper(bin_centers, *param_lognorm),
+            label="lognorm dist shape=0.74, scale=0.13, loc=0.6",
+        )
+        plt.xlabel(r"$\tau_w$")
+        plt.ylabel(r"$P(\tau_w)$")
+        plt.legend()
+        plt.ylim(-0.2, 7)
+        plt.savefig("lognorm_fit.eps", bbox_inches="tight")
 
+        plt.figure()
         normalized_forcing_fit = (
             time_series_fit - time_series_fit.mean()
         ) / time_series_fit.std()
@@ -150,7 +147,7 @@ def create_figures(fit=True):
         plt.ylabel(r"$S_{\widetilde{x}}(f)$")
         plt.xlim(0, 20)
         plt.legend()
-        plt.show()
+        plt.savefig("forcing_spectrum_2e19_rho_28.eps", bbox_inches="tight")
 
 
 if __name__ == "__main__":
