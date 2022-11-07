@@ -76,20 +76,20 @@ for kappa in [0.1, 0.4, 1.0]:
     ax2.plot(tb, R, label=rf"$\kappa = {kappa}$")
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
-ax1.semilogy(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(f)$")
+ax1.semilogy(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
 t = np.linspace(0, 50, 1000)
 R_an = autocorr_periodic_arrivals(t, 0.2, 1, 1)
-ax2.plot(t, R_an, "--k", label=r"$R_{\widetilde{\Phi}}(t)$")
+ax2.plot(t, R_an, "--k", label=r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
 
-ax1.set_xlabel(r"$f$")
-ax1.set_ylabel(r"$S_{\widetilde{\Phi}}(f)$")
+ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
+ax1.set_ylabel(r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
 ax1.set_xlim(-0.03, 1)
 ax1.set_ylim(1e-4, 1e2)
 ax1.legend()
 
 ax2.set_xlim(0, 50)
-ax2.set_xlabel(r"$t$")
-ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t)$")
+ax2.set_xlabel(r"$t/\tau_\mathrm{d}$")
+ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
 ax2.legend()
 cosmoplots.change_log_axis_base(ax1, "y", base=10)
 

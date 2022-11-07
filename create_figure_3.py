@@ -75,15 +75,15 @@ for control_parameter, color in zip([0.2, 0.4, 0.45, 0.48], plot_colors):
 
 ax1.set_xlim(-0.2, 12)
 ax1.set_ylim(1e-14, 1e3)
-ax1.set_xlabel(r"$f$")
-ax1.set_ylabel(r"$S_{\widetilde{\Phi}}(f)$")
+ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
+ax1.set_ylabel(r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
 
 ax1.legend()
 ax1.set_xlim(-0.03, 1)
 ax1.set_ylim(1e-4, 1e3)
 ax2.set_xlim(0, 50)
-ax2.set_xlabel(r"$t$")
-ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t)$")
+ax2.set_xlabel(r"$t/\tau_\mathrm{d}$")
+ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
 ax2.legend()
 cosmoplots.change_log_axis_base(ax1, "y", base=10)
 

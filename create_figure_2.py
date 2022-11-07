@@ -56,7 +56,10 @@ ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Exp}$")
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
 ax1.semilogy(
-    f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(f), \, \langle A \rangle \ne 0$"
+    f,
+    PSD,
+    "--k",
+    label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f), \, \langle A \rangle \ne 0$",
 )
 
 tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
@@ -64,7 +67,12 @@ ax2.plot(tb, R, label=r"$A \sim \mathrm{Exp}$")
 
 t = np.linspace(0, 50, 1000)
 R_an = autocorr_periodic_arrivals(t, gamma=0.2, A_mean=1, A_rms=1, norm=True)
-ax2.plot(t, R_an, "--k", label=r"$R_{\widetilde{\Phi}}(t),\, \langle A \rangle \ne 0$")
+ax2.plot(
+    t,
+    R_an,
+    "--k",
+    label=r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d}),\, \langle A \rangle \ne 0$",
+)
 
 
 class AsymLaplaceAmp(frc.ForcingGenerator):
@@ -112,26 +120,34 @@ ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Laplace}$")
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=0, dt=0.01)
 ax1.semilogy(
-    f, PSD, "--g", label=r"$S_{\widetilde{\Phi}}(f), \, \langle A \rangle = 0$"
+    f,
+    PSD,
+    "--g",
+    label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f), \, \langle A \rangle = 0$",
 )
 
 tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
 ax2.plot(tb, R, label=r"$A \sim \mathrm{Laplace}$")
 
 R_an = autocorr_periodic_arrivals(t, gamma=0.2, A_mean=0, A_rms=1, norm=True)
-ax2.plot(t, R_an, "--g", label=r"$R_{\widetilde{\Phi}}(t), \, \langle A \rangle = 0$")
+ax2.plot(
+    t,
+    R_an,
+    "--g",
+    label=r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d}), \, \langle A \rangle = 0$",
+)
 
 ax1.set_xlim(-0.2, 12)
 ax1.set_ylim(1e-14, 1e3)
-ax1.set_xlabel(r"$f$")
-ax1.set_ylabel(r"$S_{\widetilde{\Phi}}(f)$")
+ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
+ax1.set_ylabel(r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
 
 ax1.legend()
 ax1.set_xlim(-0.03, 1)
 ax1.set_ylim(1e-4, 1e3)
 ax2.set_xlim(0, 50)
-ax2.set_xlabel(r"$t$")
-ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t)$")
+ax2.set_xlabel(r"$t/\tau_\mathrm{d}$")
+ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
 ax2.legend()
 cosmoplots.change_log_axis_base(ax1, "y", base=10)
 
