@@ -60,7 +60,8 @@ class ForcingQuasiPeriodic(frc.ForcingGenerator):
 model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 
-for kappa in [0.1, 0.4, 1.0]:
+colors = ["tab:blue", "tab:orange", "tab:olive"]
+for i, kappa in enumerate([0.1, 0.4, 1.0]):
     model.set_custom_forcing_generator(ForcingQuasiPeriodic(kappa=kappa))
 
     T, S = model.make_realization()
@@ -70,10 +71,10 @@ for kappa in [0.1, 0.4, 1.0]:
     S_norm = (S - S.mean()) / S.std()
 
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
-    ax1.semilogy(f, Pxx, label=rf"$\kappa = {kappa}$")
+    ax1.semilogy(f, Pxx, label=rf"$\kappa = {kappa}$", color=colors[i])
 
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
-    ax2.plot(tb, R, label=rf"$\kappa = {kappa}$")
+    ax2.plot(tb, R, label=rf"$\kappa = {kappa}$", color=colors[i])
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
 ax1.semilogy(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
