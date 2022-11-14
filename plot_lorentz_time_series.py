@@ -99,7 +99,7 @@ def create_fit(regime, f, dt, PSD, normalized_data, T):
     time_series_fit = generate_fpp(
         res.x, normalized_data, time_kern, dt, duration_time, T
     )
-    return time_series_fit, fitrange, symbols
+    return time_series_fit, fitrange, symbols, duration_time
 
 
 def plot_time_series(regime, T, time_series, fit, time_series_fit):
@@ -136,7 +136,9 @@ def plot_time_series(regime, T, time_series, fit, time_series_fit):
         plt.savefig(f"time_series_{regime}.eps", bbox_inches="tight")
 
 
-def plot_spectral_density(regime, f, PSD, fit, f_fit, PSD_fit, symbols, fitrange):
+def plot_spectral_density(
+    regime, f, PSD, fit, f_fit, PSD_fit, symbols, fitrange, duration_time
+):
     """creates plots of power spectral density"""
     plt.figure(f"{regime} PSD x fit td")
 
@@ -146,6 +148,14 @@ def plot_spectral_density(regime, f, PSD, fit, f_fit, PSD_fit, symbols, fitrange
         plt.semilogy(f[fitrange], PSD[fitrange], symbols, c="tab:blue")
         plt.semilogy(f_fit[fitrange], PSD_fit[fitrange], symbols, c="tab:orange")
         plt.semilogy(f_fit, PSD_fit, c="tab:orange")
+        if regime == "rho=28":
+            plt.semilogy(f_fit, np.exp(-4 * np.pi * duration_time * f_fit), "k--")
+        if regime == "rho=220":
+            plt.semilogy(f_fit, np.exp(-4 * np.pi * duration_time * f_fit) * 500, "k--")
+        if regime == "rho=350":
+            plt.semilogy(
+                f_fit, np.exp(-4 * np.pi * duration_time * f_fit) * 5000, "k--"
+            )
 
     plt.xlim(-2, 40)
     plt.ylim(1e-23, 1e4)
@@ -183,12 +193,14 @@ def create_figures(fit):
         dt = 1e-3
         f, PSD = welch(normalizes_time_series, 1.0 / dt, nperseg=2**20)
 
-        time_series_fit, fitrange, symbols = create_fit(
+        time_series_fit, fitrange, symbols, duration_time = create_fit(
             regime, f, dt, PSD, normalizes_time_series, T
         )
         f_fit, PSD_fit = welch(time_series_fit, 1.0 / dt, nperseg=2**20)
 
-        plot_spectral_density(regime, f, PSD, fit, f_fit, PSD_fit, symbols, fitrange)
+        plot_spectral_density(
+            regime, f, PSD, fit, f_fit, PSD_fit, symbols, fitrange, duration_time
+        )
         plot_time_series(regime, T, normalizes_time_series, fit, time_series_fit)
 
 
