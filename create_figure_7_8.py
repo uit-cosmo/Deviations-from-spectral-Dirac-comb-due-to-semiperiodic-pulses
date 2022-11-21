@@ -67,6 +67,30 @@ def extract_amplitudes(forcing):
     return forcing[forcing != 0]
 
 
+def plot_conditional_mean_A(amplitudes, waiting_times):
+    amplitudes = amplitudes[1:]
+    # plt.scatter(waiting_times, amplitudes)
+    # plt.show()
+    mean_values = np.zeros(40)
+    for i in range(40):
+        mean_values[i] = np.mean(
+            amplitudes[(waiting_times > (i / 20)) & (waiting_times < ((i + 1) / 20))]
+        )
+        plt.scatter(
+            waiting_times[
+                (waiting_times > (i / 20)) & (waiting_times < ((i + 1) / 20))
+            ],
+            amplitudes[(waiting_times > (i / 20)) & (waiting_times < ((i + 1) / 20))],
+        )
+    plt.xlabel(r"$\tau_\mathrm{d}$")
+    plt.ylabel(r"$A$")
+    plt.show()
+    plt.scatter(np.arange(0, 2, 0.05), mean_values)
+    plt.xlabel(r"$\tau_\mathrm{d}$")
+    plt.ylabel(r"$<A|\tau_\mathrm{d}>$")
+    plt.show()
+
+
 def create_figures(fit=True):
     """Creates figure 1 and 5 in manuscript arXiv:2106.15904"""
 
@@ -87,6 +111,8 @@ def create_figures(fit=True):
     )
     waiting_times = extract_waiting_times(T, time_series_fit)
     amplitudes = extract_amplitudes(time_series_fit)
+    plot_conditional_mean_A(amplitudes, waiting_times)
+
     tb, R = corr_fun(amplitudes, amplitudes, 1)
 
     plt.plot(tb, R, "--o", linewidth=1.5, markersize=5)
@@ -96,8 +122,8 @@ def create_figures(fit=True):
     plt.savefig("Corr_A.eps", bbox_inches="tight")
 
     plt.figure()
-    plt.scatter(amplitudes[1:], waiting_times, label="A")
-    plt.scatter(-amplitudes[1:], waiting_times, label="-A")
+    plt.scatter(amplitudes[1:], waiting_times, label=r"$A$")
+    plt.scatter(-amplitudes[1:], waiting_times, label=r"$-A$")
     plt.xlabel(r"$A$")
     plt.ylabel(r"$\tau_w$")
     plt.legend()
@@ -110,7 +136,7 @@ def create_figures(fit=True):
     plt.plot(
         bin_centers,
         lognormal_wrapper(bin_centers, *param_lognorm),
-        label="lognorm dist shape=0.74, scale=0.13, loc=0.6",
+        label=r"$\alpha=0.74, \beta=0.13, \mu=0.6$",
         linewidth=1.5,
     )
     plt.xlabel(r"$\tau_w$")
