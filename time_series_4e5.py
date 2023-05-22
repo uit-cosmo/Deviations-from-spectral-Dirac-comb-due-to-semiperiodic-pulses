@@ -4,6 +4,8 @@ from scipy import signal
 import cosmoplots
 from fit_function_RB_model import create_fit_RB
 
+axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
+
 ts = np.load("RB_time_series_4e5.npy")
 
 intervals_start = 6800
@@ -21,4 +23,6 @@ time_series_fit, symbols, duration_time = create_fit_RB(
 
 plt.plot(time, ts_interval)
 plt.plot(time, time_series_fit, "--")
+plt.xlabel("t")
+plt.ylabel(r"$\widetilde{n}$")
 plt.show()

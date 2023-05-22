@@ -23,4 +23,6 @@ time_series_fit, symbols, duration_time = create_fit_RB(
 
 plt.plot(time, ts_interval)
 plt.plot(time, time_series_fit, "--")
+plt.xlabel("t")
+plt.ylabel(r"$\widetilde{n}$")
 plt.show()
