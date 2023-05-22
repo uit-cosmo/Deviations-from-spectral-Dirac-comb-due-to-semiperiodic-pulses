@@ -14,8 +14,9 @@ Pxx_average = [0]*301
 for i in range(len(intervals_start)):
     # + 600 in order to get the constant part 
     ts_interval = ts[intervals_start[i] + 600 :intervals_start[i]+1200]
-    plt.plot(ts_interval)
-    plt.show()
+    ts_interval = (ts_interval - np.mean(ts_interval))/np.std(ts_interval)
+    # plt.plot(ts_interval)
+    # plt.show()
     f, Pxx = signal.welch(ts_interval, 1/dt, nperseg=len(ts_interval)/1)
     Pxx_average += Pxx
 
