@@ -1,17 +1,35 @@
 from plot_lorentz_time_series import (
-    generate_fpp,
+    # generate_fpp,
     calculate_duration_time,
     calculate_fitrange,
+    skewed_lorentz,
 )
 import numpy as np
 from scipy.optimize import minimize
+from scipy.signal import find_peaks, fftconvolve
 
 
-def create_fit_RB(regime ,f, dt, PSD, normalized_data, T):
+def generate_fpp(var, normalized_data, tkern, dt, td, T):
+    """generated normalized filtered point process as a fit for given data"""
+    pos_peak_loc = find_peaks(normalized_data, height=0.0001)[0]
+    neg_peak_loc = find_peaks(-normalized_data, height=0.0001)[0]
+    pos_scale, neg_scale, lam, offset = var
+    forcing = np.zeros(T.size)
+    forcing[pos_peak_loc] = normalized_data[pos_peak_loc] * pos_scale
+    forcing[neg_peak_loc] = normalized_data[neg_peak_loc] * neg_scale
+
+    kern = skewed_lorentz(tkern, dt, lam, td, m=offset)
+
+    time_series_fit = fftconvolve(forcing, kern, "same")
+    time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
+    return time_series_fit
+
+
+def create_fit_RB(regime, f, dt, PSD, normalized_data, T):
     """calculates fit for Lorenz system time series"""
     symbols = ""
 
-    fitrange = {'4e5': (f < 1600) & (f > 700), '2e6': (f < 5200) & (f > 3500)}
+    fitrange = {"4e5": (f < 1600) & (f > 700), "2e6": (f < 5200) & (f > 3500)}
     duration_time = calculate_duration_time(
         f[fitrange[regime]], PSD[(fitrange[regime])]
     )
