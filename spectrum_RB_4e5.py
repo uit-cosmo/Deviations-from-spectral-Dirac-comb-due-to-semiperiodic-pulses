@@ -12,9 +12,12 @@ time = np.linspace(0,dt*len(ts)-dt, num = len(ts))
 Pxx_average = [0]*801
 
 for i in range(len(intervals_start)):
-		ts_interval = ts[intervals_start[i]:intervals_start[i]+1600]
-		f, Pxx = signal.welch(ts_interval, 1/dt, nperseg=len(ts_interval)/1)
-		Pxx_average += Pxx
+    ts_interval = ts[intervals_start[i]:intervals_start[i]+1600]
+    ts_interval = (ts_interval - np.mean(ts_interval))/np.std(ts_interval)
+    # plt.plot(ts_interval)
+    # plt.show()  
+    f, Pxx = signal.welch(ts_interval, 1/dt, nperseg=len(ts_interval)/1)
+    Pxx_average += Pxx
 
 Pxx_average /= 10
 
