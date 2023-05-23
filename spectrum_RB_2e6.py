@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
 from fit_function_RB_model import create_fit_RB
+import cosmoplots
+
+axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
 ts = np.load("RB_time_series_2e6.npy")
 
@@ -45,7 +48,9 @@ plt.plot(time, ts)
 
 plt.figure()
 plt.semilogy(f, Pxx_average)
-plt.semilogy(f_fit, Pxx_average_fit)
-plt.xlabel("f")
-plt.ylabel("PSD(f)")
-plt.show()
+plt.semilogy(f_fit, Pxx_average_fit, "--")
+plt.xlim(-50, 6000)
+plt.xlabel(r"$f$")
+plt.ylabel(r"$S_{\widetilde{n}}\left( f \right)$")
+plt.savefig("spectrum_2e6.eps", bbox_inches="tight")
+# plt.show()

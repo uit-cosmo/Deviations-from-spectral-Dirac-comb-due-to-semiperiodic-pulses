@@ -23,7 +23,7 @@ time_series_fit, symbols, duration_time = create_fit_RB(
 
 plt.plot(time, ts_interval)
 plt.plot(time, time_series_fit, "--")
-plt.xlabel("t")
+plt.xlabel(r"$t$")
 plt.ylabel(r"$\widetilde{n}$")
 plt.savefig("time_series_2e6.eps", bbox_inches="tight")
 plt.show()

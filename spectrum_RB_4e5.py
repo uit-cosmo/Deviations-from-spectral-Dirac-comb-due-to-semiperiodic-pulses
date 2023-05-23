@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
 from fit_function_RB_model import create_fit_RB
+import cosmoplots
+
+axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
 ts = np.load("RB_time_series_4e5.npy")
 
@@ -28,9 +31,9 @@ for i in range(len(intervals_start)):
         time_series_fit, 1 / dt, nperseg=len(time_series_fit) / 1
     )
 
-    plt.plot(ts_interval)
-    plt.plot(time_series_fit)
-    plt.show()
+    # plt.plot(ts_interval)
+    # plt.plot(time_series_fit)
+    # plt.show()
 
     Pxx_average += Pxx
     Pxx_average_fit += Pxx_fit
@@ -39,16 +42,13 @@ for i in range(len(intervals_start)):
 
 Pxx_average /= 10
 Pxx_average_fit /= 10
-time = np.linspace(0, dt * len(ts) - dt, num=len(ts))
 
 plt.figure()
-plt.xlabel("t")
-plt.ylabel("theta")
-plt.plot(time, ts)
-
-plt.figure()
+plt.xlim(-100,2000)
+plt.ylim(10e-19,10e-2)
 plt.semilogy(f, Pxx_average)
-plt.semilogy(f_fit, Pxx_average_fit)
-plt.xlabel("f")
-plt.ylabel("PSD(f)")
-plt.show()
+plt.semilogy(f_fit, Pxx_average_fit, '--')
+plt.xlabel(r"$f$")
+plt.ylabel(r"$S_{\widetilde{n}}\left( f \right)$")
+plt.savefig("spectrum_4e5.eps", bbox_inches="tight")
+# plt.show()
