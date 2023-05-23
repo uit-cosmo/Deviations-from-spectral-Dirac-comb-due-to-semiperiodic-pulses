@@ -22,6 +22,7 @@ time_series_fit, symbols, duration_time = create_fit_RB(
 )
 
 plt.plot(time, ts_interval)
+plt.text(x=0.055, y=2, s=r"$Ra = 4\times 10^{5}$")
 plt.plot(time, time_series_fit, "--")
 plt.xlabel(r"$t$")
 plt.ylabel(r"$\widetilde{n}$")
