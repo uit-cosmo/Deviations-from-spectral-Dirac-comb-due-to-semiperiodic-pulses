@@ -35,6 +35,16 @@ for i in range(len(intervals_start)):
     # plt.plot(time_series_fit)
     # plt.show()
 
+    # plt.figure()
+    # plt.xlim(-100, 2000)
+    # plt.ylim(10e-19, 10e-2)
+    # plt.semilogy(f, Pxx)
+    # plt.semilogy(f_fit, Pxx_fit, "--")
+    # plt.xlabel(r"$f$")
+    # plt.ylabel(r"$S_{\widetilde{n}}\left( f \right)$")
+    # plt.savefig(f"spectrum_4e5_{i+1}.eps", bbox_inches="tight")
+    # plt.show()
+
     Pxx_average += Pxx
     Pxx_average_fit += Pxx_fit
 
@@ -44,10 +54,10 @@ Pxx_average /= 10
 Pxx_average_fit /= 10
 
 plt.figure()
-plt.xlim(-100,2000)
-plt.ylim(10e-19,10e-2)
+plt.xlim(-100, 2000)
+plt.ylim(10e-19, 10e-2)
 plt.semilogy(f, Pxx_average)
-plt.semilogy(f_fit, Pxx_average_fit, '--')
+plt.semilogy(f_fit, Pxx_average_fit, "--")
 plt.text(x=1500, y=1e-3, s=r"$Ra = 4\times 10^{5}$")
 plt.xlabel(r"$f$")
 plt.ylabel(r"$S_{\widetilde{n}}\left( f \right)$")
