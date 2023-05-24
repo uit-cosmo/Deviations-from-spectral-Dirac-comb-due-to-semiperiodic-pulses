@@ -23,7 +23,7 @@ amplitudes = forcing[forcing != 0]
 arrival_times = time[forcing != 0]
 duration_times = np.diff(arrival_times)
 
-f_forcing, Pxx_forcing = signal.welch(forcing, 1/dt, nperseg=len(forcing)/1)
+f_forcing, Pxx_forcing = signal.welch(forcing, 1 / dt, nperseg=len(forcing) / 1)
 plt.semilogy(f_forcing, Pxx_forcing)
 
 plt.xlabel(r"$f$")
@@ -31,4 +31,3 @@ plt.ylabel(r"$S_{\widetilde{n}}\left( f \right)$")
 plt.xlim(-50, 2000)
 plt.savefig("forcing_spectra_4e5.eps", bbox_inches="tight")
 plt.show()
-

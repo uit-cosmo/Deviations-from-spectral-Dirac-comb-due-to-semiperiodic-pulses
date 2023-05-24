@@ -17,7 +17,7 @@ amplitudes = []
 duration_times = []
 
 for i in range(len(intervals_start)):
-    ts_interval = ts[intervals_start[i]: intervals_start[i] + 1600]
+    ts_interval = ts[intervals_start[i] : intervals_start[i] + 1600]
     ts_interval = (ts_interval - np.mean(ts_interval)) / np.std(ts_interval)
     # plt.plot(ts_interval)
     # plt.show()
@@ -43,15 +43,15 @@ plt.savefig("duration_times_4e5.eps", bbox_inches="tight")
 plt.show()
 
 plt.scatter(amplitudes, duration_times)
-plt.xlabel(r'$A$')
+plt.xlabel(r"$A$")
 plt.ylabel(r"$\tau_w$")
 plt.savefig("amp_vs_dt_4e5.eps", bbox_inches="tight")
 plt.show()
 
 tb, R = corr_fun(amplitudes, amplitudes, dt=1)
-plt.plot(tb, R, 'o--')
-plt.xlim(0,20)
-plt.xlabel(r'$n$')
-plt.ylabel(r'$R(A_n)$')
+plt.plot(tb, R, "o--")
+plt.xlim(0, 20)
+plt.xlabel(r"$n$")
+plt.ylabel(r"$R(A_n)$")
 plt.savefig("autocorr_4e5.eps", bbox_inches="tight")
 plt.show()

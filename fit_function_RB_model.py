@@ -40,7 +40,8 @@ def create_fit_RB(regime, f, dt, PSD, normalized_data, T):
     def obj_fun(x):
         return 0.5 * np.sum(
             (
-                generate_fpp(x, normalized_data, time_kern, dt, duration_time, T)[0] ** 2
+                generate_fpp(x, normalized_data, time_kern, dt, duration_time, T)[0]
+                ** 2
                 - normalized_data**2
             )
             ** 2

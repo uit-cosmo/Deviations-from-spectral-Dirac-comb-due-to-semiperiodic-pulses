@@ -16,7 +16,7 @@ Pxx_average = [0] * 801
 Pxx_average_fit = [0] * 801
 
 for i in range(len(intervals_start)):
-    ts_interval = ts[intervals_start[i]: intervals_start[i] + 1600]
+    ts_interval = ts[intervals_start[i] : intervals_start[i] + 1600]
     ts_interval = (ts_interval - np.mean(ts_interval)) / np.std(ts_interval)
     # plt.plot(ts_interval)
     # plt.show()
