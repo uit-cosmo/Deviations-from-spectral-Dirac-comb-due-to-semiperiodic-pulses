@@ -35,6 +35,15 @@ for i in range(len(intervals_start)):
     Pxx_average += Pxx
     Pxx_average_fit += Pxx_fit
 
+    # plt.figure()
+    # plt.xlim(-50, 6000)
+    # plt.semilogy(f, Pxx)
+    # plt.semilogy(f_fit, Pxx_fit, "--")
+    # plt.xlabel(r"$f$")
+    # plt.ylabel(r"$S_{\widetilde{n}}\left( f \right)$")
+    # plt.savefig(f"spectrum_2e6_{i+1}.eps", bbox_inches="tight")
+    # plt.show()
+
     print(f"Done with {i+1}/{len(intervals_start)}")
 
 Pxx_average /= 10
