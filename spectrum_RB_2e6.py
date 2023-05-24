@@ -17,14 +17,14 @@ Pxx_average_fit = [0] * 301
 
 for i in range(len(intervals_start)):
     # + 600 in order to get the constant part
-    ts_interval = ts[intervals_start[i] + 600 : intervals_start[i] + 1200]
+    ts_interval = ts[intervals_start[i] + 600: intervals_start[i] + 1200]
     ts_interval = (ts_interval - np.mean(ts_interval)) / np.std(ts_interval)
     # plt.plot(ts_interval)
     # plt.show()
     time = np.linspace(0, dt * len(ts_interval) - dt, num=len(ts_interval))
     f, Pxx = signal.welch(ts_interval, 1 / dt, nperseg=len(ts_interval) / 1)
 
-    time_series_fit, symbols, duration_time = create_fit_RB(
+    time_series_fit, symbols, duration_time, forcing = create_fit_RB(
         "2e6", f, dt, Pxx, ts_interval, time
     )
 

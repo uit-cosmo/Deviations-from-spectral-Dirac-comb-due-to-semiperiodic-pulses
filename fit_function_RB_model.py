@@ -51,7 +51,7 @@ def create_fit_RB(regime, f, dt, PSD, normalized_data, T):
         [1.0, 1.0, 0.0, 0.0],
         bounds=((0.0, 2.0), (0.0, 2.0), (-0.99, 0.99), (-0.5, 0.5)),
     )
-    time_series_fit, _ = generate_fpp(
+    time_series_fit, forcing = generate_fpp(
         res.x, normalized_data, time_kern, dt, duration_time, T
     )
-    return time_series_fit, symbols, duration_time
+    return time_series_fit, symbols, duration_time, forcing

@@ -17,7 +17,7 @@ dt = 0.01 / 200
 f, Pxx = signal.welch(ts_interval, 1 / dt, nperseg=len(ts_interval) / 1)
 time = np.linspace(0, dt * len(ts_interval) - dt, num=len(ts_interval))
 
-time_series_fit, symbols, duration_time = create_fit_RB(
+time_series_fit, symbols, duration_time, forcing = create_fit_RB(
     "4e5", f, dt, Pxx, ts_interval, time
 )
 
