@@ -24,6 +24,12 @@ def generate_fpp(var, normalized_data, tkern, dt, td, T):
     time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
     return time_series_fit, forcing
 
+def return_peaks(data, T):
+    pos_peak_loc = find_peaks(data, height=0.0001)[0]
+    neg_peak_loc = find_peaks(-data, height=0.0001)[0]
+    peaks = sorted(np.append(pos_peak_loc, neg_peak_loc))
+    return T[peaks], data[peaks] 
+
 
 def create_fit_RB(regime, f, dt, PSD, normalized_data, T):
     """calculates fit for Lorenz system time series"""

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from fit_function_RB_model import constrained_fit_RB 
+from fit_function_RB_model import constrained_fit_RB, return_peaks
 import cosmoplots
 
 axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
@@ -31,8 +31,12 @@ for i in range(len(intervals_start)):
         time_series_fit, 1 / dt, nperseg=len(time_series_fit) / 1
     )
 
+    time_peaks, peaks = return_peaks(ts_interval, time)
+    print(time_peaks, peaks)
+
     plt.plot(time, ts_interval)
     plt.plot(time, time_series_fit)
+    plt.scatter(time_peaks, peaks)
     plt.show()
 
     # plt.figure()
