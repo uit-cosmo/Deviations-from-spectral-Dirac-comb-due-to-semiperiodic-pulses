@@ -31,7 +31,7 @@ for i in range(len(intervals_start)):
         time_series_fit, 1 / dt, nperseg=len(time_series_fit) / 1
     )
 
-    time_peaks, peaks = return_peaks(ts_interval, time)
+    time_peaks, peaks, peak_indices = return_peaks(ts_interval, time)
     print(time_peaks, peaks)
 
     plt.plot(time, ts_interval)
