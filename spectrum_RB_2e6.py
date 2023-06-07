@@ -32,6 +32,16 @@ for i in range(len(intervals_start)):
         "2e6", f, dt, Pxx, ts_interval, time
     )
 
+    
+    time_series_fit += 0.2
+
+    # plt.figure()
+    # plt.plot(time, ts_interval)
+    # plt.plot(time, time_series_fit, "--")
+    # plt.show()
+
+    time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
+    
     f_fit, Pxx_fit = signal.welch(
         time_series_fit, 1 / dt, nperseg=len(time_series_fit) / 1
     )
@@ -39,10 +49,6 @@ for i in range(len(intervals_start)):
     Pxx_average += Pxx
     Pxx_average_fit += Pxx_fit
 
-    plt.figure()
-    plt.plot(time, ts_interval)
-    plt.plot(time, time_series_fit+0.2, "--")
-    plt.show()
     # plt.figure()
     # plt.xlim(-50, 6000)
     # plt.semilogy(f, Pxx)
