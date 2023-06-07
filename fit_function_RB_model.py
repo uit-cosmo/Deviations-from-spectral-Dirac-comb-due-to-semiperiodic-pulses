@@ -33,7 +33,7 @@ def generate_fpp_dipole(var, normalized_data, tkern, dt, td, T):
     forcing[pos_peak_loc] = normalized_data[pos_peak_loc] * pos_scale
 
     kern_pos = skewed_lorentz(tkern, dt, lam, td, m=offset)
-    kern_neg = -skewed_lorentz(tkern, dt, -lam, td, m=offset + 1)
+    kern_neg = -skewed_lorentz(tkern, dt, -lam, td, m=offset + 2.5)
     kern = kern_pos + kern_neg
 
     # import matplotlib.pyplot as plt

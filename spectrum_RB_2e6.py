@@ -8,7 +8,7 @@ axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
 ts = np.load("RB_time_series_2e6.npy")
 
-intervals_start = [10000, 18600, 21200, 28000, 30500, 33000, 37800, 40500, 45400, 52600]
+intervals_start = [10000, 18600, 21200, 28000, 30500, 33000, 37800, 40500, 45400]#, 52600]
 
 dt = 0.01 / 200
 
@@ -35,10 +35,10 @@ for i in range(len(intervals_start)):
     
     time_series_fit += 0.2
 
-    # plt.figure()
-    # plt.plot(time, ts_interval)
-    # plt.plot(time, time_series_fit, "--")
-    # plt.show()
+    plt.figure()
+    plt.plot(time, ts_interval)
+    plt.plot(time, time_series_fit, "--")
+    plt.show()
 
     time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
     
@@ -49,14 +49,14 @@ for i in range(len(intervals_start)):
     Pxx_average += Pxx
     Pxx_average_fit += Pxx_fit
 
-    # plt.figure()
-    # plt.xlim(-50, 6000)
-    # plt.semilogy(f, Pxx)
-    # plt.semilogy(f_fit, Pxx_fit, "--")
-    # plt.xlabel(r"$f$")
-    # plt.ylabel(r"$S_{\widetilde{n}}\left( f \right)$")
-    # plt.savefig(f"spectrum_2e6_{i+1}.eps", bbox_inches="tight")
-    # plt.show()
+    plt.figure()
+    plt.xlim(-50, 6000)
+    plt.semilogy(f, Pxx)
+    plt.semilogy(f_fit, Pxx_fit, "--")
+    plt.xlabel(r"$f$")
+    plt.ylabel(r"$S_{\widetilde{n}}\left( f \right)$")
+    plt.savefig(f"spectrum_2e6_{i+1}.eps", bbox_inches="tight")
+    plt.show()
 
     print(f"Done with {i+1}/{len(intervals_start)}")
 
