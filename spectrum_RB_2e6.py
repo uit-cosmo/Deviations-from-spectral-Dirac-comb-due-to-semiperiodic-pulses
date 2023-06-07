@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-from fit_function_RB_model import create_fit_RB
+from fit_function_RB_model import create_fit_RB, create_fit_RB_dipole
 import cosmoplots
 
 axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
@@ -24,7 +24,11 @@ for i in range(len(intervals_start)):
     time = np.linspace(0, dt * len(ts_interval) - dt, num=len(ts_interval))
     f, Pxx = signal.welch(ts_interval, 1 / dt, nperseg=len(ts_interval) / 1)
 
-    time_series_fit, symbols, duration_time, forcing = create_fit_RB(
+    # time_series_fit, symbols, duration_time, forcing = create_fit_RB(
+    #     "2e6", f, dt, Pxx, ts_interval, time
+    # )
+
+    time_series_fit, symbols, duration_time, forcing = create_fit_RB_dipole(
         "2e6", f, dt, Pxx, ts_interval, time
     )
 
@@ -35,6 +39,10 @@ for i in range(len(intervals_start)):
     Pxx_average += Pxx
     Pxx_average_fit += Pxx_fit
 
+    plt.figure()
+    plt.plot(time, ts_interval)
+    plt.plot(time, time_series_fit, "--")
+    plt.show()
     # plt.figure()
     # plt.xlim(-50, 6000)
     # plt.semilogy(f, Pxx)

@@ -31,9 +31,9 @@ for i in range(len(intervals_start)):
         time_series_fit, 1 / dt, nperseg=len(time_series_fit) / 1
     )
 
-    # plt.plot(ts_interval)
-    # plt.plot(time_series_fit)
-    # plt.show()
+    plt.plot(ts_interval)
+    plt.plot(time_series_fit)
+    plt.show()
 
     # plt.figure()
     # plt.xlim(-100, 2000)
