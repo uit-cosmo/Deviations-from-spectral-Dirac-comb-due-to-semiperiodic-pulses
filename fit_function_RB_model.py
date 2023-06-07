@@ -33,13 +33,13 @@ def generate_fpp_dipole(var, normalized_data, tkern, dt, td, T):
     forcing[pos_peak_loc] = normalized_data[pos_peak_loc] * pos_scale
 
     kern_pos = skewed_lorentz(tkern, dt, lam, td, m=offset)
-    kern_neg = -skewed_lorentz(tkern, dt, -lam, td, m=offset + 0.01)
+    kern_neg = -skewed_lorentz(tkern, dt, -lam, td, m=offset + 1)
     kern = kern_pos + kern_neg
 
-    import matplotlib.pyplot as plt
-    plt.plot(tkern, kern)
-    plt.xlim(-0.01, 0.02)
-    plt.show()
+    # import matplotlib.pyplot as plt
+    # plt.plot(tkern, kern)
+    # plt.xlim(-0.01, 0.02)
+    # plt.show()
 
     time_series_fit = fftconvolve(forcing, kern, "same")
     time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()

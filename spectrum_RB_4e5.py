@@ -27,13 +27,16 @@ for i in range(len(intervals_start)):
         "4e5", f, dt, Pxx, ts_interval, time
     )
 
-    f_fit, Pxx_fit = signal.welch(
-        time_series_fit, 1 / dt, nperseg=len(time_series_fit) / 1
-    )
-
+    time_series_fit += 0.2
     plt.plot(ts_interval)
     plt.plot(time_series_fit)
     plt.show()
+
+    time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
+
+    f_fit, Pxx_fit = signal.welch(
+        time_series_fit, 1 / dt, nperseg=len(time_series_fit) / 1
+    )
 
     # plt.figure()
     # plt.xlim(-100, 2000)

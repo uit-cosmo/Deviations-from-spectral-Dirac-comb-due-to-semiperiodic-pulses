@@ -41,7 +41,7 @@ for i in range(len(intervals_start)):
 
     plt.figure()
     plt.plot(time, ts_interval)
-    plt.plot(time, time_series_fit, "--")
+    plt.plot(time, time_series_fit+0.2, "--")
     plt.show()
     # plt.figure()
     # plt.xlim(-50, 6000)
