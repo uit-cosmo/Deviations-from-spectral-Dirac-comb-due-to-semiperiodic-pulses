@@ -8,7 +8,7 @@ axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
 ts = np.load("RB_time_series_2e6.npy")
 
-intervals_start = [10000, 18600, 21200, 28000, 30500, 33000, 37800, 40500, 45400]#, 52600]
+intervals_start = [10000, 18600, 21200, 28000, 30500, 33000, 37800, 40500, 45400, 52600]
 
 dt = 0.01 / 200
 
@@ -28,7 +28,7 @@ for i in range(len(intervals_start)):
     #     "2e6", f, dt, Pxx, ts_interval, time
     # )
 
-    time_series_fit, symbols, duration_time, forcing = create_fit_RB_dipole(
+    time_series_fit, symbols, duration_time, forcing = create_fit_RB(
         "2e6", f, dt, Pxx, ts_interval, time
     )
 

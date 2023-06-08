@@ -35,6 +35,18 @@ for i in range(len(intervals_start)):
 
 print(amplitudes)
 
+amp_0 = amplitudes[:-2]
+amp_1 = amplitudes[2:]
+
+x = np.linspace(-3,3)
+
+plt.scatter(amp_0, amp_1)
+plt.plot(x,x)
+plt.xlabel(r"$A_{n}$")
+plt.ylabel(r"$A_{n+2}$")
+plt.savefig("A_A+2_2e6.eps", bbox_inches="tight")
+plt.figure()
+
 amp_0 = amplitudes[:-1]
 amp_1 = amplitudes[1:]
 
