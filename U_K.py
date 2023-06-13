@@ -21,6 +21,7 @@ plt.xlabel(r"$f$")
 plt.ylabel(r"$S_{K}\left( f \right)$")
 plt.xlim(-10,200)
 plt.ylim(1e3,None)
+plt.savefig("S_K.pdf", bbox_inches="tight")
 plt.show()
 
 
@@ -30,4 +31,5 @@ plt.xlabel(r"$f$")
 plt.ylabel(r"$S_{U}\left( f \right)$")
 plt.xlim(-10,200)
 plt.ylim(1e3,None)
+plt.savefig("S_U.pdf", bbox_inches="tight")
 plt.show()
