@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
@@ -33,7 +32,6 @@ for i in range(len(intervals_start)):
         "2e6", f, dt, Pxx, ts_interval, time
     )
 
-    
     time_series_fit += 0.2
 
     plt.figure()
@@ -42,7 +40,7 @@ for i in range(len(intervals_start)):
     plt.show()
 
     time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
-    
+
     f_fit, Pxx_fit = signal.welch(
         time_series_fit, 1 / dt, nperseg=len(time_series_fit) / 1
     )
@@ -56,7 +54,7 @@ for i in range(len(intervals_start)):
     plt.semilogy(f_fit, Pxx_fit, "--")
     plt.xlabel(r"$f$")
     plt.ylabel(r"$S_{\widetilde{n}}\left( f \right)$")
-    plt.savefig(f"spectrum_2e6_fixed_amp_{i+1}.eps", bbox_inches="tight")
+    # plt.savefig(f"spectrum_2e6_fixed_amp_{i+1}.eps", bbox_inches="tight")
     plt.show()
 
     print(f"Done with {i+1}/{len(intervals_start)}")
@@ -77,5 +75,5 @@ plt.xlim(-50, 6000)
 plt.text(x=4000, y=1e-3, s=r"$Ra = 2\times 10^{6}$")
 plt.xlabel(r"$f$")
 plt.ylabel(r"$S_{\widetilde{n}}\left( f \right)$")
-plt.savefig("spectrum_2e6_fixed_amp.eps", bbox_inches="tight")
-# plt.show()
+# plt.savefig("spectrum_2e6_fixed_amp.eps", bbox_inches="tight")
+plt.show()

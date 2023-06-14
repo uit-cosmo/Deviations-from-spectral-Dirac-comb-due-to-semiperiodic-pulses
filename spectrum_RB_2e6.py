@@ -32,7 +32,6 @@ for i in range(len(intervals_start)):
         "2e6", f, dt, Pxx, ts_interval, time
     )
 
-    
     time_series_fit += 0.2
 
     plt.figure()
@@ -41,7 +40,7 @@ for i in range(len(intervals_start)):
     plt.show()
 
     time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
-    
+
     f_fit, Pxx_fit = signal.welch(
         time_series_fit, 1 / dt, nperseg=len(time_series_fit) / 1
     )
