@@ -24,6 +24,7 @@ def generate_fpp(var, normalized_data, tkern, dt, td, T):
     time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
     return time_series_fit, forcing
 
+
 def generate_fpp_fixed_amp(var, normalized_data, tkern, dt, td, T):
     """generated normalized filtered point process as a fit for given data"""
     pos_peak_loc = find_peaks(normalized_data, height=0.0001)[0]
@@ -38,6 +39,19 @@ def generate_fpp_fixed_amp(var, normalized_data, tkern, dt, td, T):
     time_series_fit = fftconvolve(forcing, kern, "same")
     time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
     return time_series_fit, forcing
+
+def generate_fpp_K(normalized_data, tkern, dt, T):
+    """generated normalized filtered point process as a fit for given data"""
+    pos_peak_loc = find_peaks(normalized_data, height=1)[0]
+    forcing = np.zeros(T.size)
+    forcing[pos_peak_loc] = normalized_data[pos_peak_loc] * 1
+
+    kern = skewed_lorentz(tkern, dt, 0.0, 0.002, m=0)
+
+    time_series_fit = fftconvolve(forcing, kern, "same")
+    time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
+    return time_series_fit, forcing
+
 
 def generate_fpp_dipole(var, normalized_data, tkern, dt, td, T):
     """generated normalized filtered point process as a fit for given data"""
@@ -82,7 +96,9 @@ def create_fit_RB_fixed_amp(regime, f, dt, PSD, normalized_data, T):
     def obj_fun(x):
         return 0.5 * np.sum(
             (
-                generate_fpp_fixed_amp(x, normalized_data, time_kern, dt, duration_time, T)[0]
+                generate_fpp_fixed_amp(
+                    x, normalized_data, time_kern, dt, duration_time, T
+                )[0]
                 ** 2
                 - normalized_data**2
             )
@@ -98,6 +114,7 @@ def create_fit_RB_fixed_amp(regime, f, dt, PSD, normalized_data, T):
         res.x, normalized_data, time_kern, dt, duration_time, T
     )
     return time_series_fit, symbols, duration_time, forcing
+
 
 def create_fit_RB(regime, f, dt, PSD, normalized_data, T):
     """calculates fit for Lorenz system time series"""
@@ -131,6 +148,37 @@ def create_fit_RB(regime, f, dt, PSD, normalized_data, T):
     )
     return time_series_fit, symbols, duration_time, forcing
 
+def create_fit_K(f, dt, normalized_data, T):
+    """calculates fit for Lorenz system time series"""
+    symbols = ""
+
+    # fitrange = {"4e5": (f < 1600) & (f > 700), "2e6": (f < 5200) & (f > 3500)}
+    # duration_time = calculate_duration_time(
+    #     f[fitrange[regime]], PSD[(fitrange[regime])]
+    # )
+
+    kernrad = 2**18
+    time_kern = np.arange(-kernrad, kernrad + 1) * dt
+    #
+    # def obj_fun(x):
+    #     return 0.5 * np.sum(
+    #         (
+    #             generate_fpp_K(x, normalized_data, time_kern, dt, duration_time, T)[0]
+    #             ** 2
+    #             - normalized_data**2
+    #         )
+    #         ** 2
+    #     )
+    #
+    # res = minimize(
+    #     obj_fun,
+    #     [1.0, 1.0, 0.0, 0.0],
+    #     bounds=((0.0, 2.0), (0.0, 2.0), (-0.99, 0.99), (-0.5, 0.5)),
+    # )
+    time_series_fit, forcing = generate_fpp_K(
+        normalized_data, time_kern, dt, T
+    )
+    return time_series_fit, symbols, 0.002, forcing
 
 def create_fit_RB_dipole(regime, f, dt, PSD, normalized_data, T):
     """calculates fit for Lorenz system time series"""
