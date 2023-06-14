@@ -40,13 +40,28 @@ def generate_fpp_fixed_amp(var, normalized_data, tkern, dt, td, T):
     time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
     return time_series_fit, forcing
 
-def generate_fpp_K(normalized_data, tkern, dt, T):
+def generate_fpp_K(td, normalized_data, tkern, dt, T, pulse):
     """generated normalized filtered point process as a fit for given data"""
-    pos_peak_loc = find_peaks(normalized_data, height=1)[0]
+    pos_peak_loc = find_peaks(normalized_data, height=2.5, distance = 1)[0]
     forcing = np.zeros(T.size)
     forcing[pos_peak_loc] = normalized_data[pos_peak_loc] * 1
 
-    kern = skewed_lorentz(tkern, dt, 0.0, 0.002, m=0)
+    def double_exp(tkern, lam, td):
+        kern = np.zeros(tkern.size)
+        kern[tkern < 0] = np.exp(tkern[tkern < 0] / lam/td)
+        kern[tkern >= 0] = np.exp(-tkern[tkern >= 0] / (1-lam)/td)
+        return kern
+
+    if pulse == "Lorentz":
+        kern = skewed_lorentz(tkern, dt, 0.0, td, m=0)
+    elif pulse == "sech":
+        kern = (np.pi*np.cosh(tkern/td))**(-1)
+    elif pulse == "gauss":
+        kern = np.exp(-(tkern/td)**2/2)/(np.sqrt(2*np.pi))
+    elif pulse == "exp":
+        kern = double_exp(tkern, 0.5 , td)
+    else:
+        raise ValueError("pulse shape not implemented")
 
     time_series_fit = fftconvolve(forcing, kern, "same")
     time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
@@ -148,7 +163,7 @@ def create_fit_RB(regime, f, dt, PSD, normalized_data, T):
     )
     return time_series_fit, symbols, duration_time, forcing
 
-def create_fit_K(f, dt, normalized_data, T):
+def create_fit_K(f, dt, normalized_data, T, pulse, td):
     """calculates fit for Lorenz system time series"""
     symbols = ""
 
@@ -176,7 +191,7 @@ def create_fit_K(f, dt, normalized_data, T):
     #     bounds=((0.0, 2.0), (0.0, 2.0), (-0.99, 0.99), (-0.5, 0.5)),
     # )
     time_series_fit, forcing = generate_fpp_K(
-        normalized_data, time_kern, dt, T
+        td, normalized_data, time_kern, dt, T, pulse
     )
     return time_series_fit, symbols, 0.002, forcing
 
