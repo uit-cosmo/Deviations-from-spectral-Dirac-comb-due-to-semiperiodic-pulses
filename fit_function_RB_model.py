@@ -42,7 +42,7 @@ def generate_fpp_fixed_amp(var, normalized_data, tkern, dt, td, T):
 
 def generate_fpp_K(td, normalized_data, tkern, dt, T, pulse):
     """generated normalized filtered point process as a fit for given data"""
-    pos_peak_loc = find_peaks(normalized_data, height=2.5, distance = 1)[0]
+    pos_peak_loc = find_peaks(normalized_data, height=2.5, distance = 100)[0]
     forcing = np.zeros(T.size)
     forcing[pos_peak_loc] = normalized_data[pos_peak_loc] * 1
 
