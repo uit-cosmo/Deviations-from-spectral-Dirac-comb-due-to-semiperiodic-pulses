@@ -10,8 +10,14 @@ K = np.load('K.npy')
 U = np.load('U.npy')
 time = np.load('K_time.npy')
 
+# remove first event in time series
+K = K[600:]
+U = U[600:]
+time = time[600:]
+
 K = (K - np.mean(K))/np.std(K)
-_, s_av, _, t_av, peaks, wait = cond_av(K, time, smin= 2.5)
+_, s_av, _, t_av, peaks, wait = cond_av(K, time, smin= 2.5, window = True, delta = 0.08)
+print(len(wait[wait < 0.05]))
 
 plt.plot(t_av, s_av)
 plt.xlabel(r'$t$')
@@ -38,7 +44,8 @@ plt.savefig("K_norm.pdf", bbox_inches="tight")
 plt.show()
 
 U = (U - np.mean(U))/np.std(U)
-_, s_av, _, t_av, peaks, wait = cond_av(U, time, smin= 0)
+_, s_av, _, t_av, peaks, wait = cond_av(U, time, smin= 0, window = True, delta = 0.08)
+print(len(wait[wait < 0.05]))
 
 plt.plot(t_av, s_av)
 plt.xlabel(r'$t$')
