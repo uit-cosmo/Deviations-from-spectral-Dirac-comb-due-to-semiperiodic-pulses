@@ -34,18 +34,20 @@ _, s_av, _, t_av, peaks, wait = cond_av(K, time, smin=2.5, window=True, delta=0.
 # plt.savefig("A_tau_K.pdf", bbox_inches="tight")
 # plt.show()
 
+
 def double_exp(tkern, lam, td):
     kern = np.zeros(tkern.size)
-    kern[tkern < 0] = np.exp(tkern[tkern < 0] / lam/td)
-    kern[tkern >= 0] = np.exp(-tkern[tkern >= 0] / (1-lam)/td)
+    kern[tkern < 0] = np.exp(tkern[tkern < 0] / lam / td)
+    kern[tkern >= 0] = np.exp(-tkern[tkern >= 0] / (1 - lam) / td)
     return kern
+
 
 # kern = skewed_lorentz(t_av, t_av[1] - t_av[0], 0.0, 0.002, m=0)
 # kern = (np.pi*np.cosh(t_av/0.001))**(-1)
 # kern = np.exp(-(t_av/0.001)**2/2)/(np.sqrt(2*np.pi))
-kern = double_exp(t_av, 0.5 , 0.005)
-plt.plot(t_av, s_av/np.max(s_av))
-plt.plot(t_av,kern/np.max(kern))
+kern = double_exp(t_av, 0.5, 0.005)
+plt.plot(t_av, s_av / np.max(s_av))
+plt.plot(t_av, kern / np.max(kern))
 plt.xlabel(r"$t$")
 plt.ylabel(r"$\left<\widetilde{K}\right>/\textrm{max}\left<\widetilde{K}\right>$")
 # plt.savefig("CA_K.pdf", bbox_inches="tight")
@@ -53,12 +55,12 @@ plt.show()
 
 
 K = (K - np.mean(K)) / np.std(K)
-kern = (kern - np.mean(kern))/ np.std(kern)
+kern = (kern - np.mean(kern)) / np.std(kern)
 dt = time[1] - time[0]
 f, Pxx = signal.welch(K, 1 / dt, nperseg=len(K) / 5)
-plt.loglog(f,Pxx)
+plt.loglog(f, Pxx)
 f, Pxx = signal.welch(kern, 1 / dt, nperseg=len(kern) / 1)
-plt.loglog(f,Pxx)
+plt.loglog(f, Pxx)
 plt.show()
 
 # plt.hist(wait, 32)
@@ -94,9 +96,9 @@ _, s_av, _, t_av, peaks, wait = cond_av(U, time, smin=0, window=True, delta=0.08
 # plt.savefig("A_tau_U.pdf", bbox_inches="tight")
 # plt.show()
 
-kern = skewed_lorentz(t_av, t_av[1] - t_av[0], -0.999, 0.01, m= 0.0)
-plt.plot(t_av, s_av/np.max(s_av))
-plt.plot(t_av+0.005,kern/np.max(kern))
+kern = skewed_lorentz(t_av, t_av[1] - t_av[0], -0.999, 0.01, m=0.0)
+plt.plot(t_av, s_av / np.max(s_av))
+plt.plot(t_av + 0.005, kern / np.max(kern))
 plt.xlabel(r"$t$")
 plt.ylabel(r"$\left<\widetilde{K}\right>/\textrm{max}\left<\widetilde{K}\right>$")
 plt.savefig("CA_U.pdf", bbox_inches="tight")

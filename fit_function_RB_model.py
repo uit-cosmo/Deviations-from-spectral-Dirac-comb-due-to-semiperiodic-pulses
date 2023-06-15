@@ -40,26 +40,27 @@ def generate_fpp_fixed_amp(var, normalized_data, tkern, dt, td, T):
     time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
     return time_series_fit, forcing
 
+
 def generate_fpp_K(td, normalized_data, tkern, dt, T, pulse):
     """generated normalized filtered point process as a fit for given data"""
-    pos_peak_loc = find_peaks(normalized_data, height=2.5, distance = 100)[0]
+    pos_peak_loc = find_peaks(normalized_data, height=2.5, distance=100)[0]
     forcing = np.zeros(T.size)
     forcing[pos_peak_loc] = normalized_data[pos_peak_loc] * 1
 
     def double_exp(tkern, lam, td):
         kern = np.zeros(tkern.size)
-        kern[tkern < 0] = np.exp(tkern[tkern < 0] / lam/td)
-        kern[tkern >= 0] = np.exp(-tkern[tkern >= 0] / (1-lam)/td)
+        kern[tkern < 0] = np.exp(tkern[tkern < 0] / lam / td)
+        kern[tkern >= 0] = np.exp(-tkern[tkern >= 0] / (1 - lam) / td)
         return kern
 
     if pulse == "Lorentz":
         kern = skewed_lorentz(tkern, dt, 0.0, td, m=0)
     elif pulse == "sech":
-        kern = (np.pi*np.cosh(tkern/td))**(-1)
+        kern = (np.pi * np.cosh(tkern / td)) ** (-1)
     elif pulse == "gauss":
-        kern = np.exp(-(tkern/td)**2/2)/(np.sqrt(2*np.pi))
+        kern = np.exp(-((tkern / td) ** 2) / 2) / (np.sqrt(2 * np.pi))
     elif pulse == "exp":
-        kern = double_exp(tkern, 0.5 , td)
+        kern = double_exp(tkern, 0.5, td)
     else:
         raise ValueError("pulse shape not implemented")
 
@@ -163,6 +164,7 @@ def create_fit_RB(regime, f, dt, PSD, normalized_data, T):
     )
     return time_series_fit, symbols, duration_time, forcing
 
+
 def create_fit_K(f, dt, normalized_data, T, pulse, td):
     """calculates fit for Lorenz system time series"""
     symbols = ""
@@ -174,26 +176,22 @@ def create_fit_K(f, dt, normalized_data, T, pulse, td):
 
     kernrad = 2**18
     time_kern = np.arange(-kernrad, kernrad + 1) * dt
-    #
-    # def obj_fun(x):
-    #     return 0.5 * np.sum(
-    #         (
-    #             generate_fpp_K(x, normalized_data, time_kern, dt, duration_time, T)[0]
-    #             ** 2
-    #             - normalized_data**2
-    #         )
-    #         ** 2
-    #     )
-    #
-    # res = minimize(
-    #     obj_fun,
-    #     [1.0, 1.0, 0.0, 0.0],
-    #     bounds=((0.0, 2.0), (0.0, 2.0), (-0.99, 0.99), (-0.5, 0.5)),
-    # )
+
+    def obj_fun(x):
+        return 0.5 * np.sum(
+            (
+                generate_fpp_K(x, normalized_data, time_kern, dt, T, pulse)[0] ** 2
+                - normalized_data**2
+            )
+            ** 2
+        )
+
+    res = minimize(obj_fun, x0 = 0.002, bounds=((0.001, 0.01),))
     time_series_fit, forcing = generate_fpp_K(
-        td, normalized_data, time_kern, dt, T, pulse
+        res.x, normalized_data, time_kern, dt, T, pulse
     )
-    return time_series_fit, symbols, 0.002, forcing
+    return time_series_fit, symbols, res.x, forcing
+
 
 def create_fit_RB_dipole(regime, f, dt, PSD, normalized_data, T):
     """calculates fit for Lorenz system time series"""
