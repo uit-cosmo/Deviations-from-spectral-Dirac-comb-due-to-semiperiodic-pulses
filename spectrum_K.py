@@ -21,7 +21,7 @@ K = (K - np.mean(K)) / np.std(K)
 
 f, Pxx = signal.welch(K, 1 / dt, nperseg=len(K) / 5)
 
-time_series_fit, symbols, _, forcing = create_fit_K(f, dt, K, time, "exp", 0.005)
+time_series_fit, symbols, _, forcing = create_fit_K(f, dt, K, time, "exp", 0.005, shuffled = False)
 
 f, Pxx_fit = signal.welch(time_series_fit, 1 / dt, nperseg=len(time_series_fit) / 5)
 
@@ -31,7 +31,7 @@ plt.plot(time, time_series_fit, "--")
 plt.xlabel(r"$t$")
 plt.ylabel(r"$\widetilde{K}$")
 plt.xlim(3,4)
-plt.savefig("K_fit.pdf", bbox_inches="tight")
+# plt.savefig("K_fit.pdf", bbox_inches="tight")
 plt.show()
 
 plt.semilogy(f, Pxx)
@@ -40,5 +40,5 @@ plt.xlabel(r"$f$")
 plt.ylabel(r"$S_{K}\left( f \right)$")
 plt.xlim(-10, 200)
 plt.ylim(1e-5, None)
-plt.savefig("S_K_semilogy.pdf", bbox_inches="tight")
+# plt.savefig("S_K_semilogy.pdf", bbox_inches="tight")
 plt.show()

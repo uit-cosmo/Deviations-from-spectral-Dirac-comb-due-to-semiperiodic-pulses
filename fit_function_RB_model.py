@@ -41,11 +41,18 @@ def generate_fpp_fixed_amp(var, normalized_data, tkern, dt, td, T):
     return time_series_fit, forcing
 
 
-def generate_fpp_K(td, normalized_data, tkern, dt, T, pulse):
+def generate_fpp_K(td, normalized_data, tkern, dt, T, pulse, shuffled = False):
     """generated normalized filtered point process as a fit for given data"""
     pos_peak_loc = find_peaks(normalized_data, height=2.5, distance=100)[0]
     forcing = np.zeros(T.size)
-    forcing[pos_peak_loc] = normalized_data[pos_peak_loc] * 1
+    if shuffled:
+        shuffled_positions = np.copy(pos_peak_loc)
+        rng = np.random.default_rng()
+        rng.shuffle(shuffled_positions)
+        forcing[pos_peak_loc] = normalized_data[shuffled_positions] * 1
+        print(shuffled_positions)
+    else:
+        forcing[pos_peak_loc] = normalized_data[pos_peak_loc] * 1
 
     def double_exp(tkern, lam, td):
         kern = np.zeros(tkern.size)
@@ -165,14 +172,9 @@ def create_fit_RB(regime, f, dt, PSD, normalized_data, T):
     return time_series_fit, symbols, duration_time, forcing
 
 
-def create_fit_K(f, dt, normalized_data, T, pulse, td):
+def create_fit_K(f, dt, normalized_data, T, pulse, td, shuffled = False):
     """calculates fit for Lorenz system time series"""
     symbols = ""
-
-    # fitrange = {"4e5": (f < 1600) & (f > 700), "2e6": (f < 5200) & (f > 3500)}
-    # duration_time = calculate_duration_time(
-    #     f[fitrange[regime]], PSD[(fitrange[regime])]
-    # )
 
     kernrad = 2**18
     time_kern = np.arange(-kernrad, kernrad + 1) * dt
@@ -188,7 +190,7 @@ def create_fit_K(f, dt, normalized_data, T, pulse, td):
 
     res = minimize(obj_fun, x0 = 0.002, bounds=((0.001, 0.01),))
     time_series_fit, forcing = generate_fpp_K(
-        res.x, normalized_data, time_kern, dt, T, pulse
+        res.x, normalized_data, time_kern, dt, T, pulse, shuffled = shuffled
     )
     return time_series_fit, symbols, res.x, forcing
 
