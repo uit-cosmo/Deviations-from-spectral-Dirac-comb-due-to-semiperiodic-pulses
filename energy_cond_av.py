@@ -96,12 +96,13 @@ _, s_av, _, t_av, peaks, wait = cond_av(U, time, smin=0, window=True, delta=0.08
 # plt.savefig("A_tau_U.pdf", bbox_inches="tight")
 # plt.show()
 
-kern = skewed_lorentz(t_av, t_av[1] - t_av[0], -0.999, 0.01, m=0.0)
+# kern = skewed_lorentz(t_av, t_av[1] - t_av[0], -0.999, 0.01, m=0.0)
+kern = double_exp(t_av, 0.13, 0.07)
 plt.plot(t_av, s_av / np.max(s_av))
-plt.plot(t_av + 0.005, kern / np.max(kern))
+plt.plot(t_av, kern / np.max(kern))
 plt.xlabel(r"$t$")
 plt.ylabel(r"$\left<\widetilde{K}\right>/\textrm{max}\left<\widetilde{K}\right>$")
-plt.savefig("CA_U.pdf", bbox_inches="tight")
+# plt.savefig("CA_U.pdf", bbox_inches="tight")
 plt.show()
 #
 # plt.hist(wait, 32)
