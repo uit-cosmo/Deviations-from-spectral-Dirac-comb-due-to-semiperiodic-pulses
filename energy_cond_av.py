@@ -19,7 +19,7 @@ K = K[600:]
 U = U[600:]
 time = time[600:]
 
-# K = (K - np.mean(K)) / np.std(K)
+K = (K - np.mean(K)) / np.std(K)
 _, s_av, _, t_av, peaks, wait = cond_av(K, time, smin=2.5, window=True, delta=0.08)
 
 # plt.scatter(peaks[:-1], peaks[1:])
@@ -27,13 +27,18 @@ _, s_av, _, t_av, peaks, wait = cond_av(K, time, smin=2.5, window=True, delta=0.
 # plt.ylabel(r"$A_{n+1}$")
 # plt.savefig("A_A+1_K.pdf", bbox_inches="tight")
 # plt.show()
-#
-# plt.scatter(peaks[:-1], wait[1:])
-# plt.xlabel(r"$A_n$")
-# plt.ylabel(r"$\tau_w$")
-# plt.savefig("A_tau_K.pdf", bbox_inches="tight")
-# plt.show()
 
+plt.scatter(peaks, wait)
+plt.xlabel(r"$A_{n}$")
+plt.ylabel(r"$\tau_{w, \texttt{preceding}}$")
+plt.savefig("A_tau_preceding.png", bbox_inches="tight")
+plt.show()
+
+plt.scatter(peaks[:-1], wait[1:])
+plt.xlabel(r"$A_{n}$")
+plt.ylabel(r"$\tau_{w, \texttt{trailing}}$")
+plt.savefig("A_tau_trailing.png", bbox_inches="tight")
+plt.show()
 
 def double_exp(tkern, lam, td):
     kern = np.zeros(tkern.size)
