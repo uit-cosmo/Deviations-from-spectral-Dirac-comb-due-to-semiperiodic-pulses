@@ -143,3 +143,8 @@ plot_forcing.py
 
 # .png plots
 *.png
+
+# .npy files
+*.npy
+
+/pdf_files
