@@ -10,16 +10,26 @@ from plot_lorentz_time_series import (
 
 axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
-K = np.load("K.npy")
-U = np.load("U.npy")
-time = np.load("K_time.npy")
+# K = np.load("K.npy")
+# U = np.load("U.npy")
+# time = np.load("K_time.npy")
+
+K = np.load("K_4e5.npy")
+U = np.load("U_4e5.npy")
+time = np.load("K_time_4e5.npy")
+print(len(K))
+K = K[:100000]
+U = U[:100000]
+time = time[:100000]
 
 # remove first event in time series
-K = K[600:]
-U = U[600:]
-time = time[600:]
+# K = K[600:]
+# U = U[600:]
+# time = time[600:]
 
 K = (K - np.mean(K)) / np.std(K)
+plt.plot(time, K)
+plt.show()
 _, s_av, _, t_av, peaks, wait = cond_av(K, time, smin=2.5, window=True, delta=0.08)
 
 # plt.scatter(peaks[:-1], peaks[1:])
@@ -31,14 +41,15 @@ _, s_av, _, t_av, peaks, wait = cond_av(K, time, smin=2.5, window=True, delta=0.
 plt.scatter(peaks, wait)
 plt.xlabel(r"$A_{n}$")
 plt.ylabel(r"$\tau_{w, \texttt{preceding}}$")
-plt.savefig("A_tau_preceding.png", bbox_inches="tight")
+# plt.savefig("A_tau_preceding.png", bbox_inches="tight")
 plt.show()
 
 plt.scatter(peaks[:-1], wait[1:])
 plt.xlabel(r"$A_{n}$")
 plt.ylabel(r"$\tau_{w, \texttt{trailing}}$")
-plt.savefig("A_tau_trailing.png", bbox_inches="tight")
+# plt.savefig("A_tau_trailing.png", bbox_inches="tight")
 plt.show()
+
 
 def double_exp(tkern, lam, td):
     kern = np.zeros(tkern.size)
@@ -50,7 +61,13 @@ def double_exp(tkern, lam, td):
 # kern = skewed_lorentz(t_av, t_av[1] - t_av[0], 0.0, 0.002, m=0)
 # kern = (np.pi*np.cosh(t_av/0.001))**(-1)
 # kern = np.exp(-(t_av/0.001)**2/2)/(np.sqrt(2*np.pi))
-kern = double_exp(t_av, 0.5, 0.005)
+
+# 2e6
+# kern = double_exp(t_av, 0.5, 0.005)
+
+# 4e5
+kern = double_exp(t_av, 0.3, 0.010)
+
 plt.plot(t_av, s_av / np.max(s_av))
 plt.plot(t_av, kern / np.max(kern))
 plt.xlabel(r"$t$")
@@ -68,17 +85,17 @@ f, Pxx = signal.welch(kern, 1 / dt, nperseg=len(kern) / 1)
 plt.loglog(f, Pxx)
 plt.show()
 
-# plt.hist(wait, 32)
-# plt.xlabel(r'$\tau_w$')
-# plt.ylabel(r'$P(\tau_w)$')
-# plt.savefig("tau_K.pdf", bbox_inches="tight")
-# plt.show()
-#
-# plt.hist(peaks, 32)
-# plt.xlabel(r'$peaks$')
-# plt.ylabel(r'$P(peaks)$')
-# plt.savefig("peaks_K.pdf", bbox_inches="tight")
-# plt.show()
+plt.hist(wait, 32)
+plt.xlabel(r"$\tau_w$")
+plt.ylabel(r"$P(\tau_w)$")
+plt.savefig("tau_K_4e5.png", bbox_inches="tight")
+plt.show()
+
+plt.hist(peaks, 32)
+plt.xlabel(r"$peaks$")
+plt.ylabel(r"$P(peaks)$")
+plt.savefig("peaks_K_4e5.png", bbox_inches="tight")
+plt.show()
 #
 # plt.plot(time, K)
 # plt.xlabel(r'$t$')
@@ -102,26 +119,32 @@ _, s_av, _, t_av, peaks, wait = cond_av(U, time, smin=0, window=True, delta=0.08
 # plt.show()
 
 # kern = skewed_lorentz(t_av, t_av[1] - t_av[0], -0.999, 0.01, m=0.0)
-kern = double_exp(t_av, 0.13, 0.07)
+
+# 2e6
+# kern = double_exp(t_av, 0.13, 0.07)
+
+# 4e5
+kern = double_exp(t_av, 0.2, 0.07)
+
 plt.plot(t_av, s_av / np.max(s_av))
 plt.plot(t_av, kern / np.max(kern))
 plt.xlabel(r"$t$")
 plt.ylabel(r"$\left<\widetilde{K}\right>/\textrm{max}\left<\widetilde{K}\right>$")
 # plt.savefig("CA_U.pdf", bbox_inches="tight")
 plt.show()
-#
-# plt.hist(wait, 32)
-# plt.xlabel(r'$\tau_w$')
-# plt.ylabel(r'$P(\tau_w)$')
-# plt.savefig("tau_U.pdf", bbox_inches="tight")
-# plt.show()
-#
-# plt.hist(peaks, 32)
-# plt.xlabel(r'$peaks$')
-# plt.ylabel(r'$P(peaks)$')
-# plt.savefig("peaks_U.pdf", bbox_inches="tight")
-# plt.show()
-#
+
+plt.hist(wait, 32)
+plt.xlabel(r"$\tau_w$")
+plt.ylabel(r"$P(\tau_w)$")
+plt.savefig("tau_U_4e5.png", bbox_inches="tight")
+plt.show()
+
+plt.hist(peaks, 32)
+plt.xlabel(r"$peaks$")
+plt.ylabel(r"$P(peaks)$")
+plt.savefig("peaks_U_4e5.png", bbox_inches="tight")
+plt.show()
+
 # plt.plot(time, U)
 # plt.xlabel(r'$t$')
 # plt.ylabel(r'$\widetilde{U}$')
