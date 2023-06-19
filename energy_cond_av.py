@@ -14,13 +14,17 @@ axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 # U = np.load("U.npy")
 # time = np.load("K_time.npy")
 
-K = np.load("K_4e5.npy")
-U = np.load("U_4e5.npy")
-time = np.load("K_time_4e5.npy")
-print(len(K))
-K = K[:100000]
-U = U[:100000]
-time = time[:100000]
+K = np.load("K_1e7.npy")
+U = np.load("U_1e7.npy")
+time = np.load("K_time_1e7.npy")
+
+# K = np.load("K_8e3.npy")
+# U = np.load("U_8e3.npy")
+# time = np.load("K_time_8e3.npy")
+
+# K = K[:100000]
+# U = U[:100000]
+# time = time[:100000]
 
 # remove first event in time series
 # K = K[600:]
@@ -30,7 +34,8 @@ time = time[:100000]
 K = (K - np.mean(K)) / np.std(K)
 plt.plot(time, K)
 plt.show()
-_, s_av, _, t_av, peaks, wait = cond_av(K, time, smin=2.5, window=True, delta=0.08)
+_, s_av, _, t_av, peaks, wait = cond_av(K, time, smin=2.5, window=True, delta=0.02)
+# _, s_av, _, t_av, peaks, wait = cond_av(K, time, smin=0.0, window=True, delta=0.02)
 
 # plt.scatter(peaks[:-1], peaks[1:])
 # plt.xlabel(r"$A_n$")
@@ -88,13 +93,13 @@ plt.show()
 plt.hist(wait, 32)
 plt.xlabel(r"$\tau_w$")
 plt.ylabel(r"$P(\tau_w)$")
-plt.savefig("tau_K_4e5.png", bbox_inches="tight")
+# plt.savefig("tau_K_4e5.png", bbox_inches="tight")
 plt.show()
 
 plt.hist(peaks, 32)
 plt.xlabel(r"$peaks$")
 plt.ylabel(r"$P(peaks)$")
-plt.savefig("peaks_K_4e5.png", bbox_inches="tight")
+# plt.savefig("peaks_K_4e5.png", bbox_inches="tight")
 plt.show()
 #
 # plt.plot(time, K)
@@ -104,49 +109,49 @@ plt.show()
 # plt.show()
 
 # U = (U - np.mean(U)) / np.std(U)
-_, s_av, _, t_av, peaks, wait = cond_av(U, time, smin=0, window=True, delta=0.08)
-
-# plt.scatter(peaks[:-1], peaks[1:])
-# plt.xlabel(r"$A_n$")
-# plt.ylabel(r"$A_{n+1}$")
-# plt.savefig("A_A+1_U.pdf", bbox_inches="tight")
+# _, s_av, _, t_av, peaks, wait = cond_av(U, time, smin=0, window=True, delta=0.02)
+#
+# # plt.scatter(peaks[:-1], peaks[1:])
+# # plt.xlabel(r"$A_n$")
+# # plt.ylabel(r"$A_{n+1}$")
+# # plt.savefig("A_A+1_U.pdf", bbox_inches="tight")
+# # plt.show()
+# #
+# # plt.scatter(peaks[:-1], wait[1:])
+# # plt.xlabel(r"$A_n$")
+# # plt.ylabel(r"$\tau_w$")
+# # plt.savefig("A_tau_U.pdf", bbox_inches="tight")
+# # plt.show()
+#
+# # kern = skewed_lorentz(t_av, t_av[1] - t_av[0], -0.999, 0.01, m=0.0)
+#
+# # 2e6
+# # kern = double_exp(t_av, 0.13, 0.07)
+#
+# # 4e5
+# kern = double_exp(t_av, 0.2, 0.07)
+#
+# plt.plot(t_av, s_av / np.max(s_av))
+# plt.plot(t_av, kern / np.max(kern))
+# plt.xlabel(r"$t$")
+# plt.ylabel(r"$\left<\widetilde{K}\right>/\textrm{max}\left<\widetilde{K}\right>$")
+# # plt.savefig("CA_U.pdf", bbox_inches="tight")
 # plt.show()
 #
-# plt.scatter(peaks[:-1], wait[1:])
-# plt.xlabel(r"$A_n$")
-# plt.ylabel(r"$\tau_w$")
-# plt.savefig("A_tau_U.pdf", bbox_inches="tight")
+# plt.hist(wait, 32)
+# plt.xlabel(r"$\tau_w$")
+# plt.ylabel(r"$P(\tau_w)$")
+# plt.savefig("tau_U_4e5.png", bbox_inches="tight")
 # plt.show()
-
-# kern = skewed_lorentz(t_av, t_av[1] - t_av[0], -0.999, 0.01, m=0.0)
-
-# 2e6
-# kern = double_exp(t_av, 0.13, 0.07)
-
-# 4e5
-kern = double_exp(t_av, 0.2, 0.07)
-
-plt.plot(t_av, s_av / np.max(s_av))
-plt.plot(t_av, kern / np.max(kern))
-plt.xlabel(r"$t$")
-plt.ylabel(r"$\left<\widetilde{K}\right>/\textrm{max}\left<\widetilde{K}\right>$")
-# plt.savefig("CA_U.pdf", bbox_inches="tight")
-plt.show()
-
-plt.hist(wait, 32)
-plt.xlabel(r"$\tau_w$")
-plt.ylabel(r"$P(\tau_w)$")
-plt.savefig("tau_U_4e5.png", bbox_inches="tight")
-plt.show()
-
-plt.hist(peaks, 32)
-plt.xlabel(r"$peaks$")
-plt.ylabel(r"$P(peaks)$")
-plt.savefig("peaks_U_4e5.png", bbox_inches="tight")
-plt.show()
-
-# plt.plot(time, U)
-# plt.xlabel(r'$t$')
-# plt.ylabel(r'$\widetilde{U}$')
-# plt.savefig("U_norm.pdf", bbox_inches="tight")
+#
+# plt.hist(peaks, 32)
+# plt.xlabel(r"$peaks$")
+# plt.ylabel(r"$P(peaks)$")
+# # plt.savefig("peaks_U_4e5.png", bbox_inches="tight")
 # plt.show()
+#
+# # plt.plot(time, U)
+# # plt.xlabel(r'$t$')
+# # plt.ylabel(r'$\widetilde{U}$')
+# # plt.savefig("U_norm.pdf", bbox_inches="tight")
+# # plt.show()
