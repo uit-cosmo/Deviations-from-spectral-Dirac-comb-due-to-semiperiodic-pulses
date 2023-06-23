@@ -4,9 +4,7 @@ from scipy import signal
 import cosmoplots
 from fppanalysis import cond_av
 
-from plot_lorentz_time_series import (
-    skewed_lorentz,
-)
+from plot_lorentz_time_series import skewed_lorentz
 
 axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
