@@ -41,9 +41,9 @@ def generate_fpp_fixed_amp(var, normalized_data, tkern, dt, td, T):
     return time_series_fit, forcing
 
 
-def generate_fpp_U(td, normalized_data, tkern, dt, T, pulse, shuffled=False, lam=0.5):
+def generate_fpp_U(td, normalized_data, tkern, dt, T, pulse, lam, shuffled=False):
     """generated normalized filtered point process as a fit for given data"""
-    pos_peak_loc = find_peaks(normalized_data, height=0, distance=100)[0]
+    pos_peak_loc = find_peaks(normalized_data, height=0, distance=200)[0]
     forcing = np.zeros(T.size)
     if shuffled:
         shuffled_positions = np.copy(pos_peak_loc)
@@ -76,9 +76,9 @@ def generate_fpp_U(td, normalized_data, tkern, dt, T, pulse, shuffled=False, lam
     return time_series_fit, forcing
 
 
-def generate_fpp_K(td, normalized_data, tkern, dt, T, pulse, shuffled=False, lam=0.5):
+def generate_fpp_K(td, normalized_data, tkern, dt, T, pulse, shuffled=False, lam=0.5, distance=200):
     """generated normalized filtered point process as a fit for given data"""
-    pos_peak_loc = find_peaks(normalized_data, height=2.5, distance=100)[0]
+    pos_peak_loc = find_peaks(normalized_data, height=1.0, distance=distance)[0]
     forcing = np.zeros(T.size)
     if shuffled:
         shuffled_positions = np.copy(pos_peak_loc)
@@ -207,53 +207,56 @@ def create_fit_RB(regime, f, dt, PSD, normalized_data, T):
     return time_series_fit, symbols, duration_time, forcing
 
 
-def create_fit_K(f, dt, normalized_data, T, pulse, td, shuffled=False, lam=0.5):
+def create_fit_K(f, dt, normalized_data, T, pulse, td, shuffled=False, lam=0.5, distance=200):
     """calculates fit for Lorenz system time series"""
     symbols = ""
 
     kernrad = 2**18
     time_kern = np.arange(-kernrad, kernrad + 1) * dt
 
-    def obj_fun(x):
-        return 0.5 * np.sum(
-            (
-                generate_fpp_K(x, normalized_data, time_kern, dt, T, pulse, lam=0.5)[0]
-                ** 2
-                - normalized_data**2
-            )
-            ** 2
-        )
-
-    res = minimize(obj_fun, x0=0.002, bounds=((0.001, 0.01),))
+    # def obj_fun(x):
+    #     return 0.5 * np.sum(
+    #         (
+    #             generate_fpp_K(x, normalized_data, time_kern, dt, T, pulse, lam=0.5)[0]
+    #             ** 2
+    #             - normalized_data**2
+    #         )
+    #         ** 2
+    #     )
+    #
+    # res = minimize(obj_fun, x0=0.002, bounds=((0.001, 0.01),))
+    # time_series_fit, forcing = generate_fpp_K(
+    #     res.x, normalized_data, time_kern, dt, T, pulse, lam=0.5
+    # )
     time_series_fit, forcing = generate_fpp_K(
-        res.x, normalized_data, time_kern, dt, T, pulse, lam=0.5
+        td, normalized_data, time_kern, dt, T, pulse, distance=distance, lam=lam
     )
-    return time_series_fit, symbols, res.x, forcing
+    return time_series_fit, symbols, td, forcing
 
 
-def create_fit_U(f, dt, normalized_data, T, pulse, td, shuffled=False, lam=0.5):
+def create_fit_U(f, dt, normalized_data, T, pulse, td, lam, shuffled=False):
     """calculates fit for Lorenz system time series"""
     symbols = ""
 
     kernrad = 2**18
     time_kern = np.arange(-kernrad, kernrad + 1) * dt
 
-    def obj_fun(x):
-        return 0.5 * np.sum(
-            (
-                generate_fpp_U(x, normalized_data, time_kern, dt, T, pulse, lam=0.5)[0]
-                ** 2
-                - normalized_data**2
-            )
-            ** 2
-        )
-
-    res = minimize(obj_fun, x0=0.13, bounds=((0.05, 0.3),))
+    # def obj_fun(x):
+    #     return 0.5 * np.sum(
+    #         (
+    #             generate_fpp_U(x, normalized_data, time_kern, dt, T, pulse, lam=0.5)[0]
+    #             ** 2
+    #             - normalized_data**2
+    #         )
+    #         ** 2
+    #     )
+    #
+    # res = minimize(obj_fun, x0=0.13, bounds=((0.05, 0.3),))
     time_series_fit, forcing = generate_fpp_U(
-        res.x, normalized_data, time_kern, dt, T, pulse, lam=0.5
+        td, normalized_data, time_kern, dt, T, pulse, lam
     )
-    print(res.x)
-    return time_series_fit, symbols, res.x, forcing
+    # print(res.x)
+    return time_series_fit, symbols, td, forcing
 
 
 def create_fit_RB_dipole(regime, f, dt, PSD, normalized_data, T):
