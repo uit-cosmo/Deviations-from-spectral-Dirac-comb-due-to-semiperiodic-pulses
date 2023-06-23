@@ -69,6 +69,7 @@ plt.plot(time, K)
 plt.plot(time, K_fit, "--")
 plt.xlabel(r"$t$")
 plt.ylabel(r"$\widetilde{K}$")
+plt.xlim(70000, 72000)
 plt.show()
 
 
@@ -77,9 +78,9 @@ f, PK_fit = signal.welch(K_fit, 1 / dt, nperseg=len(K_fit) / 4)
 plt.semilogy(fK, PK)
 plt.semilogy(f, PK_fit, "--")
 plt.xlabel(r"$f$")
-plt.ylabel(r"$S_{K}\left( f \right)$")
-# plt.xlim(-10, 200)
-# plt.ylim(1e-5, None)
+plt.ylabel(r"$S_{\widetilde{K}}\left( f \right)$")
+plt.xlim(-0.01, 0.1)
+plt.ylim(1e-2, None)
 plt.show()
 
 #
