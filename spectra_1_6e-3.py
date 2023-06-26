@@ -32,12 +32,12 @@ plt.plot(t_av, K_av / np.max(K_av))
 plt.plot(t_av, kern / np.max(kern))
 plt.show()
 
-_, U_av, _, t_av, peaks, wait = cond_av(U, time, smin=0, window=True, delta=50)
-kern = double_exp(t_av, 0.1, 500)
-
-plt.plot(t_av, U_av / np.max(U_av))
-plt.plot(t_av, kern / np.max(kern))
-plt.show()
+# _, U_av, _, t_av, peaks, wait = cond_av(U, time, smin=0, window=True, delta=50)
+# kern = double_exp(t_av, 0.1, 500)
+#
+# plt.plot(t_av, U_av / np.max(U_av))
+# plt.plot(t_av, kern / np.max(kern))
+# plt.show()
 
 # plt.hist(peaks, 32)
 # plt.xlabel('peaks')
@@ -45,6 +45,9 @@ plt.show()
 # plt.show()
 
 wait = wait[wait > 50]
+
+print(f"Mean wait: {np.mean(wait)}")
+print(f"std wait: {np.std(wait)}")
 
 plt.hist(wait / np.mean(wait), 32, density=True)
 plt.xlabel(r"$\tau_w/\langle\tau_w\rangle$")

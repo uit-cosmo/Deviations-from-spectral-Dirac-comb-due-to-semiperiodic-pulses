@@ -34,6 +34,9 @@ plt.show()
 _, K_av, _, t_av, peaks, wait = cond_av(K, time, smin=1, window=True, delta=200)
 kern = double_exp(t_av, 0.5, 10)
 
+print(f"Mean wait: {np.mean(wait)}")
+print(f"std wait: {np.std(wait)}")
+
 plt.plot(t_av, K_av / np.max(K_av))
 plt.plot(t_av, kern / np.max(kern))
 plt.show()
