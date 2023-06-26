@@ -85,8 +85,8 @@ plt.semilogy(fK, PK)
 plt.semilogy(f, PK_fit, "--")
 plt.xlabel(r"$f$")
 plt.ylabel(r"$S_{\widetilde{K}}\left( f \right)$")
-plt.xlim(-0.01, 0.1)
-plt.ylim(1e-2, None)
+plt.xlim(-0.003, 0.03)
+plt.ylim(1e-1, None)
 plt.show()
 
 #
