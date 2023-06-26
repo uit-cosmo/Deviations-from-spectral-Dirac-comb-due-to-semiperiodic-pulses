@@ -76,7 +76,9 @@ def generate_fpp_U(td, normalized_data, tkern, dt, T, pulse, lam, shuffled=False
     return time_series_fit, forcing
 
 
-def generate_fpp_K(td, normalized_data, tkern, dt, T, pulse, shuffled=False, lam=0.5, distance=200):
+def generate_fpp_K(
+    td, normalized_data, tkern, dt, T, pulse, shuffled=False, lam=0.5, distance=200
+):
     """generated normalized filtered point process as a fit for given data"""
     pos_peak_loc = find_peaks(normalized_data, height=1.0, distance=distance)[0]
     forcing = np.zeros(T.size)
@@ -207,7 +209,9 @@ def create_fit_RB(regime, f, dt, PSD, normalized_data, T):
     return time_series_fit, symbols, duration_time, forcing
 
 
-def create_fit_K(f, dt, normalized_data, T, pulse, td, shuffled=False, lam=0.5, distance=200):
+def create_fit_K(
+    f, dt, normalized_data, T, pulse, td, shuffled=False, lam=0.5, distance=200
+):
     """calculates fit for Lorenz system time series"""
     symbols = ""
 

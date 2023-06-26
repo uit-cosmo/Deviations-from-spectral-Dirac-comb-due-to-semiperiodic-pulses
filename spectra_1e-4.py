@@ -14,15 +14,21 @@ def double_exp(tkern, lam, td):
 
 K = np.load("K_1e-4.npy")
 time = np.load("K_time_1e-4.npy")
-U = np.load("U_1e-4.npy")
+# U = np.load("U_1e-4.npy")
 dt = time[1] - time[0]
 
+K_2 = np.load("K_1e-4_2.npy")
+time_2 = np.load("K_time_1e-4_2.npy")
+
+K = np.append(K, K_2)
+time = np.append(time, time_2)
+
 K = K[2000:]
-U = U[2000:]
+# U = U[2000:]
 time = time[2000:]
 
 plt.plot(time, K)
-plt.plot(time, U)
+# plt.plot(time, U)
 plt.show()
 
 _, K_av, _, t_av, peaks, wait = cond_av(K, time, smin=1, window=True, delta=200)
@@ -32,32 +38,32 @@ plt.plot(t_av, K_av / np.max(K_av))
 plt.plot(t_av, kern / np.max(kern))
 plt.show()
 
-_, U_av, _, t_av, peaks, wait = cond_av(U, time, smin=0, window=True, delta=200)
-kern = double_exp(t_av, 0.1, 500)
+# _, U_av, _, t_av, peaks, wait = cond_av(U, time, smin=0, window=True, delta=200)
+# kern = double_exp(t_av, 0.1, 500)
 
-plt.plot(t_av, U_av / np.max(U_av))
-plt.plot(t_av, kern / np.max(kern))
-plt.show()
+# plt.plot(t_av, U_av / np.max(U_av))
+# plt.plot(t_av, kern / np.max(kern))
+# plt.show()
 
-plt.hist(peaks, 32)
-plt.xlabel('peaks')
-plt.ylabel('P(peaks)')
-plt.show()
+# plt.hist(peaks, 32)
+# plt.xlabel("peaks")
+# plt.ylabel("P(peaks)")
+# plt.show()
 
-wait = wait[wait>200]
-plt.hist(wait/np.mean(wait), 32)
-plt.xlabel(r'$\tau_w/\langle\tau_w\rangle$')
-plt.ylabel(r'$P(\tau_w/\langle\tau_w\rangle)$')
+wait = wait[wait > 200]
+plt.hist(wait / np.mean(wait), 32, density=True)
+plt.xlabel(r"$\tau_w/\langle\tau_w\rangle$")
+plt.ylabel(r"$P(\tau_w/\langle\tau_w\rangle)$")
 plt.show()
 
 K = (K - np.mean(K)) / np.std(K)
-U = (U - np.mean(U)) / np.std(U)
+# U = (U - np.mean(U)) / np.std(U)
 
 fK, PK = signal.welch(K, 1 / dt, nperseg=len(K) / 4)
-fU, PU = signal.welch(U, 1 / dt, nperseg=len(U) / 4)
+# fU, PU = signal.welch(U, 1 / dt, nperseg=len(U) / 4)
 
 plt.semilogy(fK, PK)
-plt.semilogy(fU, PU)
+# plt.semilogy(fU, PU)
 plt.show()
 
 

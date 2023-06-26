@@ -44,11 +44,11 @@ plt.show()
 # plt.ylabel('P(peaks)')
 # plt.show()
 
-wait = wait[wait>50]
+wait = wait[wait > 50]
 
-plt.hist(wait/np.mean(wait), 32)
-plt.xlabel(r'$\tau_w/\langle\tau_w\rangle$')
-plt.ylabel(r'$P(\tau_w/\langle\tau_w\rangle)$')
+plt.hist(wait / np.mean(wait), 32, density=True)
+plt.xlabel(r"$\tau_w/\langle\tau_w\rangle$")
+plt.ylabel(r"$P(\tau_w/\langle\tau_w\rangle)$")
 plt.show()
 
 K = (K - np.mean(K)) / np.std(K)
