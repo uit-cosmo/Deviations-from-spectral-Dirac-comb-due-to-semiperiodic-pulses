@@ -23,12 +23,11 @@ class ForcingQuasiPeriodic(frc.ForcingGenerator):
 
     def get_forcing(self, times: np.ndarray, gamma: float) -> frc.Forcing:
         total_pulses = int(max(times) * gamma)
-        periodic_waiting_times = np.arange(1, total_pulses + 1)
-        waiting_times_jitter = np.random.normal(loc=1, scale=self.nu, size=total_pulses)
-        # * 100 for dt correction
-        arrival_times = (periodic_waiting_times + waiting_times_jitter) * 100 / gamma
-
-        # arrival_times = np.add.accumulate(waiting_times)
+        waiting_times = (
+            np.random.normal(loc=1, scale=self.nu, size=total_pulses)
+            * 100  # multiplied with inverse dt
+        ) / gamma
+        arrival_times = np.add.accumulate(waiting_times)
         arrival_time_indx = np.rint(arrival_times).astype(int)
         arrival_time_indx -= arrival_time_indx[0]  # set first pulse to t = 0
         # check whether events are sampled with arrival time > times[-1]
@@ -60,7 +59,7 @@ model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 
 colors = ["tab:blue", "tab:orange", "tab:olive"]
-for i, nu in enumerate([0.0, 0.1, 0.4]):
+for i, nu in enumerate([0.1, 0.4, 3.0]):
     model.set_custom_forcing_generator(ForcingQuasiPeriodic(nu=nu))
 
     T, S = model.make_realization()
@@ -70,10 +69,10 @@ for i, nu in enumerate([0.0, 0.1, 0.4]):
     S_norm = (S - S.mean()) / S.std()
 
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
-    ax1.semilogy(f, Pxx, label=rf"$\nu = {nu}$", color=colors[i])
+    ax1.semilogy(f, Pxx, label=rf"$\nu= {nu}$", color=colors[i])
 
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
-    ax2.plot(tb, R, label=rf"$\nu = {nu}$", color=colors[i])
+    ax2.plot(tb, R, label=rf"$\nu= {nu}$", color=colors[i])
 
 # PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
 # ax1.semilogy(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
