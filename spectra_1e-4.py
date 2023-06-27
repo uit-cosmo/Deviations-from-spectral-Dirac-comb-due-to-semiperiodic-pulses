@@ -20,8 +20,14 @@ dt = time[1] - time[0]
 K_2 = np.load("K_1e-4_2.npy")
 time_2 = np.load("K_time_1e-4_2.npy")
 
+K_3 = np.load("K_1e-4_3.npy")
+time_3 = np.load("K_time_1e-4_3.npy")
+
 K = np.append(K, K_2)
 time = np.append(time, time_2)
+
+K = np.append(K, K_3)
+time = np.append(time, time_3)
 
 K = K[2000:]
 # U = U[2000:]
