@@ -8,6 +8,7 @@ import cosmoplots
 
 axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
+
 def double_exp(tkern, lam, td):
     kern = np.zeros(tkern.size)
     kern[tkern < 0] = np.exp(tkern[tkern < 0] / lam / td)
