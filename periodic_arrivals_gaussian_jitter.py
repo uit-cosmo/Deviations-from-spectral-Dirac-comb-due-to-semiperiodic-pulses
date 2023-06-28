@@ -13,8 +13,8 @@ axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
 fig_PSD = plt.figure()
 ax1 = fig_PSD.add_axes(axes_size)
-fig_AC = plt.figure()
-ax2 = fig_AC.add_axes(axes_size)
+# fig_AC = plt.figure()
+# ax2 = fig_AC.add_axes(axes_size)
 
 
 class ForcingQuasiPeriodic(frc.ForcingGenerator):
@@ -62,7 +62,7 @@ model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 
 colors = ["tab:blue", "tab:orange", "tab:olive"]
-for i, variance in enumerate([0.01]):  # , 0.1, 0.4]):
+for i, variance in enumerate([0.01]):#, 0.01, 0.04]):
     model.set_custom_forcing_generator(ForcingQuasiPeriodic(variance=variance))
 
     T, S = model.make_realization()
@@ -73,12 +73,12 @@ for i, variance in enumerate([0.01]):  # , 0.1, 0.4]):
     S_norm = S - S.mean()
 
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
-    ax1.semilogy(f, Pxx, label=rf"$\nu = {variance}$", color=colors[i])
+    ax1.semilogy(f, Pxx, label=rf"$\sigma = {variance}$", color=colors[i])
 
-    tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
-    ax2.plot(tb, R, label=rf"$\nu = {variance}$", color=colors[i])
+    # tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
+    # ax2.plot(tb, R, label=rf"$\sigma = {variance}$", color=colors[i])
 
-PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
+# PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
 # ax1.semilogy(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
 # t = np.linspace(0, 50, 1000)
 # R_an = autocorr_periodic_arrivals(t, 0.2, 1, 1)
@@ -110,7 +110,7 @@ def spectra_analytical(omega, gamma, A_rms, A_mean, sigma, dt):
 
     second_term = (
         2
-        * np.pi
+        * np.pi**2
         * gamma**2
         * A_mean**2
         * I_2
@@ -119,23 +119,28 @@ def spectra_analytical(omega, gamma, A_rms, A_mean, sigma, dt):
     ) * tmp
     return 2 * (first_term + second_term / dt)
 
-
+gamma = 0.2
 PSD = spectra_analytical(
-    2 * np.pi * f, gamma=0.2, A_rms=1, A_mean=1, sigma=0.1, dt=0.01
+    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.1/gamma, dt=0.01
 )
 ax1.semilogy(f, PSD, "--k", label=r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
 
+# PSD = spectra_analytical(
+#     2 * np.pi * f, gamma=0.2, A_rms=1, A_mean=1, sigma=0.1, dt=0.01
+# )
+
+# ax1.semilogy(f, PSD, "--k", label=r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
 ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
 ax1.set_ylabel(r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
 ax1.set_xlim(-0.03, 1)
 ax1.set_ylim(1e-4, 1e2)
 ax1.legend()
-
-ax2.set_xlim(0, 50)
-ax2.set_xlabel(r"$t/\tau_\mathrm{d}$")
-ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
-ax2.legend()
-cosmoplots.change_log_axis_base(ax1, "y", base=10)
+#
+# ax2.set_xlim(0, 50)
+# ax2.set_xlabel(r"$t/\tau_\mathrm{d}$")
+# ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
+# ax2.legend()
+# cosmoplots.change_log_axis_base(ax1, "y", base=10)
 
 # fig_PSD.savefig("PSD_gaussian_jitter.eps", bbox_inches="tight")
 # fig_AC.savefig("AC_gaussian_jitter.eps", bbox_inches="tight")
