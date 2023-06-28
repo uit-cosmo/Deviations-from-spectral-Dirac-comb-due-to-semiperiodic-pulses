@@ -3,6 +3,10 @@ from fppanalysis import cond_av
 from scipy import signal
 import matplotlib.pyplot as plt
 from fit_function_RB_model import create_fit_K
+import cosmoplots
+
+
+axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 
 
 def double_exp(tkern, lam, td):
@@ -52,6 +56,7 @@ print(f"std wait: {np.std(wait)}")
 plt.hist(wait / np.mean(wait), 32, density=True)
 plt.xlabel(r"$\tau_w/\langle\tau_w\rangle$")
 plt.ylabel(r"$P(\tau_w/\langle\tau_w\rangle)$")
+plt.savefig("P(tau)_1_6e-3.eps", bbox_inches="tight")
 plt.show()
 
 K = (K - np.mean(K)) / np.std(K)
@@ -75,6 +80,7 @@ plt.plot(time, K_fit, "--")
 plt.xlabel(r"$t$")
 plt.ylabel(r"$\widetilde{K}$")
 plt.xlim(20000, 22000)
+plt.savefig("K_fit_1_6e-3.eps", bbox_inches="tight")
 plt.show()
 
 
@@ -86,4 +92,5 @@ plt.xlabel(r"$f$")
 plt.ylabel(r"$S_{\widetilde{K}}\left( f \right)$")
 plt.xlim(-0.01, 0.1)
 plt.ylim(1e-2, None)
+plt.savefig("S(K)_fit_1_6e-3.eps", bbox_inches="tight")
 plt.show()
