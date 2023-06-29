@@ -6,7 +6,6 @@ import model.forcing as frc
 import model.point_model as pm
 import model.pulse_shape as ps
 import cosmoplots
-from closedexpressions import PSD_periodic_arrivals, autocorr_periodic_arrivals
 
 
 axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
@@ -30,7 +29,6 @@ class ForcingQuasiPeriodic(frc.ForcingGenerator):
         # * 100 for dt correction
         arrival_times = (periodic_waiting_times + waiting_times_jitter) * 100 / gamma
 
-        # arrival_times = np.add.accumulate(waiting_times)
         arrival_time_indx = np.rint(arrival_times).astype(int)
         arrival_time_indx -= arrival_time_indx[0]  # set first pulse to t = 0
         # check whether events are sampled with arrival time > times[-1]
@@ -39,10 +37,6 @@ class ForcingQuasiPeriodic(frc.ForcingGenerator):
         arrival_time_indx = arrival_time_indx[arrival_time_indx < times.size]
 
         amplitudes = np.random.default_rng().exponential(scale=1.0, size=total_pulses)
-        # amplitudes = np.random.default_rng().normal(loc=0,scale=1.0, size=total_pulses)
-        # amplitudes = np.ones(total_pulses)
-        print(np.mean(amplitudes))
-        print(np.std(amplitudes))
         durations = np.ones(shape=total_pulses)
 
         return frc.Forcing(
@@ -70,41 +64,19 @@ for i, sigma in enumerate([0.0, 0.1, 0.3]):
     model.set_custom_forcing_generator(ForcingQuasiPeriodic(sigma=sigma))
 
     T, S = model.make_realization()
-    forcing = model.get_last_used_forcing()
-    F = np.zeros(len(S))
-    matching_indexes = np.isin(T, forcing.arrival_times)
-    F[matching_indexes] = 1
-    # plt.plot(T, S)
-    # plt.plot(T, F)
-    # plt.show()
-    amp = forcing.amplitudes
-
-    # S_norm = (S - S.mean()) / S.std()
     S_norm = S - S.mean()
-    F_norm = F - F.mean()
 
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
-    # f, Pxx = signal.welch(x=F_norm, fs=100, nperseg=S.size / 30)
-    # f, Pxx = signal.periodogram(x=S_norm, fs=100)
-    print(f"Integrated spectrum: {np.trapz(Pxx,f)}")
     ax1.semilogy(f, Pxx, label=rf"$\sigma = {sigma}$", color=colors[i])
 
     if i == 2:
-        fitrange = signal.find_peaks(Pxx[(f < 0.3)], distance=500, height=[5e-4, 1e3])[
-            0
-        ]
+        fitrange = signal.find_peaks(Pxx[(f < 0.3)], distance=500, height=[5e-4, 1e3])[0]
     else:
         fitrange = signal.find_peaks(Pxx[(f < 1)], distance=500, height=[5e-4, 1e3])[0]
     ax1.semilogy(f[fitrange][1:], Pxx[fitrange][1:], "o", c=colors[i])
-
+    
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
     ax2.plot(tb, R, label=rf"$\sigma = {sigma}$", color=colors[i])
-
-# PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
-# ax1.semilogy(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
-# t = np.linspace(0, 50, 1000)
-# R_an = autocorr_periodic_arrivals(t, 0.2, 1, 1)
-# ax2.plot(t, R_an, "--k", label=r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
 
 
 def Lorentz_PSD(theta):
@@ -123,12 +95,7 @@ def spectra_analytical(omega, gamma, A_rms, A_mean, sigma, dt):
     nu = sigma * gamma
     Omega = omega / gamma
     I_2 = 1 / (2 * np.pi)
-    first_term = (
-        gamma
-        * (A_rms**2 + A_mean**2 * (1 - np.exp(-(nu**2) * Omega**2)))
-        * I_2
-        * Lorentz_PSD(omega)
-    )
+    first_term = gamma * (A_rms**2 + A_mean**2*(1 - np.exp(-(nu**2) * Omega**2))) * I_2 * Lorentz_PSD(omega)
 
     tmp = np.zeros(omega.size)
     for n in range(-1000, 1000):
@@ -146,27 +113,22 @@ def spectra_analytical(omega, gamma, A_rms, A_mean, sigma, dt):
     ) * tmp
     return 2 * (first_term + second_term / dt)
 
-
 gamma = 0.2
 PSD = spectra_analytical(
-    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.0 / gamma, dt=0.01
+    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.0/gamma, dt=0.01
 )
 ax1.semilogy(f, PSD, "--k", label=r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
 
 PSD = spectra_analytical(
-    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.1 / gamma, dt=0.01
+    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.1/gamma, dt=0.01
 )
 ax1.semilogy(f, PSD, "--k")
 PSD = spectra_analytical(
-    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.3 / gamma, dt=0.01
+    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.3/gamma, dt=0.01
 )
 ax1.semilogy(f, PSD, "--k")
 
-# PSD = spectra_analytical(
-#     2 * np.pi * f, gamma=0.2, A_rms=1, A_mean=1, sigma=0.1, dt=0.01
-# )
 
-# ax1.semilogy(f, PSD, "--k", label=r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
 ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
 ax1.set_ylabel(r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
 ax1.set_xlim(-0.03, 0.8)
