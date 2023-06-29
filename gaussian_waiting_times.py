@@ -120,7 +120,7 @@ ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
 ax2.legend()
 cosmoplots.change_log_axis_base(ax1, "y", base=10)
 
-fig_PSD.savefig("PSD_guassian_waiting_times.eps", bbox_inches="tight")
+fig_PSD.savefig("PSD_gaussian_waiting_times.eps", bbox_inches="tight")
 fig_AC.savefig("AC_gaussian_waiting_times.eps", bbox_inches="tight")
 
 plt.show()
