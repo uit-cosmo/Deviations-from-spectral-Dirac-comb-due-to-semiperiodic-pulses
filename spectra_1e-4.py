@@ -34,7 +34,7 @@ K = (K - np.mean(K)) / np.std(K)
 fK, PK = signal.welch(K, 1 / dt, nperseg=len(K) / 4)
 
 K_fit, symbols, _, _ = create_fit_K(
-    fK, dt, K, time, "exp", td=10, shuffled=False, lam=0.5
+    fK, dt, K, time, td=10, lam=0.5
 )
 
 plt.plot(time, K)
