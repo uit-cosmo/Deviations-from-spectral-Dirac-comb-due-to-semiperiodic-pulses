@@ -16,8 +16,8 @@ def double_exp(tkern, lam, td):
     return kern
 
 
-K = np.load("K_1e-4_data.npy")
-time = np.load("time_1e-4_data.npy")
+K = np.load("./RB_data/K_1e-4_data.npy")
+time = np.load("./RB_data/time_1e-4_data.npy")
 
 dt = time[1] - time[0]
 
