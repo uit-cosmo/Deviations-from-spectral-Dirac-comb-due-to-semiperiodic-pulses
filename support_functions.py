@@ -1,5 +1,7 @@
 import numpy as np
 import scipy.signal as ssi
+from scipy.optimize import minimize
+from scipy.signal import find_peaks, fftconvolve
 
 
 def corr_fun(X, Y, dt, norm=True, biased=True, method="auto"):
@@ -75,3 +77,26 @@ def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=None, seed=None):
     X[U < kappa] = 2 * alpha * kappa * np.log(U[U < kappa] / kappa)
 
     return X
+
+
+def create_fit(dt, normalized_data, T, td, lam=0.5, distance=200):
+    """calculates fit for K time series"""
+
+    kernrad = 2**18
+    time_kern = np.arange(-kernrad, kernrad + 1) * dt
+
+    peak_loc = find_peaks(normalized_data, height=1.0, distance=distance)[0]
+    forcing = np.zeros(T.size)
+    forcing[peak_loc] = normalized_data[peak_loc]
+
+    def double_exp(tkern, lam, td):
+        kern = np.zeros(tkern.size)
+        kern[tkern < 0] = np.exp(tkern[tkern < 0] / lam / td)
+        kern[tkern >= 0] = np.exp(-tkern[tkern >= 0] / (1 - lam) / td)
+        return kern
+
+    kern = double_exp(time_kern, lam, td)
+
+    time_series_fit = fftconvolve(forcing, kern, "same")
+    time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
+    return time_series_fit
