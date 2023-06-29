@@ -18,8 +18,8 @@ ax2 = fig_AC.add_axes(axes_size)
 
 
 class ForcingQuasiPeriodic(frc.ForcingGenerator):
-    def __init__(self, variance):
-        self.sigma = np.sqrt(variance)
+    def __init__(self, sigma):
+        self.sigma = sigma
 
     def get_forcing(self, times: np.ndarray, gamma: float) -> frc.Forcing:
         total_pulses = int(max(times) * gamma)
@@ -59,8 +59,8 @@ model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 
 colors = ["tab:blue", "tab:orange", "tab:olive"]
-for i, variance in enumerate([0.0025, 0.01, 1]):  # , 0.4, 3.0]):
-    model.set_custom_forcing_generator(ForcingQuasiPeriodic(variance=variance))
+for i, sigma in enumerate([0.05, 0.1, 1]):  # , 0.4, 3.0]):
+    model.set_custom_forcing_generator(ForcingQuasiPeriodic(sigma=sigma))
 
     T, S = model.make_realization()
     forcing = model.get_last_used_forcing()
@@ -69,12 +69,12 @@ for i, variance in enumerate([0.0025, 0.01, 1]):  # , 0.4, 3.0]):
     S_norm = S - S.mean()
 
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
-    ax1.semilogy(f, Pxx, label=rf"$\sigma= {variance}$", color=colors[i])
+    ax1.semilogy(f, Pxx, label=rf"$\sigma= {sigma}$", color=colors[i])
 
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
 
     # divide by max to show normalized Phi
-    ax2.plot(tb, R / np.max(R), label=rf"$\sigma= {variance}$", color=colors[i])
+    ax2.plot(tb, R / np.max(R), label=rf"$\sigma= {sigma}$", color=colors[i])
 
 
 def Lorentz_PSD(theta):
