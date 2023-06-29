@@ -148,3 +148,7 @@ plot_forcing.py
 *.npy
 
 /pdf_files
+
+
+# old scripts
+old_scripts/
