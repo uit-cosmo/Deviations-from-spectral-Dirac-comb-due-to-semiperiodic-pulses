@@ -1,7 +1,0 @@
-use R=1e7 and 4e5
-run longer for higher sample sizes
-make fit for 1e7
-use skewed sech pulse for fit
-Tau_w hist for both, calculate relative variance
-use U since K has more difficult pulse shape
-run one simulation with mu kappa instead of Pr, R
