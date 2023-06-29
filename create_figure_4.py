@@ -70,11 +70,13 @@ for i, sigma in enumerate([0.0, 0.1, 0.3]):
     ax1.semilogy(f, Pxx, label=rf"$\sigma = {sigma}$", color=colors[i])
 
     if i == 2:
-        fitrange = signal.find_peaks(Pxx[(f < 0.3)], distance=500, height=[5e-4, 1e3])[0]
+        fitrange = signal.find_peaks(Pxx[(f < 0.3)], distance=500, height=[5e-4, 1e3])[
+            0
+        ]
     else:
         fitrange = signal.find_peaks(Pxx[(f < 1)], distance=500, height=[5e-4, 1e3])[0]
     ax1.semilogy(f[fitrange][1:], Pxx[fitrange][1:], "o", c=colors[i])
-    
+
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
     ax2.plot(tb, R, label=rf"$\sigma = {sigma}$", color=colors[i])
 
@@ -95,7 +97,12 @@ def spectra_analytical(omega, gamma, A_rms, A_mean, sigma, dt):
     nu = sigma * gamma
     Omega = omega / gamma
     I_2 = 1 / (2 * np.pi)
-    first_term = gamma * (A_rms**2 + A_mean**2*(1 - np.exp(-(nu**2) * Omega**2))) * I_2 * Lorentz_PSD(omega)
+    first_term = (
+        gamma
+        * (A_rms**2 + A_mean**2 * (1 - np.exp(-(nu**2) * Omega**2)))
+        * I_2
+        * Lorentz_PSD(omega)
+    )
 
     tmp = np.zeros(omega.size)
     for n in range(-1000, 1000):
@@ -113,18 +120,19 @@ def spectra_analytical(omega, gamma, A_rms, A_mean, sigma, dt):
     ) * tmp
     return 2 * (first_term + second_term / dt)
 
+
 gamma = 0.2
 PSD = spectra_analytical(
-    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.0/gamma, dt=0.01
+    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.0 / gamma, dt=0.01
 )
 ax1.semilogy(f, PSD, "--k", label=r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
 
 PSD = spectra_analytical(
-    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.1/gamma, dt=0.01
+    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.1 / gamma, dt=0.01
 )
 ax1.semilogy(f, PSD, "--k")
 PSD = spectra_analytical(
-    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.3/gamma, dt=0.01
+    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.3 / gamma, dt=0.01
 )
 ax1.semilogy(f, PSD, "--k")
 
