@@ -1,0 +1,51 @@
+timestep              = 0.1
+nout                  = 500000
+MZ                    = 124
+zmin                  = 0
+zmax                  = mesh:Lz/2./pi
+myg                   = 0
+
+[mesh:ddx]
+first                 = C2
+second                = C2
+upwind                = C2
+flux                  = SPLIT
+
+[mesh:ddz]
+first                 = C2
+second                = C2
+upwind                = C2
+flux                  = SPLIT
+
+[mesh]
+Ly                    = 5500.0
+Lx                    = 1.0
+Lz                    = 1.0
+nx                    = 128	           # including 4 guard cells
+ny                    = 1                  # excluding guard cells
+dx                    = Lx/(nx-4)
+
+[laplace] 
+global_flags          = 0 
+inner_boundary_flags  = 0
+outer_boundary_flags  = 0       # set to 3 for neumann 0
+include_yguards       = false
+
+[solver]
+type=pvode
+timestep = 0.001    	 # Suggested init timestep for numerical methods
+mxstep = 100000000       # max steps before result is deemed not to converge
+monitor_timestep = false  # enable fast_output
+
+[rbmodel]
+kappa			   	= 1.6e-3
+mu				= 1.6e-3
+initial_noise		= true
+
+[All]
+bndry_all = dirichlet
+
+[n]
+function = 1 - x + 0.01 * cos(z*pi/2)*sin(pi*x)
+bndry_xin = dirichlet(1)
+bndry_xout = dirichlet(0)
