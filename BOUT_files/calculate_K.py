@@ -1,7 +1,7 @@
 from xbout import open_boutdataset
 import numpy as np
 
-ds = open_boutdataset("public_input_data/BOUT.dmp.*.nc").squeeze()
+ds = open_boutdataset("output_data_dir/BOUT.dmp.*.nc").squeeze()
 
 ds = ds.isel(x=slice(2,-2))
 ds = ds.assign_coords({"x": ds['z'].values})
