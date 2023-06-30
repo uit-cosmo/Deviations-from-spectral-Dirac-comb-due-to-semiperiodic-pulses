@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
 from support_functions import *
-import model.forcing as frc
-import model.point_model as pm
-import model.pulse_shape as ps
+import superposedpulses.forcing as frc
+import superposedpulses.point_model as pm
+import superposedpulses.pulse_shape as ps
 import cosmoplots
 
 

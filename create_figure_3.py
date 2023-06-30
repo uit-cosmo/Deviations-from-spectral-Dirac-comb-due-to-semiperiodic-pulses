@@ -3,9 +3,9 @@ import numpy as np
 from scipy import signal
 import cosmoplots
 from support_functions import *
-import model.forcing as frc
-import model.point_model as pm
-import model.pulse_shape as ps
+import superposedpulses.forcing as frc
+import superposedpulses.point_model as pm
+import superposedpulses.pulse_shape as ps
 from scipy.signal import find_peaks
 
 axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
