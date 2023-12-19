@@ -79,7 +79,7 @@ def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=None, seed=None):
     return X
 
 
-def create_fit(dt, normalized_data, T, td, lam=0.5, distance=200):
+def create_fit(dt, normalized_data, T, td, lam=0.5, kerntype='lorentz', distance=200):
     """calculates fit for K time series"""
 
     kernrad = 2**18
@@ -95,7 +95,13 @@ def create_fit(dt, normalized_data, T, td, lam=0.5, distance=200):
         kern[tkern >= 0] = np.exp(-tkern[tkern >= 0] / (1 - lam) / td)
         return kern
 
-    kern = double_exp(time_kern, lam, td)
+    def lorentz(tkern, td):
+        return (np.pi*(1+(tkern/td)**2))**(-1)
+    
+    if kerntype == 'lorentz':
+        kern = lorentz(time_kern, td)
+    else:
+        kern = double_exp(time_kern, lam, td)
 
     time_series_fit = fftconvolve(forcing, kern, "same")
     time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
