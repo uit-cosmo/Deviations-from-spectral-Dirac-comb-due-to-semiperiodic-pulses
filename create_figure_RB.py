@@ -12,8 +12,8 @@ axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
 plt.rcParams["font.family"] = "serif"
 
 mu_list = ['1.6e-3','1e-4']
-wait_min = {mu_list[0]:50,
-            mu_list[1]:200}
+wait_min = {mu_list[0]:60,
+            mu_list[1]:300}
 ts_lim = {mu_list[0]:[20000,22000, None, None],
         mu_list[1]:[70000,72000, None, 15]}
 spectra_lim = {mu_list[0]:[0, 0.1, 1e-1, None],
@@ -45,11 +45,19 @@ def plot_RB(mu,fit=False):
     plt.ylim(spectra_lim[mu][2:])
 
     if fit:
-        wait = cond_av(K, time, smin=1, window=True, delta=wait_min[mu])[-1]
+        _, K_av, K_var, t_av, _, wait = cond_av(K, time, smin=1, window=True, delta=wait_min[mu])
+        plt.figure('Kav'+mu)
+        plt.plot(t_av, K_av)
+        plt.plot(t_av, K_var)
+        plt.xlabel(r"$t$")
+        plt.xlabel(r"$K_{av}$")
+        plt.savefig('Kav_'+mu+'.eps')
+        plt.close('Kav_'+mu+'.eps')
+
         K_fit = create_fit(dt, K, time, td=8, lam=0.4, distance=50, kerntype='double_exp')
         f_fit, PK_fit = signal.welch(K_fit, 1 / dt, nperseg=len(K_fit) / 4)
 
-        wait = wait[wait > wait_min[mu]]
+        #wait = wait[wait > wait_min[mu]]
         plt.figure('wait_hist'+mu)
         plt.hist(wait / np.mean(wait), 32, density=True)
         plt.xlabel(r"$\tau_w/\langle\tau_w\rangle$")
