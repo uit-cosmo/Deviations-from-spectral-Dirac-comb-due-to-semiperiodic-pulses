@@ -2,7 +2,7 @@ import numpy as np
 from plasmapy.analysis.time_series.conditional_averaging import ConditionalEvents
 from scipy import signal
 import matplotlib.pyplot as plt
-from support_functions import create_fit
+import support_functions as sf
 from fppanalysis import get_hist,distribution
 import cosmoplots
 
@@ -21,8 +21,8 @@ wait_min = {mu_list[0]:60,
             mu_list[1]:300}
 ts_lim = {mu_list[0]:[20000,22000, None, None],
         mu_list[1]:[70000,72000, None, 15]}
-spectra_lim = {mu_list[0]:[0, 0.1, 1e-1, None],
-               mu_list[1]:[0, 3e-2, 1e0, None]}
+spectra_lim = {mu_list[0]:[0, 0.1, 1e-6, None],
+               mu_list[1]:[0, 3e-2, 1e-6, None]}
 
 def plot_RB(mu,fit=False):
     K = np.load("./RB_data/K_"+mu+"_data.npy")
@@ -38,28 +38,24 @@ def plot_RB(mu,fit=False):
     plt.plot(time, nK)
     plt.xlabel(r"$t$")
     plt.ylabel(r"$\widetilde{\mathcal{K}}$")
-    plt.xlim(ts_lim[mu][:2])
-    plt.ylim(ts_lim[mu][2:])
+    plt.axis(ts_lim[mu])
     
     plt.figure('S_K'+mu)
     ax = plt.gca()
     cosmoplots.change_log_axis_base(ax, "y")
-    ax.plot(fK[1:], PK[1:])
+    ax.plot(fK[1:], PK[1:]*K.std()**2)
+    plt.ylabel(r"$\mathcal{K}_\mathrm{rms}^2 S_{\widetilde{\mathcal{K}}}\left( f \right)$")
     plt.xlabel(r"$f$")
-    plt.ylabel(r"$S_{\widetilde{\mathcal{K}}}\left( f \right)$")
-    plt.xlim(spectra_lim[mu][:2])
-    plt.ylim(spectra_lim[mu][2:])
+    plt.axis(spectra_lim[mu])
 
     if fit:
         CoEv = ConditionalEvents(signal=K, time = time, lower_threshold=K.mean()+K.std(), distance = wait_min[mu], remove_non_max_peaks=True)
-        print(CoEv.arrival_times[0])
-        print(CoEv.arrival_times[-1])
         
         print('mu={}'.format(mu))
         print('<K>={}'.format(np.mean(K)))
         print('K_rms={}'.format(np.std(K)))
         
-        K_fit, pulse = create_fit(dt, time, CoEv) # pulse contains (time_kern, kern)
+        K_fit, pulse = sf.create_fit(dt, time, CoEv) # pulse contains (time_kern, kern, (td, lam))
         nK_fit = (K_fit-np.mean(K_fit))/np.std(K_fit)
 
         print('<K_fit>={}'.format(np.mean(K_fit)))
@@ -93,13 +89,33 @@ def plot_RB(mu,fit=False):
         plt.plot(time+(CoEv.arrival_times[0]-time[0]), nK_fit, "--", c=mu_col[mu])
         
         plt.figure('S_K'+mu)
-        plt.semilogy(f_fit, PK_fit, "--", c=mu_col[mu])
+        plt.semilogy(f_fit, PK_fit*K_fit.std()**2, "--", c=mu_col[mu])
+        plt.semilogy(f_fit, sf.spectrum_renewal(f_fit, pulse[2][0], pulse[2][1],
+                                                CoEv.peaks.mean(), CoEv.peaks.std(),
+                                                CoEv.waiting_times),
+                     'k--')
 
         plt.figure('K_ts'+mu)
         plt.savefig("K_"+mu+"fit.eps", bbox_inches="tight")
         
         plt.figure('S_K'+mu)
         plt.savefig("S(K)_"+mu+"fit.eps", bbox_inches="tight")
+
+        plt.figure('Compare_renewal_gauss'+mu)
+        ax = plt.gca()
+        cosmoplots.change_log_axis_base(ax, "y")
+        plt.semilogy(f_fit, sf.est_wait_spectrum_ECF(f_fit, CoEv.waiting_times),
+                     c=mu_col[mu], label=r'$\mathrm{True }\, \tau_\mathrm{w}$')
+        plt.semilogy(f_fit, sf.spectrum_gauss_renewal_part(f_fit, 
+                                                           CoEv.waiting_times.mean(), 
+                                                           CoEv.waiting_times.std()),
+                     'k--', label=r'$\mathrm{Gauss}$')
+        plt.ylabel(r"$\mathcal{K}_\mathrm{rms}^2 S_{\widetilde{\mathcal{K}}}\left( f \right)$")
+        plt.xlabel(r"$f$")
+        plt.legend()
+        plt.xlim(spectra_lim[mu][:2])
+        plt.savefig('S_compare_renewal_gauss_'+mu+'.eps',bbox_inches='tight')
+        plt.close('Compare_renewal_gauss'+mu)
 
     else:
         plt.figure('K_ts'+mu)

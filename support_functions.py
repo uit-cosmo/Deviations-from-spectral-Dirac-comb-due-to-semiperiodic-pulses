@@ -1,7 +1,8 @@
 import numpy as np
 import scipy.signal as ssi
 from scipy.optimize import curve_fit
-from scipy.signal import find_peaks, fftconvolve
+from scipy.signal import fftconvolve
+from closedexpressions import psd
 
 def corr_fun(X, Y, dt, norm=True, biased=True, method="auto"):
     """
@@ -106,4 +107,36 @@ def create_fit(dt, T, ConditionalEvents, kernrad=2**18):
     time_kern = np.arange(-kernrad, kernrad + 1) * dt
     kern = double_exp(time_kern, opt[0], opt[1])
 
-    return make_signal_convolve(T, ConditionalEvents.peaks, ConditionalEvents.arrival_times, kern, dt), (time_kern, kern)
+    return make_signal_convolve(T, ConditionalEvents.peaks, ConditionalEvents.arrival_times, kern, dt), (time_kern, kern, opt)
+
+def spectrum_gauss_renewal_part(f, tw, tw_rms):
+    # The part of the gaussian renewal spectrum due to the waiting times
+    Omega = tw*2*np.pi*f
+    nu = tw_rms/tw
+    return np.sinh(nu**2*Omega**2/2)/(np.cosh(nu**2*Omega**2/2)-np.cos(Omega))
+
+def spectrum_gauss(f, td, lam, amean, arms,tw, tw_rms):
+    # Assumes gaussian renewal arrivals and two-sided exponential pulses
+    gamma = td/tw
+    Omega = tw*2*np.pi*f
+    S = td*gamma*psd(gamma*Omega,1,lam)/2 #td = 1 here since the expression already contains td.
+    S *= (arms**2+amean**2*spectrum_gauss_renewal_part(f, tw, tw_rms))
+    return S
+
+def est_wait_spectrum_ECF(f, data):
+    omega=2*np.pi*f
+    # Estimate the empirical CF of data at frequencies omega.
+    ECF = np.zeros(omega.size, dtype=complex)
+    for i in range(omega.size):
+        ECF[i] = np.mean(np.exp(1.0j * omega[i] * data))
+
+    return np.real((1+ECF)/(1-ECF))
+
+def spectrum_renewal(f, td, lam, amean, arms, tw_data):
+    # Use waiting time data to estimate spectrum for renewal arrivals and two-sided exponential pulses
+    gamma = td/tw_data.mean()
+    omega = 2*np.pi*f
+
+    S = td*gamma*psd(td*omega,1,lam)/2
+    S *= (arms**2+amean**2*est_wait_spectrum_ECF(f,tw_data))
+    return S
