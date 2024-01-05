@@ -1,19 +1,21 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-import cosmoplots
 from support_functions import *
 import superposedpulses.forcing as frc
 import superposedpulses.point_model as pm
 import superposedpulses.pulse_shape as ps
 from closedexpressions import PSD_periodic_arrivals, autocorr_periodic_arrivals
+import cosmoplots
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
-axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
+mpl.style.use("cosmoplots.default")
 
 fig_PSD = plt.figure()
-ax1 = fig_PSD.add_axes(axes_size)
+ax1 = fig_PSD.gca()
+cosmoplots.change_log_axis_base(ax1, "y")
 fig_AC = plt.figure()
-ax2 = fig_AC.add_axes(axes_size)
+ax2 = fig_AC.gca()
 
 
 class ExpAmp(frc.ForcingGenerator):
@@ -52,10 +54,10 @@ amp = forcing.amplitudes
 S_norm = (S - S.mean()) / S.std()
 
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
-ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Exp}$")
+ax1.plot(f, Pxx, label=r"$A \sim \mathrm{Exp}$")
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
-ax1.semilogy(
+ax1.plot(
     f,
     PSD,
     "--k",
@@ -116,10 +118,10 @@ amp = forcing.amplitudes
 S_norm = (S - S.mean()) / S.std()
 
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
-ax1.semilogy(f, Pxx, label=r"$A \sim \mathrm{Laplace}$")
+ax1.plot(f, Pxx, label=r"$A \sim \mathrm{Laplace}$")
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=0, dt=0.01)
-ax1.semilogy(
+ax1.plot(
     f,
     PSD,
     "--g",
@@ -137,21 +139,18 @@ ax2.plot(
     label=r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d}), \, \langle A \rangle = 0$",
 )
 
-ax1.set_xlim(-0.2, 12)
-ax1.set_ylim(1e-14, 1e3)
-ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
-ax1.set_ylabel(r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
-
 ax1.legend()
 ax1.set_xlim(-0.03, 1)
 ax1.set_ylim(1e-4, 1e3)
+ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
+ax1.set_ylabel(r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
+
 ax2.set_xlim(0, 50)
 ax2.set_xlabel(r"$t/\tau_\mathrm{d}$")
 ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
 ax2.legend()
-cosmoplots.change_log_axis_base(ax1, "y", base=10)
 
-fig_PSD.savefig("PSD_exp_lap.eps", bbox_inches="tight")
-fig_AC.savefig("AC_exp_lap.eps", bbox_inches="tight")
+fig_PSD.savefig("PSD_exp_lap.eps")
+fig_AC.savefig("AC_exp_lap.eps")
 
 plt.show()

@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
 from support_functions import *
@@ -6,16 +5,17 @@ import superposedpulses.forcing as frc
 import superposedpulses.point_model as pm
 import superposedpulses.pulse_shape as ps
 import cosmoplots
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 from closedexpressions import PSD_periodic_arrivals, autocorr_periodic_arrivals
 
-
-axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
+mpl.style.use("cosmoplots.default")
 
 fig_PSD = plt.figure()
-ax1 = fig_PSD.add_axes(axes_size)
+ax1 = fig_PSD.gca()
+cosmoplots.change_log_axis_base(ax1, "y")
 fig_AC = plt.figure()
-ax2 = fig_AC.add_axes(axes_size)
-
+ax2 = fig_AC.gca()
 
 class ForcingQuasiPeriodic(frc.ForcingGenerator):
     def __init__(self, sigma):
@@ -69,7 +69,7 @@ for i, sigma in enumerate([0.05, 0.1, 1]):  # , 0.4, 3.0]):
     S_norm = S - S.mean()
 
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
-    ax1.semilogy(f, Pxx, label=rf"$\sigma= {sigma}$", color=colors[i])
+    ax1.plot(f, Pxx, label=rf"$\sigma= {sigma}$", color=colors[i])
 
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
 
@@ -102,11 +102,11 @@ gamma = 0.2
 PSD = spectra_analytical(
     2 * np.pi * f, gamma=0.2, A_rms=1, A_mean=1, sigma=0.05 / gamma
 )
-ax1.semilogy(f, PSD, "--k")
+ax1.plot(f, PSD, "--k")
 PSD = spectra_analytical(2 * np.pi * f, gamma=0.2, A_rms=1, A_mean=1, sigma=0.1 / gamma)
-ax1.semilogy(f, PSD, "-.k")
+ax1.plot(f, PSD, "-.k")
 PSD = spectra_analytical(2 * np.pi * f, gamma=0.2, A_rms=1, A_mean=1, sigma=1 / gamma)
-ax1.semilogy(f, PSD, ":k")
+ax1.plot(f, PSD, ":k")
 
 ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
 ax1.set_ylabel(r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")

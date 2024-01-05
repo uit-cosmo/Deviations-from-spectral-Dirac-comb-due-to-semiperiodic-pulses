@@ -1,20 +1,22 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
 from support_functions import *
 import superposedpulses.forcing as frc
 import superposedpulses.point_model as pm
 import superposedpulses.pulse_shape as ps
-import cosmoplots
 from closedexpressions import PSD_periodic_arrivals, autocorr_periodic_arrivals
 
+import cosmoplots
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
-axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
+mpl.style.use("cosmoplots.default")
 
 fig_PSD = plt.figure()
-ax1 = fig_PSD.add_axes(axes_size)
+ax1 = fig_PSD.gca()
+cosmoplots.change_log_axis_base(ax1, "y")
 fig_AC = plt.figure()
-ax2 = fig_AC.add_axes(axes_size)
+ax2 = fig_AC.gca()
 
 
 class ForcingQuasiPeriodic(frc.ForcingGenerator):
@@ -71,13 +73,13 @@ for i, kappa in enumerate([0.1, 0.4, 1.0]):
     S_norm = (S - S.mean()) / S.std()
 
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
-    ax1.semilogy(f, Pxx, label=rf"$\kappa = {kappa}$", color=colors[i])
+    ax1.plot(f, Pxx, label=rf"$\kappa = {kappa}$", color=colors[i])
 
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
     ax2.plot(tb, R, label=rf"$\kappa = {kappa}$", color=colors[i])
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
-ax1.semilogy(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
+ax1.plot(f, PSD, "--k", label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
 t = np.linspace(0, 50, 1000)
 R_an = autocorr_periodic_arrivals(t, 0.2, 1, 1)
 ax2.plot(t, R_an, "--k", label=r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
@@ -92,7 +94,6 @@ ax2.set_xlim(0, 50)
 ax2.set_xlabel(r"$t/\tau_\mathrm{d}$")
 ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
 ax2.legend()
-cosmoplots.change_log_axis_base(ax1, "y", base=10)
 
 fig_PSD.savefig("PSD_different_kappa.eps", bbox_inches="tight")
 fig_AC.savefig("AC_different_kappa.eps", bbox_inches="tight")

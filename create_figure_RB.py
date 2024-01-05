@@ -1,13 +1,13 @@
 import numpy as np
 from plasmapy.analysis.time_series.conditional_averaging import ConditionalEvents
 from scipy import signal
-import matplotlib.pyplot as plt
 import support_functions as sf
 from fppanalysis import get_hist,distribution
 import cosmoplots
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
-
-axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
+mpl.style.use("cosmoplots.default")
 
 # Match \mathcal{K} in text
 plt.rcParams["font.family"] = "serif"
@@ -81,7 +81,7 @@ def plot_RB(Mu,fit=False):
         plt.xlim([-50,50])
         plt.xlabel(r"$t$")
         plt.ylabel(r"$K_{av}$")
-        plt.savefig('Kav_'+Mu.savename+'.eps',bbox_inches='tight')
+        plt.savefig('Kav_'+Mu.savename+'.eps')
         plt.close('Kav_'+Mu.savename+'.eps')
 
         f_fit, PK_fit = signal.welch(nK_fit, 1 / dt, nperseg=int(len(nK_fit) / 4))
@@ -102,24 +102,24 @@ def plot_RB(Mu,fit=False):
         plt.plot(time+(CoEv.arrival_times[0]-time[0]), nK_fit, "--", c=Mu.color)
         
         plt.figure('S_K'+Mu.savename)
-        plt.semilogy(f_fit, PK_fit*K_fit.std()**2, "--", c=Mu.color)
-        plt.semilogy(f_fit, sf.spectrum_renewal(f_fit, pulse[2][0], pulse[2][1],
+        ax.plot(f_fit, PK_fit*K_fit.std()**2, "--", c=Mu.color)
+        ax.plot(f_fit, sf.spectrum_renewal(f_fit, pulse[2][0], pulse[2][1],
                                                 CoEv.peaks.mean(), CoEv.peaks.std(),
                                                 CoEv.waiting_times),
                      'k--')
 
         plt.figure('K_ts'+Mu.savename)
-        plt.savefig("K_"+Mu.savename+"fit.eps", bbox_inches="tight")
+        plt.savefig("K_"+Mu.savename+"fit.eps")
         
         plt.figure('S_K'+Mu.savename)
-        plt.savefig("S_K_"+Mu.savename+"fit.eps", bbox_inches="tight")
+        plt.savefig("S_K_"+Mu.savename+"fit.eps")
 
         plt.figure('Compare_renewal_gauss'+Mu.savename)
-        ax = plt.gca()
-        cosmoplots.change_log_axis_base(ax, "y")
-        plt.semilogy(f_fit, sf.est_wait_spectrum_ECF(f_fit, CoEv.waiting_times),
+        ax2 = plt.gca()
+        cosmoplots.change_log_axis_base(ax2, "y")
+        ax2.plot(f_fit, sf.est_wait_spectrum_ECF(f_fit, CoEv.waiting_times),
                      c=Mu.color, label=r'$\mathrm{True }\, \tau_\mathrm{w}$')
-        plt.semilogy(f_fit, sf.spectrum_gauss_renewal_part(f_fit, 
+        ax2.plot(f_fit, sf.spectrum_gauss_renewal_part(f_fit, 
                                                            CoEv.waiting_times.mean(), 
                                                            CoEv.waiting_times.std()),
                      'k--', label=r'$\mathrm{Gauss}$')
@@ -127,15 +127,15 @@ def plot_RB(Mu,fit=False):
         plt.xlabel(r"$f$")
         plt.legend()
         plt.xlim(Mu.spectra_lim[:2])
-        plt.savefig('S_compare_renewal_gauss_'+Mu.savename+'.eps',bbox_inches='tight')
+        plt.savefig('S_compare_renewal_gauss_'+Mu.savename+'.eps')
         plt.close('Compare_renewal_gauss'+Mu.savename)
 
     else:
         plt.figure('K_ts'+Mu.savename)
-        plt.savefig("K_"+Mu.savename+".eps", bbox_inches="tight")
+        plt.savefig("K_"+Mu.savename+".eps")
         
         plt.figure('S_K'+Mu.savename)
-        plt.savefig("S_K_"+Mu.savename+".eps", bbox_inches="tight")
+        plt.savefig("S_K_"+Mu.savename+".eps")
 
     plt.close('K_ts'+Mu.savename)
     plt.close('S_K'+Mu.savename)
@@ -147,10 +147,10 @@ for mu in mu_list:
 
 plt.figure("wait_hist")
 plt.legend()
-plt.savefig("Ptau.eps", bbox_inches="tight")
+plt.savefig("Ptau.eps")
 plt.close('wait_hist')
 
 plt.figure("amp_hist")
 plt.legend()
-plt.savefig("PA.eps", bbox_inches="tight")
+plt.savefig("PA.eps")
 plt.close('amp_hist')
