@@ -60,15 +60,17 @@ def plot_RB(Mu,fit=False):
     if fit:
         CoEv = ConditionalEvents(signal=K, time = time, lower_threshold=K.mean()+K.std(), distance = Mu.wait_min, remove_non_max_peaks=True)
         
-        print('mu={}'.format(Mu.mu))
-        print('<K>={}'.format(np.mean(K)))
-        print('K_rms={}'.format(np.std(K)))
+        fitfile = open('fitdata_'+Mu.savename+'.txt','w')
+        fitfile.write('<K>={}, K_rms={}\n'.format(np.mean(K),np.std(K)))
         
         K_fit, pulse = sf.create_fit(dt, time, CoEv) # pulse contains (time_kern, kern, (td, lam))
         nK_fit = (K_fit-np.mean(K_fit))/np.std(K_fit)
-
-        print('<K_fit>={}'.format(np.mean(K_fit)))
-        print('K_fit_rms={}'.format(np.std(K_fit)),flush=True)
+        
+        fitfile.write('<K_fit>={}, K_fit_rms={}\n'.format(np.mean(K_fit),np.std(K_fit)))
+        fitfile.write('td={}, lam={}\n <tw>={},tw_rms={}\n <A>={}, A_rms={}'.format(pulse[2][0],pulse[2][1],
+                                                                                    CoEv.waiting_times.mean(),CoEv.waiting_times.std(),
+                                                                                    CoEv.peaks.mean(),CoEv.peaks.std()))
+        fitfile.close()
 
         plt.figure('Kav'+Mu.savename)
         plt.plot(CoEv.time, CoEv.average/max(CoEv.average), c=Mu.color)
