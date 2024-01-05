@@ -25,11 +25,11 @@ def plot_RB(mu,fit=False):
 
     dt = time[1] - time[0]
     
-    K = (K - np.mean(K)) / np.std(K)
-    fK, PK = signal.welch(K, 1 / dt, nperseg=len(K) / 4)
+    nK = (K - np.mean(K)) / np.std(K)
+    fK, PK = signal.welch(nK, 1 / dt, nperseg=len(nK) / 4)
     
     plt.figure('K_ts'+mu)
-    plt.plot(time, K)
+    plt.plot(time, nK)
     plt.xlabel(r"$t$")
     plt.ylabel(r"$\widetilde{\mathcal{K}}$")
     plt.xlim(ts_lim[mu][:2])
@@ -38,17 +38,18 @@ def plot_RB(mu,fit=False):
     plt.figure('S_K'+mu)
     ax = plt.gca()
     cosmoplots.change_log_axis_base(ax, "y")
-    ax.plot(fK, PK)
+    ax.plot(fK[1:], PK[1:])
     plt.xlabel(r"$f$")
     plt.ylabel(r"$S_{\widetilde{\mathcal{K}}}\left( f \right)$")
     plt.xlim(spectra_lim[mu][:2])
     plt.ylim(spectra_lim[mu][2:])
 
     if fit:
-        _, K_av, K_var, t_av, _, wait = cond_av(K, time, smin=1, window=True, delta=wait_min[mu])
+        CoEv = ConditionalEvents(signal=K, time = time, lower_threshold=K.mean()+K.std(), distance = wait_min[mu], remove_non_max_peaks=True)
+
         plt.figure('Kav'+mu)
-        plt.plot(t_av, K_av)
-        plt.plot(t_av, K_var)
+        plt.plot(CoEv.time, CoEv.average)
+        plt.plot(CoEv.time, CoEv.variance)
         plt.xlabel(r"$t$")
         plt.xlabel(r"$K_{av}$")
         plt.savefig('Kav_'+mu+'.eps')
