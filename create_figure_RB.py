@@ -30,7 +30,7 @@ class MuOpts:
             self.label =r"$10^{-4}$"
             self.color = "C2"
             self.wait_min = 300
-            self.ts_lim =[70000,72000, None, 15] 
+            self.ts_lim =[70000,72000, -1, 14] 
             self.spectra_lim =[0, 3e-2, 1e-6, None] 
 
 def plot_RB(Mu,fit=False):
@@ -48,6 +48,8 @@ def plot_RB(Mu,fit=False):
     plt.xlabel(r"$t$")
     plt.ylabel(r"$\widetilde{\mathcal{K}}$")
     plt.axis(Mu.ts_lim)
+    if Mu.mu == mu_list[1]:
+        plt.yticks(range(0,15,3))
     
     plt.figure('S_K'+Mu.savename)
     ax = plt.gca()
@@ -79,7 +81,7 @@ def plot_RB(Mu,fit=False):
         plt.xlim([-50,50])
         plt.xlabel(r"$t$")
         plt.ylabel(r"$K_{av}$")
-        plt.savefig('Kav_'+Mu.savename+'.eps')
+        plt.savefig('Kav_'+Mu.savename+'.eps',bbox_inches='tight')
         plt.close('Kav_'+Mu.savename+'.eps')
 
         f_fit, PK_fit = signal.welch(nK_fit, 1 / dt, nperseg=int(len(nK_fit) / 4))
