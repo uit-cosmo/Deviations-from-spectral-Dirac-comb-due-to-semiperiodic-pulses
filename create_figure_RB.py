@@ -1,6 +1,6 @@
 import numpy as np
-from fppanalysis import cond_av
-from scipy import signal
+from plasmapy.analysis.time_series.conditional_averaging import ConditionalEvents
+from scipy import signal, optimize
 import matplotlib.pyplot as plt
 from support_functions import create_fit
 import cosmoplots
@@ -24,10 +24,11 @@ def plot_RB(mu,fit=False):
     time = np.load("./RB_data/time_"+mu+"_data.npy")
 
     dt = time[1] - time[0]
+
     
     nK = (K - np.mean(K)) / np.std(K)
     fK, PK = signal.welch(nK, 1 / dt, nperseg=len(nK) / 4)
-    
+   
     plt.figure('K_ts'+mu)
     plt.plot(time, nK)
     plt.xlabel(r"$t$")
@@ -46,29 +47,41 @@ def plot_RB(mu,fit=False):
 
     if fit:
         CoEv = ConditionalEvents(signal=K, time = time, lower_threshold=K.mean()+K.std(), distance = wait_min[mu], remove_non_max_peaks=True)
+        print(CoEv.arrival_times[0])
+        print(CoEv.arrival_times[-1])
+        
+        print('mu={}'.format(mu))
+        print('<K>={}'.format(np.mean(K)))
+        print('K_rms={}'.format(np.std(K)))
+        
+        K_fit, pulse = create_fit(dt, time, CoEv) # pulse contains (time_kern, kern)
+        nK_fit = (K_fit-np.mean(K_fit))/np.std(K_fit)
+
+        print('<K_fit>={}'.format(np.mean(K_fit)))
+        print('K_fit_rms={}'.format(np.std(K_fit)),flush=True)
 
         plt.figure('Kav'+mu)
-        plt.plot(CoEv.time, CoEv.average)
+        plt.plot(CoEv.time, CoEv.average/max(CoEv.average))
         plt.plot(CoEv.time, CoEv.variance)
+        plt.plot(pulse[0], pulse[1], 'k--')
+        plt.xlim([-50,50])
         plt.xlabel(r"$t$")
         plt.xlabel(r"$K_{av}$")
         plt.savefig('Kav_'+mu+'.eps')
         plt.close('Kav_'+mu+'.eps')
 
-        K_fit = create_fit(dt, K, time, td=8, lam=0.4, distance=50, kerntype='double_exp')
-        f_fit, PK_fit = signal.welch(K_fit, 1 / dt, nperseg=len(K_fit) / 4)
+        f_fit, PK_fit = signal.welch(nK_fit, 1 / dt, nperseg=int(len(nK_fit) / 4))
 
-        #wait = wait[wait > wait_min[mu]]
         plt.figure('wait_hist'+mu)
-        plt.hist(wait / np.mean(wait), 32, density=True)
+        plt.hist(CoEv.waiting_times / np.mean(CoEv.waiting_times), 32, density=True)
         plt.xlabel(r"$\tau_w/\langle\tau_w\rangle$")
         plt.ylabel(r"$P(\tau_w/\langle\tau_w\rangle)$")
         plt.savefig("P(tau)_"+mu+".eps", bbox_inches="tight")
         plt.close('wait_hist'+mu)
 
         plt.figure('K_ts'+mu)
-        plt.plot(time, K_fit, "--")
-
+        plt.plot(time+(CoEv.arrival_times[0]-time[0]), nK_fit, "--")
+        
         plt.figure('S_K'+mu)
         plt.semilogy(f_fit, PK_fit, "--")
 

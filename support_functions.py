@@ -1,8 +1,7 @@
 import numpy as np
 import scipy.signal as ssi
-from scipy.optimize import minimize
+from scipy.optimize import curve_fit
 from scipy.signal import find_peaks, fftconvolve
-
 
 def corr_fun(X, Y, dt, norm=True, biased=True, method="auto"):
     """
@@ -78,31 +77,33 @@ def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=None, seed=None):
 
     return X
 
+def make_signal_convolve(T, amp, ta, pulse, dt):
+    """
+    Make a signal with prescribed amplitudes, arrival times and pulse shape by convolution.
+    """
+    S = np.zeros(T.size)
+    for i in range(ta.size):
+        S[int((ta[i]-ta[0])/dt)]+=amp[i]
+    S=fftconvolve(S,pulse,mode='same')
+    return S
 
-def create_fit(dt, normalized_data, T, td, lam=0.5, kerntype='lorentz', distance=200):
-    """calculates fit for K time series"""
-
-    kernrad = 2**18
-    time_kern = np.arange(-kernrad, kernrad + 1) * dt
-
-    peak_loc = find_peaks(normalized_data, height=1.0, distance=distance)[0]
-    forcing = np.zeros(T.size)
-    forcing[peak_loc] = normalized_data[peak_loc]
-
-    def double_exp(tkern, lam, td):
+def create_fit(dt, T, ConditionalEvents, kernrad=2**18):
+    """calculates fit for K time series using already calculated 
+    conditional events and assuming exponential pulses."""
+    def double_exp(tkern, td, lam):
         kern = np.zeros(tkern.size)
         kern[tkern < 0] = np.exp(tkern[tkern < 0] / lam / td)
         kern[tkern >= 0] = np.exp(-tkern[tkern >= 0] / (1 - lam) / td)
         return kern
 
-    def lorentz(tkern, td):
-        return (np.pi*(1+(tkern/td)**2))**(-1)
+    opt, cov = curve_fit(double_exp,ConditionalEvents.time,
+                                  ConditionalEvents.average/max(ConditionalEvents.average), p0=[12.,0.4])
     
-    if kerntype == 'lorentz':
-        kern = lorentz(time_kern, td)
-    else:
-        kern = double_exp(time_kern, lam, td)
+    print('[td lambda]:')
+    print(opt)
+    print('convariance:')
+    print(cov)
+    time_kern = np.arange(-kernrad, kernrad + 1) * dt
+    kern = double_exp(time_kern, opt[0], opt[1])
 
-    time_series_fit = fftconvolve(forcing, kern, "same")
-    time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
-    return time_series_fit
+    return make_signal_convolve(T, ConditionalEvents.peaks, ConditionalEvents.arrival_times, kern, dt), (time_kern, kern)
