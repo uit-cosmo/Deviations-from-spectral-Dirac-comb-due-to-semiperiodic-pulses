@@ -17,6 +17,7 @@ fig_AC = plt.figure()
 ax2 = fig_AC.gca()
 
 Sigma = [0.01, 0.1, 1.]
+Sigmalab = [r'$10^{-2}$',r'$10^{-1}$',r'$1$']
 gamma = 0.2
 
 class ForcingQuasiPeriodic(frc.ForcingGenerator):
@@ -70,7 +71,7 @@ for i, sigma in enumerate(Sigma):
     S_norm = S - S.mean()
 
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
-    ax1.plot(f, Pxx, label=rf"$\sigma = {sigma}$", color=colors[i])
+    ax1.plot(f, Pxx, label=r"$\sigma = $"+Sigmalab[i], color=colors[i])
 
     if i == 2:
         fitrange = signal.find_peaks(Pxx[(f < 0.3)], distance=500, height=[5e-4, 1e3])[
@@ -83,7 +84,7 @@ for i, sigma in enumerate(Sigma):
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
 
     # divide by max to show normalized Phi
-    ax2.plot(tb[abs(tb)<50], R[abs(tb)<50]/np.max(R), label=rf"$\sigma = {sigma}$", color=colors[i])
+    ax2.plot(tb[abs(tb)<50], R[abs(tb)<50]/np.max(R), label=r"$\sigma = $"+Sigmalab[i], color=colors[i])
 
 
 def Lorentz_PSD(theta):
