@@ -8,9 +8,6 @@ import cosmoplots
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-
-axes_size = cosmoplots.set_rcparams_dynamo(plt.rcParams, num_cols=1, ls="thin")
-
 mpl.style.use("cosmoplots.default")
 
 fig_PSD = plt.figure()
@@ -19,6 +16,8 @@ cosmoplots.change_log_axis_base(ax1, "y")
 fig_AC = plt.figure()
 ax2 = fig_AC.gca()
 
+Sigma = [0.01, 0.1, 1.]
+gamma = 0.2
 
 class ForcingQuasiPeriodic(frc.ForcingGenerator):
     def __init__(self, sigma):
@@ -60,11 +59,11 @@ class ForcingQuasiPeriodic(frc.ForcingGenerator):
         pass
 
 
-model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
+model = pm.PointModel(gamma=gamma, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 
 colors = ["tab:blue", "tab:orange", "tab:olive"]
-for i, sigma in enumerate([0.0, 0.1, 0.3]):
+for i, sigma in enumerate(Sigma):
     model.set_custom_forcing_generator(ForcingQuasiPeriodic(sigma=sigma))
 
     T, S = model.make_realization()
@@ -82,7 +81,9 @@ for i, sigma in enumerate([0.0, 0.1, 0.3]):
     ax1.plot(f[fitrange][1:], Pxx[fitrange][1:], "o", c=colors[i])
 
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
-    ax2.plot(tb, R, label=rf"$\sigma = {sigma}$", color=colors[i])
+
+    # divide by max to show normalized Phi
+    ax2.plot(tb[abs(tb)<50], R[abs(tb)<50]/np.max(R), label=rf"$\sigma = {sigma}$", color=colors[i])
 
 
 def Lorentz_PSD(theta):
@@ -125,34 +126,32 @@ def spectra_analytical(omega, gamma, A_rms, A_mean, sigma, dt):
     return 2 * (first_term + second_term / dt)
 
 
-gamma = 0.2
-PSD = spectra_analytical(
-    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.0 / gamma, dt=0.01
-)
-ax1.plot(f, PSD, "--k", label=r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
+for label, ls, sigma in zip([r"$S_{{\Phi}}(\tau_\mathrm{d} f)$",None, None],
+                            ['--','-.',':'],
+                            Sigma):
+    PSD = spectra_analytical(
+        2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=sigma / gamma, dt=0.01
+    )
+    ax1.plot(f, PSD, ls+"k",label=label)
 
-PSD = spectra_analytical(
-    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.1 / gamma, dt=0.01
-)
-ax1.plot(f, PSD, "--k")
-PSD = spectra_analytical(
-    2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=0.3 / gamma, dt=0.01
-)
-ax1.plot(f, PSD, "--k")
+def Lorentz_AC_basic(t):
+    return 4/(4+t**2)
 
+tb = np.linspace(0,50,1000)
+ax2.plot(tb, Lorentz_AC_basic(tb),':k',label=r'$\rho_\phi(t/\tau_\mathrm{d})$')
 
 ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
 ax1.set_ylabel(r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
 ax1.set_xlim(-0.03, 0.8)
 ax1.set_ylim(1e-4, 1e2)
 ax1.legend()
-#
+
 ax2.set_xlim(0, 50)
 ax2.set_xlabel(r"$t/\tau_\mathrm{d}$")
 ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
 ax2.legend()
 
-fig_PSD.savefig("PSD_gaussian_jitter.eps", bbox_inches="tight")
-fig_AC.savefig("AC_gaussian_jitter.eps", bbox_inches="tight")
+fig_PSD.savefig("PSD_gaussian_jitter.eps")
+fig_AC.savefig("AC_gaussian_jitter.eps")
 
-plt.show()
+#plt.show()
