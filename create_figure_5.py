@@ -17,9 +17,10 @@ cosmoplots.change_log_axis_base(ax1, "y")
 fig_AC = plt.figure()
 ax2 = fig_AC.gca()
 
-Sigma = [0.01, 0.1, 1.]
-Sigmalab = [r'$10^{-2}$',r'$10^{-1}$',r'$1$']
+Sigma = [0.05, 0.5, 5]
+Sigmalab = [r'$\langle w \rangle/100$',r'$\langle w \rangle/10$',r'$\langle w \rangle$']
 gamma = 0.2
+dt = 1e-2
 
 class ForcingQuasiPeriodic(frc.ForcingGenerator):
     def __init__(self, sigma):
@@ -28,11 +29,10 @@ class ForcingQuasiPeriodic(frc.ForcingGenerator):
     def get_forcing(self, times: np.ndarray, gamma: float) -> frc.Forcing:
         total_pulses = int(max(times) * gamma)
         waiting_times = (
-            np.random.normal(loc=1, scale=self.sigma, size=total_pulses)
-            * 100  # multiplied with inverse dt
-        ) / gamma
+            np.random.normal(loc=1./gamma, scale=self.sigma, size=total_pulses)
+        )
         arrival_times = np.add.accumulate(waiting_times)
-        arrival_time_indx = np.rint(arrival_times).astype(int)
+        arrival_time_indx = np.rint(arrival_times/dt).astype(int)
         arrival_time_indx -= arrival_time_indx[0]  # set first pulse to t = 0
         # check whether events are sampled with arrival time > times[-1]
         number_of_overshotings = len(arrival_time_indx[arrival_time_indx > times.size])
@@ -59,7 +59,7 @@ class ForcingQuasiPeriodic(frc.ForcingGenerator):
         pass
 
 
-model = pm.PointModel(gamma=gamma, total_duration=100000, dt=0.01)
+model = pm.PointModel(gamma=gamma, total_duration=100000, dt=dt)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 
 colors = ["tab:blue", "tab:orange", "tab:olive"]
@@ -67,12 +67,10 @@ for i, sigma in enumerate(Sigma):  # , 0.4, 3.0]):
     model.set_custom_forcing_generator(ForcingQuasiPeriodic(sigma=sigma))
 
     T, S = model.make_realization()
-    forcing = model.get_last_used_forcing()
-    amp = forcing.amplitudes
 
     S_norm = S - S.mean()
 
-    f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
+    f, Pxx = signal.welch(x=S_norm, fs=1./dt, nperseg=S.size / 30)
     ax1.plot(f, Pxx, label=r"$\sigma = $"+Sigmalab[i], color=colors[i])
 
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
@@ -87,17 +85,15 @@ def Lorentz_PSD(theta):
 
 
 def spectra_analytical(omega, gamma, A_rms, A_mean, sigma):
-    nu = sigma * gamma
-    Omega = omega / gamma
     I_2 = 1 / (2 * np.pi)
     first_term = gamma * A_rms**2 * I_2 * Lorentz_PSD(omega)
     second_term = (
-        gamma**1
+        gamma
         * A_mean**2
         * I_2
         * Lorentz_PSD(omega)
-        * np.sinh(nu**2 * Omega**2 / 2)
-        / (np.cosh(nu**2 * Omega**2 / 2) - np.cos(Omega))
+        * np.sinh((sigma*omega)**2 / 2)
+        / (np.cosh((sigma*omega)**2 / 2) - np.cos(omega/gamma))
     )
     return 2 * (first_term + second_term)
 
@@ -106,7 +102,7 @@ for label, ls, sigma in zip([r"$S_{{\Phi}}(\tau_\mathrm{d} f)$",None, None],
                             ['--','-.',':'],
                             Sigma):
     PSD = spectra_analytical(
-        2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=sigma / gamma
+        2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=sigma 
     )
     ax1.plot(f, PSD, ls+"k",label=label)
 
