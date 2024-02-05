@@ -80,7 +80,7 @@ def plot_RB(Mu,fit=False):
         plt.plot(pulse[0], pulse[1], 'k--')
         plt.xlim([-50,50])
         plt.xlabel(r"$t$")
-        plt.ylabel(r"$K_{av}$")
+        plt.ylabel(r"$\langle \mathcal{K}(t-s) | \mathcal{K}(s)=\mathcal{K}_\mathrm{max}\rangle$")
         plt.savefig('Kav_'+Mu.savename+'.eps')
         plt.close('Kav_'+Mu.savename+'.eps')
 
