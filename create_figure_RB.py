@@ -118,11 +118,11 @@ def plot_RB(Mu,fit=False):
         ax2 = plt.gca()
         cosmoplots.change_log_axis_base(ax2, "y")
         ax2.plot(f_fit, sf.est_wait_spectrum_ECF(f_fit, CoEv.waiting_times),
-                     c=Mu.color, label=r'$\mathrm{True }\, \tau_\mathrm{w}$')
+                     'k--', label=r'$\mathrm{ECF}$')
         ax2.plot(f_fit, sf.spectrum_gauss_renewal_part(f_fit, 
                                                            CoEv.waiting_times.mean(), 
                                                            CoEv.waiting_times.std()),
-                     'k--', label=r'$\mathrm{Gauss}$')
+                     c=Mu.color, label=r'$\mathrm{Gauss}$')
         plt.ylabel(r"$\mathcal{K}_\mathrm{rms}^2 S_{\widetilde{\mathcal{K}}}\left( f \right)$")
         plt.xlabel(r"$f$")
         plt.legend()
