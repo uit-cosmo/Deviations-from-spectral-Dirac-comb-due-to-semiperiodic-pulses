@@ -19,7 +19,7 @@ ax2 = fig_AC.gca()
 colors = ["tab:blue", "tab:orange", "tab:olive"]
 
 Beta =[1000,100,10]
-beta_label = [r"$10^3$", r"$10^2$", r"$1$"]
+beta_label = [r"$10^3$", r"$10^2$", r"$10$"]
 gamma = 0.2
 dt = 1e-2
 
