@@ -20,7 +20,7 @@ def spectrum_waiting_time_part(omega, charfun):
     return np.real((1+cf)/(1-cf))
 
 def psd_norm_num(wrms):
-    dname = 'psd_w_norm_fmax_50.0_w_{:.1e}.npz'.format(wrms)
+    dname = 'psd_w_norm_fmax_5.0_w_{:.1e}.npz'.format(wrms)
     D = np.load(dname)
     return D['freq'], D['psd']
 
@@ -64,9 +64,9 @@ for row in range(rows*columns):
     ax[row].set_ylabel(r"$S_\Phi(\omega)/\left[ \tau_\mathrm{d} \gamma \langle A \rangle^2 I_2 \varrho(\tau_\mathrm{d} \omega) \right]$")
     ax[row].set_xlabel(r"$\langle w \rangle f$")
     if row == 2:
-        ax[2].set_xlim(1e-2,10)
+        ax[2].set_xlim(1e-2,5)
     else:
-        ax[row].set_xlim(0,10)
+        ax[row].set_xlim(0,5)
     ax[row].set_ylim(1e-1,2e1)
     ax[row].text(0.8, 0.1,r"$w_\mathrm{rms}/\langle w \rangle=\,$" + wrms_label[row], horizontalalignment='center', verticalalignment='center', transform=ax[row].transAxes)
     ax[row].text(-0.15, 1, subfiglabel[row], horizontalalignment='center', verticalalignment='center', transform=ax[row].transAxes)
