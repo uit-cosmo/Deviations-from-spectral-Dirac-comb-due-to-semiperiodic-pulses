@@ -1,3 +1,7 @@
+"""
+Power spectrum and autocorrelation of a process with gamma distributed waiting times.
+"""
+
 import numpy as np
 from scipy import signal
 from support_functions import *

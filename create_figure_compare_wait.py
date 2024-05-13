@@ -1,3 +1,7 @@
+"""
+Comparison of spectra for the process with different waiting time distributions: Gamma, inverse gamma and gaussian.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import cosmoplots
@@ -33,7 +37,6 @@ linestyle = ['-','--', '-.', ':']
 labels = [r"$\mathrm{Normal\,num.}$",r"$\mathrm{Inverse\, Gamma}$",r"$\mathrm{Normal\,an.}$", r"$\mathrm{Gamma}$",]
 wrms_label = [r"$1/10$", r"$1$",r"$5$"]
 Wrms = [1e-1, 1, 5] 
-subfiglabel = [r"$\mathrm{(a)}$",r"$\mathrm{(b)}$",r"$\mathrm{(c)}$"]
 
 tw = 1.
 
@@ -68,9 +71,7 @@ for row in range(rows*columns):
         ax[row].set_xlim(0,5)
     ax[row].set_ylim(1e-1,2e1)
     ax[row].text(0.8, 0.1,r"$w_\mathrm{rms}/\langle w \rangle=\,$" + wrms_label[row], horizontalalignment='center', verticalalignment='center', transform=ax[row].transAxes)
-    ax[row].text(-0.15, 1, subfiglabel[row], horizontalalignment='center', verticalalignment='center', transform=ax[row].transAxes)
     cosmoplots.change_log_axis_base(ax[row], base=10)
-#ax[1].semilogy(f, spectrum_waiting_time_part(omega, lambda o: cf_ray(o, 1)), ls = (0, (3, 1, 1, 1, 1, 1)), label=r"$\mathrm{Rayleigh}$")
 ax[1].legend()
 
 

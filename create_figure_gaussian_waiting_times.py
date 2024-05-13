@@ -1,21 +1,19 @@
+"""
+Power spectrum and autocorrelation of a process with gaussian waiting times.
+"""
+
 import numpy as np
 from scipy import signal
 from support_functions import *
 import superposedpulses.forcing as frc
 import superposedpulses.point_model as pm
 import superposedpulses.pulse_shape as ps
-import cosmoplots
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from closedexpressions import PSD_periodic_arrivals, autocorr_periodic_arrivals
+import cosmoplots
+plt.style.use("cosmoplots.default")
 
-mpl.style.use("cosmoplots.default")
-
-fig_PSD = plt.figure()
-ax1 = fig_PSD.gca()
-cosmoplots.change_log_axis_base(ax1, "y")
-fig_AC = plt.figure()
-ax2 = fig_AC.gca()
+fig, ax = cosmoplots.figure_multiple_rows_columns(1,2)
+cosmoplots.change_log_axis_base(ax[0], "y")
 
 Sigma = [0.05, 0.5, 5]
 Sigmalab = [r'$\langle w \rangle/100$',r'$\langle w \rangle/10$',r'$\langle w \rangle$']
@@ -62,8 +60,7 @@ class ForcingQuasiPeriodic(frc.ForcingGenerator):
 model = pm.PointModel(gamma=gamma, total_duration=100000, dt=dt)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 
-colors = ["tab:blue", "tab:orange", "tab:olive"]
-for i, sigma in enumerate(Sigma):  # , 0.4, 3.0]):
+for i, sigma in enumerate(Sigma):
     model.set_custom_forcing_generator(ForcingQuasiPeriodic(sigma=sigma))
 
     T, S = model.make_realization()
@@ -71,12 +68,12 @@ for i, sigma in enumerate(Sigma):  # , 0.4, 3.0]):
     S_norm = S - S.mean()
 
     f, Pxx = signal.welch(x=S_norm, fs=1./dt, nperseg=S.size / 30)
-    ax1.plot(f, Pxx, label=r"$\sigma = $"+Sigmalab[i], color=colors[i])
+    ax[0].plot(f, Pxx, label=r"$\sigma = $"+Sigmalab[i])
 
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
 
     # divide by max to show normalized Phi
-    ax2.plot(tb[abs(tb)<50], R[abs(tb)<50]/np.max(R), label=r"$\sigma = $"+Sigmalab[i], color=colors[i])
+    ax[1].plot(tb[abs(tb)<50], R[abs(tb)<50]/np.max(R), label=r"$\sigma = $"+Sigmalab[i])
 
 
 def Lorentz_PSD(theta):
@@ -104,26 +101,25 @@ for label, ls, sigma in zip([r"$S_{{\Phi}}(\tau_\mathrm{d} f)$",None, None],
     PSD = spectra_analytical(
         2 * np.pi * f, gamma=gamma, A_rms=1, A_mean=1, sigma=sigma 
     )
-    ax1.plot(f, PSD, ls+"k",label=label)
+    ax[0].plot(f, PSD, ls+"k",label=label)
 
 def Lorentz_AC_basic(t):
     return 4/(4+t**2)
 
 tb = np.linspace(0,50,1000)
-ax2.plot(tb, Lorentz_AC_basic(tb),':k',label=r'$\rho_\phi(t/\tau_\mathrm{d})$')
+ax[1].plot(tb, Lorentz_AC_basic(tb),':k',label=r'$\rho_\phi(t/\tau_\mathrm{d})$')
 
-ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
-ax1.set_ylabel(r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
-ax1.set_xlim(-0.03, 0.8)
-ax1.set_ylim(1e-4, 1e1)
-ax1.legend()
+ax[0].set_xlabel(r"$\tau_\mathrm{d} f$")
+ax[0].set_ylabel(r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
+ax[0].set_xlim(-0.03, 0.8)
+ax[0].set_ylim(1e-4, 1e1)
+ax[0].legend()
 
-ax2.set_xlim(0, 50)
-ax2.set_xlabel(r"$t/\tau_\mathrm{d}$")
-ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
-ax2.legend()
+ax[1].set_xlim(0, 50)
+ax[1].set_xlabel(r"$t/\tau_\mathrm{d}$")
+ax[1].set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
+ax[1].legend()
 
-fig_PSD.savefig("PSD_gaussian_waiting_times.eps")
-fig_AC.savefig("AC_gaussian_waiting_times.eps")
+fig.savefig("gaussian_waiting_times.eps")
 
 #plt.show()
