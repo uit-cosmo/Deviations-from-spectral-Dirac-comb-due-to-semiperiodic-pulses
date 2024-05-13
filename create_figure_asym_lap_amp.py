@@ -1,21 +1,21 @@
+"""
+Power spectral density and autocorrelation function of asymetrically laplace distributed amplitudes with different asymmetry parameters.
+"""
+
 import numpy as np
 from scipy import signal
-import cosmoplots
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 from support_functions import *
 import superposedpulses.forcing as frc
 import superposedpulses.point_model as pm
 import superposedpulses.pulse_shape as ps
 from scipy.signal import find_peaks
 
-mpl.style.use("cosmoplots.default")
+import matplotlib.pyplot as plt
+import cosmoplots
+plt.style.use("cosmoplots.default")
 
-fig_PSD = plt.figure()
-ax1 = fig_PSD.gca()
-cosmoplots.change_log_axis_base(ax1, "y")
-fig_AC = plt.figure()
-ax2 = fig_AC.gca()
+fig, ax = cosmoplots.figure_multiple_rows_columns(1,2)
+cosmoplots.change_log_axis_base(ax[0], "y")
 
 
 class AsymLaplaceAmp(frc.ForcingGenerator):
@@ -53,40 +53,34 @@ class AsymLaplaceAmp(frc.ForcingGenerator):
 model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 
-plot_colors = ["tab:blue", "tab:orange", "tab:green", "tab:red"]
-
-for control_parameter, color in zip([0.2, 0.4, 0.45, 0.48], plot_colors):
+for color, control_parameter in enumerate([0.2, 0.4, 0.45, 0.48]):
     model.set_custom_forcing_generator(
         AsymLaplaceAmp(control_parameter=control_parameter)
     )
 
     T, S = model.make_realization()
     forcing = model.get_last_used_forcing()
-    amp = forcing.amplitudes
 
     S_norm = (S - S.mean()) / S.std()
 
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
-    ax1.plot(f, Pxx, label=rf"$\lambda = {control_parameter}$", c=color)
+    ax[0].plot(f, Pxx, label=rf"$\lambda = {control_parameter}$", c='C{}'.format(color))
 
     fitrange = find_peaks(Pxx[(f < 1)], distance=500, height=[5e-4, 1e3])[0]
-    ax1.plot(f[fitrange][1:], Pxx[fitrange][1:], "o", c=color)
+    ax[0].plot(f[fitrange][1:], Pxx[fitrange][1:], "o", c='C{}'.format(color))
 
     tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
-    ax2.plot(tb, R, label=rf"$\lambda = {control_parameter}$", c=color)
+    ax[1].plot(tb, R, label=rf"$\lambda = {control_parameter}$")
 
-ax1.legend()
-ax1.set_xlim(-0.03, 1)
-ax1.set_ylim(1e-4, 1e3)
-ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
-ax1.set_ylabel(r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
+ax[0].legend()
+ax[0].set_xlim(-0.03, 1)
+ax[0].set_ylim(1e-4, 1e3)
+ax[0].set_xlabel(r"$\tau_\mathrm{d} f$")
+ax[0].set_ylabel(r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
 
-ax2.set_xlim(0, 50)
-ax2.set_xlabel(r"$t/\tau_\mathrm{d}$")
-ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
-ax2.legend()
+ax[1].set_xlim(0, 50)
+ax[1].set_xlabel(r"$t/\tau_\mathrm{d}$")
+ax[1].set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
+ax[1].legend()
 
-fig_PSD.savefig("PSD_asym_lap.eps", bbox_inches="tight")
-fig_AC.savefig("AC_asym_lap.eps", bbox_inches="tight")
-
-plt.show()
+fig.savefig("asym_laplace_amp.eps")

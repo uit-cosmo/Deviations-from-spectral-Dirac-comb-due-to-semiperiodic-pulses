@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.special import dawsn
 import matplotlib.pyplot as plt
 import cosmoplots
 plt.style.use("cosmoplots.default")

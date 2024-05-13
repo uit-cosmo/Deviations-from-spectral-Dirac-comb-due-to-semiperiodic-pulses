@@ -1,3 +1,7 @@
+"""
+Power spectral density and autocorrelation function for periodic arrivals and exponentially and laplace distributed amplitudes.
+"""
+
 import numpy as np
 from scipy import signal
 from support_functions import *
@@ -5,17 +9,12 @@ import superposedpulses.forcing as frc
 import superposedpulses.point_model as pm
 import superposedpulses.pulse_shape as ps
 from closedexpressions import PSD_periodic_arrivals, autocorr_periodic_arrivals
-import cosmoplots
-import matplotlib as mpl
 import matplotlib.pyplot as plt
+import cosmoplots
+plt.style.use("cosmoplots.default")
 
-mpl.style.use("cosmoplots.default")
-
-fig_PSD = plt.figure()
-ax1 = fig_PSD.gca()
-cosmoplots.change_log_axis_base(ax1, "y")
-fig_AC = plt.figure()
-ax2 = fig_AC.gca()
+fig, ax = cosmoplots.figure_multiple_rows_columns(rows=1, columns=2)
+cosmoplots.change_log_axis_base(ax[0], "y")
 
 
 class ExpAmp(frc.ForcingGenerator):
@@ -48,16 +47,14 @@ model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 model.set_custom_forcing_generator(ExpAmp())
 
 T, S = model.make_realization()
-forcing = model.get_last_used_forcing()
-amp = forcing.amplitudes
 
 S_norm = (S - S.mean()) / S.std()
 
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
-ax1.plot(f, Pxx, label=r"$A \sim \mathrm{Exp}$")
+ax[0].plot(f, Pxx, label=r"$A \sim \mathrm{Exp}$")
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
-ax1.plot(
+ax[0].plot(
     f,
     PSD,
     "--k",
@@ -65,11 +62,11 @@ ax1.plot(
 )
 
 tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
-ax2.plot(tb, R, label=r"$A \sim \mathrm{Exp}$")
+ax[1].plot(tb, R, label=r"$A \sim \mathrm{Exp}$")
 
 t = np.linspace(0, 50, 1000)
 R_an = autocorr_periodic_arrivals(t, gamma=0.2, A_mean=1, A_rms=1, norm=True)
-ax2.plot(
+ax[1].plot(
     t,
     R_an,
     "--k",
@@ -112,16 +109,14 @@ model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 model.set_custom_forcing_generator(AsymLaplaceAmp())
 
 T, S = model.make_realization()
-forcing = model.get_last_used_forcing()
-amp = forcing.amplitudes
 
 S_norm = (S - S.mean()) / S.std()
 
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
-ax1.plot(f, Pxx, label=r"$A \sim \mathrm{Laplace}$")
+ax[0].plot(f, Pxx, label=r"$A \sim \mathrm{Laplace}$")
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=0, dt=0.01)
-ax1.plot(
+ax[0].plot(
     f,
     PSD,
     "--g",
@@ -129,28 +124,25 @@ ax1.plot(
 )
 
 tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
-ax2.plot(tb, R, label=r"$A \sim \mathrm{Laplace}$")
+ax[1].plot(tb, R, label=r"$A \sim \mathrm{Laplace}$")
 
 R_an = autocorr_periodic_arrivals(t, gamma=0.2, A_mean=0, A_rms=1, norm=True)
-ax2.plot(
+ax[1].plot(
     t,
     R_an,
     "--g",
     label=r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d}), \, \langle A \rangle = 0$",
 )
 
-ax1.legend()
-ax1.set_xlim(-0.03, 1)
-ax1.set_ylim(1e-4, 1e3)
-ax1.set_xlabel(r"$\tau_\mathrm{d} f$")
-ax1.set_ylabel(r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
+ax[0].legend()
+ax[0].set_xlim(-0.03, 1)
+ax[0].set_ylim(1e-4, 1e3)
+ax[0].set_xlabel(r"$\tau_\mathrm{d} f$")
+ax[0].set_ylabel(r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
 
-ax2.set_xlim(0, 50)
-ax2.set_xlabel(r"$t/\tau_\mathrm{d}$")
-ax2.set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
-ax2.legend()
+ax[1].set_xlim(0, 50)
+ax[1].set_xlabel(r"$t/\tau_\mathrm{d}$")
+ax[1].set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
+ax[1].legend()
 
-fig_PSD.savefig("PSD_exp_lap.eps")
-fig_AC.savefig("AC_exp_lap.eps")
-
-plt.show()
+fig.savefig("exp_lap.eps")

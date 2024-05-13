@@ -1,13 +1,16 @@
+"""
+Figures for the Rayleigh-Bénard convection, both raw time series and power spectra, plus stochastic model fits.
+"""
+
 import numpy as np
 from plasmapy.analysis.time_series.conditional_averaging import ConditionalEvents
 from scipy import signal
 import support_functions as sf
-from fppanalysis import get_hist,distribution
+from fppanalysis import distribution
 import cosmoplots
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-
-mpl.style.use("cosmoplots.default")
+import cosmoplots
+plt.style.use("cosmoplots.default")
 
 # Match \mathcal{K} in text
 plt.rcParams["font.family"] = "serif"
@@ -22,18 +25,51 @@ class MuOpts:
             self.label =r"$1.6\times 10^{-3}$"
             self.color = "C1"
             self.wait_min = 60
-            self.ts_lim = [20000,22000, None, None]
-            self.spectra_lim = [0, 0.1, 1e-6, None]
+            self.ts_lim = (20000,22000, None, None)
+            self.spectra_lim = (0, 0.1, 1e-6, None)
         elif mu == mu_list[1]:
             self.mu = mu_list[1]
             self.savename = '1e-4'
             self.label =r"$10^{-4}$"
             self.color = "C2"
             self.wait_min = 300
-            self.ts_lim =[70000,72000, -1, 14] 
-            self.spectra_lim =[0, 3e-2, 1e-6, None] 
+            self.ts_lim =(70000,72000, -1, 14) 
+            self.spectra_lim =(0, 3e-2, 1e-6, None) 
 
-def plot_RB(Mu,fit=False):
+
+def plot_RB(fit=False):
+    if fit:
+        fig, ax = cosmoplots.figure_multiple_rows_columns(2,3)
+    else:
+        fig, ax = cosmoplots.figure_multiple_rows_columns(2,2)
+    
+    for i, mu in enumerate(mu_list):
+        Mu = MuOpts(mu)
+        K = np.load("./RB_data/K_"+Mu.mu+"_data.npy")
+        time = np.load("./RB_data/time_"+Mu.mu+"_data.npy")
+        dt = time[1] - time[0]
+
+        nK = (K - np.mean(K)) / np.std(K)
+        fK, PK = signal.welch(nK, 1 / dt, nperseg=len(nK) / 4)
+    
+        ax[i].plot(time, nK)
+        ax[i].set_xlabel(r"$t$")
+        ax[i].set_ylabel(r"$\widetilde{\mathcal{K}}$")
+        ax[i].axis(Mu.ts_lim)
+        if Mu.mu == mu_list[1]:
+            ax[i].set_yticks(range(0,15,3))
+
+        cosmoplots.change_log_axis_base(ax[i+2], "y")
+        ax[i+2].plot(fK[1:], PK[1:]*K.std()**2)
+        ax[i+2].set_ylabel(r"$\mathcal{K}_\mathrm{rms}^2 S_{\widetilde{\mathcal{K}}}\left( f \right)$")
+        ax[i+2].set_xlabel(r"$f$")
+        ax[i+2].axis(Mu.spectra_lim)
+    
+    if fit:
+        pass
+    else:
+        fig.savefig("K_nofit.eps")
+def plot_RB_old(Mu,fit=False):
     K = np.load("./RB_data/K_"+Mu.mu+"_data.npy")
     time = np.load("./RB_data/time_"+Mu.mu+"_data.npy")
 
@@ -42,7 +78,7 @@ def plot_RB(Mu,fit=False):
     
     nK = (K - np.mean(K)) / np.std(K)
     fK, PK = signal.welch(nK, 1 / dt, nperseg=len(nK) / 4)
-   
+
     plt.figure('K_ts'+Mu.savename)
     plt.plot(time, nK)
     plt.xlabel(r"$t$")
@@ -140,17 +176,18 @@ def plot_RB(Mu,fit=False):
     plt.close('K_ts'+Mu.savename)
     plt.close('S_K'+Mu.savename)
 
-for mu in mu_list:
-    for fit in [False,True]:
-        plot_RB(MuOpts(mu),fit)
+#for mu in mu_list:
+plot_RB(False)
+    #for fit in [False,True]:
+        #plot_RB(MuOpts(mu),fit)
 
+if False:
+    plt.figure("wait_hist")
+    plt.legend()
+    plt.savefig("Ptau.eps")
+    plt.close('wait_hist')
 
-plt.figure("wait_hist")
-plt.legend()
-plt.savefig("Ptau.eps")
-plt.close('wait_hist')
-
-plt.figure("amp_hist")
-plt.legend()
-plt.savefig("PA.eps")
-plt.close('amp_hist')
+    plt.figure("amp_hist")
+    plt.legend()
+    plt.savefig("PA.eps")
+    plt.close('amp_hist')
