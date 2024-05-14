@@ -39,7 +39,8 @@ class MuOpts:
 
 def plot_RB(fit=False):
     if fit:
-        fig, ax = cosmoplots.figure_multiple_rows_columns(2,3)
+        fig, ax = cosmoplots.figure_multiple_rows_columns(3,2)
+        figav, axav = cosmoplots.figure_multiple_rows_columns(2,2)
     else:
         fig, ax = cosmoplots.figure_multiple_rows_columns(2,2)
     
@@ -65,129 +66,67 @@ def plot_RB(fit=False):
         ax[i+2].set_xlabel(r"$f$")
         ax[i+2].axis(Mu.spectra_lim)
     
+        if fit:
+            CoEv = ConditionalEvents(signal=K, time = time, lower_threshold=K.mean()+K.std(), distance = Mu.wait_min, remove_non_max_peaks=True)
+            
+            fitfile = open('fitdata_'+Mu.savename+'.txt','w')
+            fitfile.write('<K>={}, K_rms={}\n'.format(np.mean(K),np.std(K)))
+            
+            K_fit, pulse = sf.create_fit(dt, time, CoEv) # pulse contains (time_kern, kern, (td, lam))
+            nK_fit = (K_fit-np.mean(K_fit))/np.std(K_fit)
+            
+            fitfile.write('<K_fit>={}, K_fit_rms={}\n'.format(np.mean(K_fit),np.std(K_fit)))
+            fitfile.write('td={}, lam={}\n <tw>={},tw_rms={}\n <A>={}, A_rms={}'.format(pulse[2][0],pulse[2][1],
+                                                                                        CoEv.waiting_times.mean(),CoEv.waiting_times.std(),
+                                                                                        CoEv.peaks.mean(),CoEv.peaks.std()))
+            fitfile.close()
+            
+            axav[i].plot(CoEv.time, CoEv.average/max(CoEv.average), c=Mu.color,label=r'$\mu=$'+Mu.label)
+            axav[i].plot(pulse[0], pulse[1], 'k--')
+            axav[i].set_xlim([-50,50])
+            axav[i].set_xlabel(r"$t$")
+            axav[i].set_ylabel(r"$\langle \mathcal{K}(t-s) | \mathcal{K}(s)=\mathcal{K}_\mathrm{max}\rangle$")
+            axav[i].legend()
+
+            
+            pdf, _, x = distribution(CoEv.peaks / np.mean(CoEv.peaks), 32, kernel=True)
+            axav[2].plot(x, pdf, c=Mu.color)
+            axav[2].set_xlabel(r"$A/\langle A\rangle$")
+            axav[2].set_ylabel(r"$P(A/\langle A\rangle)$")
+
+            pdf, _, x = distribution(CoEv.waiting_times / np.mean(CoEv.waiting_times), 32, kernel=True)
+            axav[3].plot(x, pdf, label=r'$\mu=$'+Mu.label, c=Mu.color)
+            axav[3].set_xlabel(r"$\tau_\mathrm{w}/\langle\tau_\mathrm{w}\rangle$")
+            axav[3].set_ylabel(r"$P(\tau_\mathrm{w}/\langle\tau_\mathrm{w}\rangle)$")
+
+
+
+
+            ax[i].plot(time+(CoEv.arrival_times[0]-time[0]), nK_fit, "--", c=Mu.color)
+            
+            f_fit, PK_fit = signal.welch(nK_fit, 1 / dt, nperseg=int(len(nK_fit) / 4))
+            ax[i+2].plot(f_fit, PK_fit*K_fit.std()**2, "--", c=Mu.color)
+            ax[i+2].plot(f_fit, sf.spectrum_gauss(f_fit, pulse[2][0], pulse[2][1],
+                                                    CoEv.peaks.mean(), CoEv.peaks.std(),
+                                                    CoEv.waiting_times.mean(), CoEv.waiting_times.std()),
+                         'k--')
+
+            cosmoplots.change_log_axis_base(ax[i+4], "y")
+            ax[i+4].plot(f_fit, sf.est_wait_spectrum_ECF(f_fit, CoEv.waiting_times),
+                         c=Mu.color, label=r'$\mathrm{ECF}$')
+            ax[i+4].plot(f_fit, sf.spectrum_gauss_renewal_part(f_fit, 
+                                                               CoEv.waiting_times.mean(), 
+                                                               CoEv.waiting_times.std()),
+                         'k--', label=r'$\mathrm{Gauss}$')
+            ax[i+4].set_ylabel(r"$\mathcal{K}_\mathrm{rms}^2 S_{\widetilde{\mathcal{K}}}\left( f \right)$")
+            ax[i+4].set_xlabel(r"$f$")
+            ax[i+4].legend()
+            ax[i+4].set_xlim(Mu.spectra_lim[:2])
     if fit:
-        pass
+        figav.savefig('Kav_fit.eps')
+        fig.savefig("K_fit.eps")
     else:
         fig.savefig("K_nofit.eps")
-def plot_RB_old(Mu,fit=False):
-    K = np.load("./RB_data/K_"+Mu.mu+"_data.npy")
-    time = np.load("./RB_data/time_"+Mu.mu+"_data.npy")
 
-    dt = time[1] - time[0]
-
-    
-    nK = (K - np.mean(K)) / np.std(K)
-    fK, PK = signal.welch(nK, 1 / dt, nperseg=len(nK) / 4)
-
-    plt.figure('K_ts'+Mu.savename)
-    plt.plot(time, nK)
-    plt.xlabel(r"$t$")
-    plt.ylabel(r"$\widetilde{\mathcal{K}}$")
-    plt.axis(Mu.ts_lim)
-    if Mu.mu == mu_list[1]:
-        plt.yticks(range(0,15,3))
-    
-    plt.figure('S_K'+Mu.savename)
-    ax = plt.gca()
-    cosmoplots.change_log_axis_base(ax, "y")
-    ax.plot(fK[1:], PK[1:]*K.std()**2)
-    plt.ylabel(r"$\mathcal{K}_\mathrm{rms}^2 S_{\widetilde{\mathcal{K}}}\left( f \right)$")
-    plt.xlabel(r"$f$")
-    plt.axis(Mu.spectra_lim)
-
-    if fit:
-        CoEv = ConditionalEvents(signal=K, time = time, lower_threshold=K.mean()+K.std(), distance = Mu.wait_min, remove_non_max_peaks=True)
-        
-        fitfile = open('fitdata_'+Mu.savename+'.txt','w')
-        fitfile.write('<K>={}, K_rms={}\n'.format(np.mean(K),np.std(K)))
-        
-        K_fit, pulse = sf.create_fit(dt, time, CoEv) # pulse contains (time_kern, kern, (td, lam))
-        nK_fit = (K_fit-np.mean(K_fit))/np.std(K_fit)
-        
-        fitfile.write('<K_fit>={}, K_fit_rms={}\n'.format(np.mean(K_fit),np.std(K_fit)))
-        fitfile.write('td={}, lam={}\n <tw>={},tw_rms={}\n <A>={}, A_rms={}'.format(pulse[2][0],pulse[2][1],
-                                                                                    CoEv.waiting_times.mean(),CoEv.waiting_times.std(),
-                                                                                    CoEv.peaks.mean(),CoEv.peaks.std()))
-        fitfile.close()
-
-        plt.figure('Kav'+Mu.savename)
-        plt.plot(CoEv.time, CoEv.average/max(CoEv.average), c=Mu.color)
-        #plt.plot(CoEv.time, CoEv.variance)
-        plt.plot(pulse[0], pulse[1], 'k--')
-        plt.xlim([-50,50])
-        plt.xlabel(r"$t$")
-        plt.ylabel(r"$\langle \mathcal{K}(t-s) | \mathcal{K}(s)=\mathcal{K}_\mathrm{max}\rangle$")
-        plt.savefig('Kav_'+Mu.savename+'.eps')
-        plt.close('Kav_'+Mu.savename+'.eps')
-
-        f_fit, PK_fit = signal.welch(nK_fit, 1 / dt, nperseg=int(len(nK_fit) / 4))
-
-        plt.figure('wait_hist')
-        pdf, _, x = distribution(CoEv.waiting_times / np.mean(CoEv.waiting_times), 32, kernel=True)
-        plt.plot(x, pdf, label=r'$\mu=$'+Mu.label, c=Mu.color)
-        plt.xlabel(r"$\tau_\mathrm{w}/\langle\tau_\mathrm{w}\rangle$")
-        plt.ylabel(r"$P(\tau_\mathrm{w}/\langle\tau_\mathrm{w}\rangle)$")
-
-        plt.figure('amp_hist')
-        pdf, _, x = distribution(CoEv.peaks / np.mean(CoEv.peaks), 32, kernel=True)
-        plt.plot(x, pdf, label=r'$\mu=$'+Mu.label, c=Mu.color)
-        plt.xlabel(r"$A/\langle A\rangle$")
-        plt.ylabel(r"$P(A/\langle A\rangle)$")
-
-        plt.figure('K_ts'+Mu.savename)
-        plt.plot(time+(CoEv.arrival_times[0]-time[0]), nK_fit, "--", c=Mu.color)
-        
-        plt.figure('S_K'+Mu.savename)
-        ax.plot(f_fit, PK_fit*K_fit.std()**2, "--", c=Mu.color)
-        ax.plot(f_fit, sf.spectrum_renewal(f_fit, pulse[2][0], pulse[2][1],
-                                                CoEv.peaks.mean(), CoEv.peaks.std(),
-                                                CoEv.waiting_times),
-                     'k--')
-
-        plt.figure('K_ts'+Mu.savename)
-        plt.savefig("K_"+Mu.savename+"fit.eps")
-        
-        plt.figure('S_K'+Mu.savename)
-        plt.savefig("S_K_"+Mu.savename+"fit.eps")
-
-        plt.figure('Compare_renewal_gauss'+Mu.savename)
-        ax2 = plt.gca()
-        cosmoplots.change_log_axis_base(ax2, "y")
-        ax2.plot(f_fit, sf.est_wait_spectrum_ECF(f_fit, CoEv.waiting_times),
-                     'k--', label=r'$\mathrm{ECF}$')
-        ax2.plot(f_fit, sf.spectrum_gauss_renewal_part(f_fit, 
-                                                           CoEv.waiting_times.mean(), 
-                                                           CoEv.waiting_times.std()),
-                     c=Mu.color, label=r'$\mathrm{Gauss}$')
-        plt.ylabel(r"$\mathcal{K}_\mathrm{rms}^2 S_{\widetilde{\mathcal{K}}}\left( f \right)$")
-        plt.xlabel(r"$f$")
-        plt.legend()
-        plt.xlim(Mu.spectra_lim[:2])
-        plt.savefig('S_compare_renewal_gauss_'+Mu.savename+'.eps')
-        plt.close('Compare_renewal_gauss'+Mu.savename)
-
-    else:
-        plt.figure('K_ts'+Mu.savename)
-        plt.savefig("K_"+Mu.savename+".eps")
-        
-        plt.figure('S_K'+Mu.savename)
-        plt.savefig("S_K_"+Mu.savename+".eps")
-
-    plt.close('K_ts'+Mu.savename)
-    plt.close('S_K'+Mu.savename)
-
-#for mu in mu_list:
 plot_RB(False)
-    #for fit in [False,True]:
-        #plot_RB(MuOpts(mu),fit)
-
-if False:
-    plt.figure("wait_hist")
-    plt.legend()
-    plt.savefig("Ptau.eps")
-    plt.close('wait_hist')
-
-    plt.figure("amp_hist")
-    plt.legend()
-    plt.savefig("PA.eps")
-    plt.close('amp_hist')
+plot_RB(True)
