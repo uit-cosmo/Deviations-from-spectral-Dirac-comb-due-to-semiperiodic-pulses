@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "fpp-deviations-periodic"
+version = "0.1.0"
+description = "Code to generate figures for the manuscript 'Deviations from spectral Dirac comb due to semiperiodic pulses'"
+authors = ["Gregor Decristoforo <gregor.decristoforo@uit.no>"]
+license = "MIT"
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+numba = "^0.60.0"
+cosmoplots = {git = "https://github.com/uit-cosmo/cosmoplots.git", branch="tex-use"}
+superposed-pulses = {git = "https://github.com/uit-cosmo/superposed-pulses.git"}
+fppanalysis = {git = "https://github.com/uit-cosmo/fpp-analysis-tools.git"}
+scipy = "^1.14.1"
+plasmapy = "^2024.10.0"
+closedexpressions = "^0.1.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
