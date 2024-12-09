@@ -27,8 +27,8 @@ class ExpAmp(frc.ForcingGenerator):
     def __init__(self):
         pass
 
-    def get_forcing(self, times: np.ndarray, gamma: float) -> frc.Forcing:
-        total_pulses = int(max(times) * gamma)
+    def get_forcing(self, times: np.ndarray, waiting_time: float) -> frc.Forcing:
+        total_pulses = int(max(times) / waiting_time)
         arrival_time_indx = (
             np.arange(start=0, stop=99994, step=5) * 100
         )  # multiplied with inverse dt
@@ -48,7 +48,7 @@ class ExpAmp(frc.ForcingGenerator):
         pass
 
 
-model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
+model = pm.PointModel(waiting_time=5, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 # model.set_amplitude_distribution("exp")
 model.set_custom_forcing_generator(ExpAmp())
@@ -85,8 +85,8 @@ class AsymLaplaceAmp(frc.ForcingGenerator):
     def __init__(self):
         pass
 
-    def get_forcing(self, times: np.ndarray, gamma: float) -> frc.Forcing:
-        total_pulses = int(max(times) * gamma)
+    def get_forcing(self, times: np.ndarray, waiting_time: float) -> frc.Forcing:
+        total_pulses = int(max(times) / waiting_time)
         arrival_time_indx = (
             np.arange(start=0, stop=99994, step=5) * 100
         )  # multiplied with inverse dt
@@ -111,7 +111,7 @@ class AsymLaplaceAmp(frc.ForcingGenerator):
         pass
 
 
-model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
+model = pm.PointModel(waiting_time=5, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 model.set_custom_forcing_generator(AsymLaplaceAmp())
 
