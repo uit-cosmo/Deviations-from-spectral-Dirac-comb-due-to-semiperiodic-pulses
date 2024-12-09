@@ -1,5 +1,9 @@
 """
 Power spectral density and autocorrelation function for periodic arrivals and exponentially and laplace distributed amplitudes.
+
+Figure 3 in the paper.
+
+TODO: Fix dirac delta amplitudes.
 """
 
 import numpy as np
