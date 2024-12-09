@@ -4,13 +4,15 @@ Power spectral density and autocorrelation function for periodic arrivals and ex
 
 import numpy as np
 from scipy import signal
-from support_functions import *
+import fppanalysis as fa
+import support_functions as sf
 import superposedpulses.forcing as frc
 import superposedpulses.point_model as pm
 import superposedpulses.pulse_shape as ps
 from closedexpressions import PSD_periodic_arrivals, autocorr_periodic_arrivals
 import matplotlib.pyplot as plt
 import cosmoplots
+
 plt.style.use("cosmoplots.default")
 
 fig, ax = cosmoplots.figure_multiple_rows_columns(rows=1, columns=2)
@@ -44,6 +46,7 @@ class ExpAmp(frc.ForcingGenerator):
 
 model = pm.PointModel(gamma=0.2, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
+# model.set_amplitude_distribution("exp")
 model.set_custom_forcing_generator(ExpAmp())
 
 T, S = model.make_realization()
@@ -61,7 +64,7 @@ ax[0].plot(
     label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f), \, \langle A \rangle \ne 0$",
 )
 
-tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
+tb, R = fa.corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
 ax[1].plot(tb, R, label=r"$A \sim \mathrm{Exp}$")
 
 t = np.linspace(0, 50, 1000)
@@ -84,7 +87,7 @@ class AsymLaplaceAmp(frc.ForcingGenerator):
             np.arange(start=0, stop=99994, step=5) * 100
         )  # multiplied with inverse dt
         kappa = 0.5
-        amplitudes = sample_asymm_laplace(
+        amplitudes = sf.sample_asymm_laplace(
             alpha=0.5 / np.sqrt(1.0 - 2.0 * kappa * (1.0 - kappa)),
             kappa=kappa,
             size=total_pulses,
@@ -123,7 +126,7 @@ ax[0].plot(
     label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f), \, \langle A \rangle = 0$",
 )
 
-tb, R = corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
+tb, R = fa.corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
 ax[1].plot(tb, R, label=r"$A \sim \mathrm{Laplace}$")
 
 R_an = autocorr_periodic_arrivals(t, gamma=0.2, A_mean=0, A_rms=1, norm=True)

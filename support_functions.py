@@ -1,10 +1,10 @@
 import numpy as np
 from scipy.optimize import curve_fit
 from scipy.signal import fftconvolve
-from closedexpressions import psd
+import closedexpressions as ce
 
 
-def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=None, seed=None):
+def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=1, seed=None):
     """
     Use:
         sample_asymm_laplace(alpha=1., kappa=0.5, size=None)
@@ -26,8 +26,6 @@ def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=None, seed=None):
 
     assert alpha > 0.0
     assert (kappa >= 0.0) & (kappa <= 1.0)
-    if size:
-        assert size > 0
     prng = np.random.RandomState(seed=seed)
     U = prng.uniform(size=size)
     X = np.zeros(size)
@@ -91,7 +89,7 @@ def spectrum_gauss(f, td, lam, amean, arms, tw, tw_rms):
     gamma = td / tw
     Omega = tw * 2 * np.pi * f
     S = (
-        td * gamma * psd(gamma * Omega, 1, lam) / 2
+        td * gamma * ce.psd(gamma * Omega, 1, lam) / 2
     )  # td = 1 here since the expression already contains td.
     S *= arms**2 + amean**2 * spectrum_gauss_renewal_part(f, tw, tw_rms)
     return S
@@ -112,6 +110,6 @@ def spectrum_renewal(f, td, lam, amean, arms, tw_data):
     gamma = td / tw_data.mean()
     omega = 2 * np.pi * f
 
-    S = td * gamma * psd(td * omega, 1, lam) / 2
+    S = td * gamma * ce.psd(td * omega, 1, lam) / 2
     S *= arms**2 + amean**2 * est_wait_spectrum_ECF(f, tw_data)
     return S
