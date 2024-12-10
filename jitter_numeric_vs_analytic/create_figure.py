@@ -31,7 +31,8 @@ def psd_norm_num(wrms):
     return D["freq"], D["psd"]
 
 
-linestyle = ["-", "--", "-.", ":"]
+linestyle = ["-", "--"]
+color = ["C0", "k"]
 labels = [
     r"$\mathrm{Normal\,num.}$",
     r"$\mathrm{Normal\,an.}$",
@@ -51,35 +52,18 @@ columns = 1
 fig, ax = cosmoplots.figure_multiple_rows_columns(rows, columns)
 
 ax[2].set_xscale("log")
-for row in range(rows * columns):
-    for psd, ls, lab in zip([psd_norm_num], linestyle[:1], labels[:1]):
-        F, P = psd(Wrms[row])
-        if row == 1:
-            ax[row].semilogy(F, P, ls=ls, label=lab)
-        else:
-            ax[row].semilogy(F, P, ls=ls)
-        ax[row].plot(F[P > 1.5], P[P > 1.5], ls=" ", marker="o")
-
+for row in range(rows):
+    F, Pn = psd_norm_num(Wrms[row])
+    pa = spectrum_waiting_time_part(omega, lambda o: cf_norm(o, 1, Wrms[row]))
     if row == 1:
-        ax[row].semilogy(
-            f,
-            spectrum_waiting_time_part(omega, lambda o: cf_norm(o, 1, Wrms[row])),
-            label=labels[1],
-        )
+        ax[row].semilogy(F, Pn, c=color[0], label=labels[0])
+        ax[row].semilogy(f, pa, c=color[1], ls=linestyle[1], label=labels[1])
+
     else:
-        ax[row].semilogy(
-            f,
-            spectrum_waiting_time_part(omega, lambda o: cf_norm(o, 1, Wrms[row])),
-        )
-    if False:
-        for cf, ls, lab in zip(
-            [
-                cf_norm,
-            ],
-            linestyle[3:],
-            labels[3:],
-        ):
-            pass
+        ax[row].semilogy(F, Pn, c=color[0])
+        ax[row].semilogy(f, pa, c=color[1], ls=linestyle[1])
+    ax[row].plot(F[Pn > 1.5], Pn[Pn > 1.5], c=color[0], ls=" ", marker="o")
+    ax[row].plot(f[pa > 1.5], pa[pa > 1.5], c=color[0], ls=" ", marker="o")
 
     ax[row].set_ylabel(
         r"$S_\Phi(\omega)/\left[ \tau_\mathrm{d} \gamma \langle A \rangle^2 I_2 \varrho(\tau_\mathrm{d} \omega) \right]$"
@@ -89,7 +73,10 @@ for row in range(rows * columns):
         ax[2].set_xlim(1e-2, 5)
     else:
         ax[row].set_xlim(0, 5)
-    ax[row].set_ylim(1e-2, 2e3)
+    if row == 0:
+        ax[row].set_ylim(1e-2, 1e4)
+    else:
+        ax[row].set_ylim(1e-2, 1e2)
     ax[row].text(
         0.8,
         0.1,

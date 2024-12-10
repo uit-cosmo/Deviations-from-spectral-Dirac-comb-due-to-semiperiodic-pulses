@@ -54,6 +54,14 @@ Run `gen_gammainv_cf.py` and `gen_norm_wait_num_psd.py` first, then `create_figu
 
 Generates figure 7 in the manuscript.
 
+### `wait_compare`
+
+Compares the parts due to jittered waiting times in the PSD for normal jitter times using the analytic and numeric solutions.
+
+Run `gen_norm_jitter_num_psd.py` first, then `create_figure.py`.
+
+Generates figure 8 in the manuscript.
+
 ### Raw data of $K$
 
 The raw data of the energy integral $K$ and the according time values are available in `RB_data/`. The values `1e-4` and `1.6e-3` refer to the diffusivity $\kappa$ and viscosity $\mu$.
