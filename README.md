@@ -40,6 +40,12 @@ Power spectral density and autocorrelation of the stochastic process with period
 
 Generates figure 5 in the manuscript.
 
+### `create_figure_gaussian_waiting_times.py`
+
+Power spectral density and autocorrelation of the stochastic process with Gaussian waiting times.
+
+Generates figure 6 in the manuscript.
+
 ### Raw data of $K$
 
 The raw data of the energy integral $K$ and the according time values are available in `RB_data/`. The values `1e-4` and `1.6e-3` refer to the diffusivity $\kappa$ and viscosity $\mu$.
