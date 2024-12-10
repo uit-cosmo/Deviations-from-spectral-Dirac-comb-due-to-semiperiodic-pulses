@@ -65,9 +65,7 @@ for row in range(rows):
     ax[row].plot(F[Pn > 1.5], Pn[Pn > 1.5], c=color[0], ls=" ", marker="o")
     ax[row].plot(f[pa > 1.5], pa[pa > 1.5], c=color[0], ls=" ", marker="o")
 
-    ax[row].set_ylabel(
-        r"$S_\Phi(\omega)/\left[ \tau_\mathrm{d} \gamma \langle A \rangle^2 I_2 \varrho(\tau_\mathrm{d} \omega) \right]$"
-    )
+    ax[row].set_ylabel(r"$S_\Phi$")
     ax[row].set_xlabel(r"$\langle w \rangle f$")
     if row == 2:
         ax[2].set_xlim(1e-2, 5)

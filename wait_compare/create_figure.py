@@ -90,7 +90,8 @@ for row in range(rows * columns):
             )
 
     ax[row].set_ylabel(
-        r"$S_\Phi(\omega)/\left[ \tau_\mathrm{d} \gamma \langle A \rangle^2 I_2 \varrho(\tau_\mathrm{d} \omega) \right]$"
+        r"$\mathrm{Re}\left[ (1 + \psi_w)/(1-\psi_w) \right]$"
+        # r"$S_\Phi(\omega)/\left[ \tau_\mathrm{d} \gamma \langle A \rangle^2 I_2 \varrho(\tau_\mathrm{d} \omega) \right]$"
     )
     ax[row].set_xlabel(r"$\langle w \rangle f$")
     if row == 2:
