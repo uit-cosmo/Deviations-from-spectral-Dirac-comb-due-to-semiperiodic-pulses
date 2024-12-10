@@ -60,11 +60,11 @@ Run [gen_gammainv_cf.py](wait_compare/gen_gammainv_cf.py) and [gen_norm_wait_num
 
 Generates figure 7 in the manuscript.
 
-### `wait_compare`
+### [jitter_numeric_vs_analytic](jitter_numeric_vs_analytic)
 
 Compares the parts due to jittered waiting times in the PSD for normal jitter times using the analytic and numeric solutions.
 
-Run `gen_norm_jitter_num_psd.py` first, then `create_figure.py`.
+Run [gen_norm_jitter_num_psd.py](jitter_numeric_vs_analytic/gen_norm_jitter_num_psd.py) first, then [create_figure.py](jitter_numeric_vs_analytic/create_figure.py).
 
 Generates figure 8 in the manuscript.
 
@@ -72,10 +72,10 @@ Generates figure 8 in the manuscript.
 
 ### Raw data of $K$
 
-The raw data of the energy integral $K$ and the according time values are available in `rayleigh_benard/RB_data/`. The values `1e-4` and `1.6e-3` refer to the diffusivity $\kappa$ and viscosity $\mu$.
+The raw data of the energy integral $K$ and the according time values are available in [RB_data](rayleigh_benard/RB_data). The values `1e-4` and `1.6e-3` refer to the diffusivity $\kappa$ and viscosity $\mu$.
 
 ### Run Rayleigh-Benard model in BOUT++
 
-If you prefer to run the RB-model from scratch in BOUT++ you find all necessary files in `rayleigh_benard/BOUT_files`. The `PhysicsModel` is defined in `rb-model.cxx` and the simulation inputs, such as $\kappa$ and $\mu$, are defined in `BOUT.inp`. The data shown in the paper is created with BOUT++ version 4.4.0. Check the BOUT++ manual for instructions for to install BOUT++ and run a custom `PhysicsModel`: <https://bout-dev.readthedocs.io/en/stable/>
+If you prefer to run the RB-model from scratch in BOUT++ you find all necessary files in [BOUT_files](rayleigh_benard/BOUT_files). The `PhysicsModel` is defined in [rb-model.cxx](rayleigh_benard/BOUT_files/rb-model.cxx) and the simulation inputs, such as $\kappa$ and $\mu$, are defined in [BOUT.inp](rayleigh_benard/BOUT_files/BOUT.inp). The data shown in the paper is created with BOUT++ version 4.4.0. Check the BOUT++ manual for instructions for to install BOUT++ and run a custom `PhysicsModel`: <https://bout-dev.readthedocs.io/en/stable/>
 
-You can calculate $K$ from the simulation output using the `BOUT_files/calculate_K.py` script. For this, install the `xbout` package (<https://github.com/boutproject/xBOUT>) and adjust the path to the BOUT++ output data in line 4.
+You can calculate $K$ from the simulation output using the [calculate_K.py](rayleigh_benard/BOUT_files/calculate_K.py) script. For this, install the `xbout` package (<https://github.com/boutproject/xBOUT>) and adjust the path to the BOUT++ output data in line 4.
