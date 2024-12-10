@@ -26,7 +26,7 @@ model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 
 for color, control_parameter in enumerate([0.2, 0.4, 0.45, 0.48]):
     model.set_custom_forcing_generator(
-        sf.PeriodicAsymLapPulses(control_parameter=control_parameter)
+        sf.ForcingQuasiPeriodicAsymLapAmp(sigma=0.0, beta=control_parameter)
     )
 
     T, S = model.make_realization()
@@ -37,7 +37,7 @@ for color, control_parameter in enumerate([0.2, 0.4, 0.45, 0.48]):
     f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 30)
     ax[0].plot(f, Pxx, label=rf"$\lambda = {control_parameter}$", c="C{}".format(color))
 
-    height = 30 * np.exp(-2 * 2 * np.pi * f)
+    height = 20 * np.exp(-2 * 2 * np.pi * f)
 
     fitrange = find_peaks(Pxx[(f < 1)], distance=10, height=height[f < 1])[0]
     ax[0].plot(f[fitrange], Pxx[fitrange], "o", c="C{}".format(color))

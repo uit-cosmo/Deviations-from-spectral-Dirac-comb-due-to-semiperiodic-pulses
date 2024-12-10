@@ -23,7 +23,9 @@ cosmoplots.change_log_axis_base(ax[0], "y")
 
 model = pm.PointModel(waiting_time=5, total_duration=100_000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
-model.set_custom_forcing_generator(sf.PeriodicAsymLapPulses(control_parameter=0.0))
+model.set_custom_forcing_generator(
+    sf.ForcingQuasiPeriodicAsymLapAmp(sigma=0.0, beta=0.0)
+)
 
 T, S = model.make_realization()
 print(T[-1])
@@ -66,7 +68,9 @@ ax[1].plot(
 
 model = pm.PointModel(waiting_time=5, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
-model.set_custom_forcing_generator(sf.PeriodicAsymLapPulses(control_parameter=0.5))
+model.set_custom_forcing_generator(
+    sf.ForcingQuasiPeriodicAsymLapAmp(sigma=0.0, beta=0.5)
+)
 
 T, S = model.make_realization()
 

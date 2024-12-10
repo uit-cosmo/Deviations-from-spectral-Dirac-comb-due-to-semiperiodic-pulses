@@ -16,7 +16,7 @@ poetry install
 
 The top-level scripts may be run without any extra preparation.
 
-### create_figure_gamma_wait.py
+### `create_figure_gamma_wait.py`
 
 Power spectral density and autocorrelation of the stochastic process with exponentially distributed amplitudes and Gamma distributed waiting times.
 
@@ -28,11 +28,17 @@ Power spectral density and autocorrelation of the stochastic process with expone
 
 Generates figure 3 in the manuscript.
 
-### `create_figure asym_lap_amp.py`
+### `create_figure_asym_lap_amp.py`
 
 Power spectral density and autocorrelation of the stochastic process with asymmetrically Laplace distributed amplitudes.
 
 Generates figure 4 in the manuscript.
+
+### `create_figure_gaussian_jitter_wait.py`
+
+Power spectral density and autocorrelation of the stochastic process with periodic arrivals with Gaussian jitter.
+
+Generates figure 5 in the manuscript.
 
 ### Raw data of $K$
 

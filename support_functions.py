@@ -5,6 +5,58 @@ import superposedpulses.forcing as frc
 import closedexpressions as ce
 
 
+class ForcingQuasiPeriodicAsymLapAmp(frc.ForcingGenerator):
+    """
+    Forcing for the FPP with asymmetric laplace distributed amplitudes with shape parameter beta
+    and periodic arrival times jittered by a Gaussian with standard deviation sigma.
+    """
+
+    def __init__(self, sigma, beta):
+        self.sigma = sigma
+        self.beta = beta
+
+    def get_forcing(self, times: np.ndarray, waiting_time: float) -> frc.Forcing:
+        dt = times[1] - times[0]
+        total_pulses = int(max(times) / waiting_time)
+        periodic_waiting_times = np.arange(1, total_pulses + 1) * waiting_time
+        if self.sigma > 0:
+            waiting_times_jitter = np.random.normal(
+                loc=1, scale=self.sigma, size=total_pulses
+            )
+            arrival_times = periodic_waiting_times + waiting_times_jitter
+        else:
+            arrival_times = periodic_waiting_times
+        arrival_time_indx = np.rint(arrival_times / dt).astype(int)
+        arrival_time_indx -= arrival_time_indx[0]  # set first pulse to t = 0
+        # check whether events are sampled with arrival time > times[-1]
+        number_of_overshotings = len(arrival_time_indx[arrival_time_indx > times.size])
+        total_pulses -= number_of_overshotings
+        arrival_time_indx = arrival_time_indx[arrival_time_indx < times.size]
+
+        amplitudes = sample_asymm_laplace(
+            alpha=0.5 / np.sqrt(1.0 - 2.0 * self.beta * (1.0 - self.beta)),
+            kappa=self.beta,
+            size=total_pulses,
+        )
+        durations = np.ones(shape=total_pulses)
+
+        return frc.Forcing(
+            total_pulses,
+            times[arrival_time_indx],
+            amplitudes,
+            durations,
+        )
+
+    def set_amplitude_distribution(
+        self,
+        amplitude_distribution_function,
+    ):
+        pass
+
+    def set_duration_distribution(self, duration_distribution_function):
+        pass
+
+
 class PeriodicAsymLapPulses(frc.ForcingGenerator):
     def __init__(self, control_parameter):
         self.control_parameter = control_parameter
