@@ -1,18 +1,32 @@
+# Deviations from spectral Dirac comb in Rayleigh Bénard turbulent bursting
+
 Code to generate, plot and fit data used in Manuscript *"Deviations from spectral dirac comb in Rayleigh-Benard turbulent bursting"*.
 
-# Description of figure generation
+## Reproducing the environment
+
+To set up the environment to reproduce the figures, clone the repo to your local machine, then install the project and its dependencies with poetry:
+
+```sh
+git clone https://github.com/uit-cosmo/cosmoplots.git
+cd cosmoplots
+poetry install
+```
+
+## Description of figure generation
+
+The top-level scripts may be run without any extra preparation.
 
 ## `create_figure_exp_lap_amp.py`
 
 Power spectral density and autocorrelation of the stochastic process with exponentially and symmetrically Laplace distributed amplitudes.
 
-Figure 3 in the manuscript.
+Generates figure 3 in the manuscript.
 
 ## `create_figure asym_lap_amp.py`
 
 Power spectral density and autocorrelation of the stochastic process with asymmetrically Laplace distributed amplitudes.
 
-Figure 4 in the manuscript.
+Generates figure 4 in the manuscript.
 
 ### Raw data of $K$
 
