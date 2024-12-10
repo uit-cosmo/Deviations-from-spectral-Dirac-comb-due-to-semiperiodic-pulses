@@ -41,7 +41,7 @@ tw = 1
 Wrms = [5, 1, 1e-1]
 
 T = 10_000
-repeat = 100
+repeat = 1000
 dt = 0.01
 
 for i in range(len(Wrms)):

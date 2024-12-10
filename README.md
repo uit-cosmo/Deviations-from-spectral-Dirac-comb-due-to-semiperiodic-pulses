@@ -46,6 +46,14 @@ Power spectral density and autocorrelation of the stochastic process with Gaussi
 
 Generates figure 6 in the manuscript.
 
+### `wait_compare`
+
+Compares the parts due to renewal waiting times in the PSD for normal, Gamma and inverse gamma waiting times.
+
+Run `gen_gammainv_cf.py` and `gen_norm_wait_num_psd.py` first, then `create_figure.py`.
+
+Generates figure 7 in the manuscript.
+
 ### Raw data of $K$
 
 The raw data of the energy integral $K$ and the according time values are available in `RB_data/`. The values `1e-4` and `1.6e-3` refer to the diffusivity $\kappa$ and viscosity $\mu$.
