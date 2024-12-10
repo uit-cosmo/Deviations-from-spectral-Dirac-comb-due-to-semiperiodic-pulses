@@ -10,7 +10,6 @@ import numpy as np
 from scipy import signal
 import fppanalysis as fa
 import support_functions as sf
-import superposedpulses.forcing as frc
 import superposedpulses.point_model as pm
 import superposedpulses.pulse_shape as ps
 from closedexpressions import PSD_periodic_arrivals, autocorr_periodic_arrivals
@@ -22,36 +21,9 @@ plt.style.use("cosmoplots.default")
 fig, ax = cosmoplots.figure_multiple_rows_columns(rows=1, columns=2)
 cosmoplots.change_log_axis_base(ax[0], "y")
 
-
-class ExpAmp(frc.ForcingGenerator):
-    def __init__(self):
-        pass
-
-    def get_forcing(self, times: np.ndarray, waiting_time: float) -> frc.Forcing:
-        total_pulses = int(max(times) / waiting_time)
-        arrival_time_indx = (
-            np.arange(start=0, stop=99994, step=5) * 100
-        )  # multiplied with inverse dt
-        amplitudes = np.random.default_rng().exponential(scale=1.0, size=total_pulses)
-        durations = np.ones(shape=total_pulses)
-        return frc.Forcing(
-            total_pulses, times[arrival_time_indx], amplitudes, durations
-        )
-
-    def set_amplitude_distribution(
-        self,
-        amplitude_distribution_function,
-    ):
-        pass
-
-    def set_duration_distribution(self, duration_distribution_function):
-        pass
-
-
 model = pm.PointModel(waiting_time=5, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
-# model.set_amplitude_distribution("exp")
-model.set_custom_forcing_generator(ExpAmp())
+model.set_custom_forcing_generator(sf.PeriodicAsymLapPulses(control_parameter=0.0))
 
 T, S = model.make_realization()
 
@@ -60,7 +32,7 @@ S_norm = (S - S.mean()) / S.std()
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 ax[0].plot(f, Pxx, label=r"$A \sim \mathrm{Exp}$")
 
-PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, dt=0.01)
+PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, T=T[-1])
 ax[0].plot(
     f,
     PSD,
@@ -81,39 +53,9 @@ ax[1].plot(
 )
 
 
-class AsymLaplaceAmp(frc.ForcingGenerator):
-    def __init__(self):
-        pass
-
-    def get_forcing(self, times: np.ndarray, waiting_time: float) -> frc.Forcing:
-        total_pulses = int(max(times) / waiting_time)
-        arrival_time_indx = (
-            np.arange(start=0, stop=99994, step=5) * 100
-        )  # multiplied with inverse dt
-        kappa = 0.5
-        amplitudes = sf.sample_asymm_laplace(
-            alpha=0.5 / np.sqrt(1.0 - 2.0 * kappa * (1.0 - kappa)),
-            kappa=kappa,
-            size=total_pulses,
-        )
-        durations = np.ones(shape=total_pulses)
-        return frc.Forcing(
-            total_pulses, times[arrival_time_indx], amplitudes, durations
-        )
-
-    def set_amplitude_distribution(
-        self,
-        amplitude_distribution_function,
-    ):
-        pass
-
-    def set_duration_distribution(self, duration_distribution_function):
-        pass
-
-
 model = pm.PointModel(waiting_time=5, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
-model.set_custom_forcing_generator(AsymLaplaceAmp())
+model.set_custom_forcing_generator(sf.PeriodicAsymLapPulses(control_parameter=0.5))
 
 T, S = model.make_realization()
 
@@ -122,7 +64,7 @@ S_norm = (S - S.mean()) / S.std()
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
 ax[0].plot(f, Pxx, label=r"$A \sim \mathrm{Laplace}$")
 
-PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=0, dt=0.01)
+PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=0, T=T[-1])
 ax[0].plot(
     f,
     PSD,

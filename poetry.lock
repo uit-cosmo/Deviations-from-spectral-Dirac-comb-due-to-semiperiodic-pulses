@@ -485,15 +485,19 @@ name = "closedexpressions"
 version = "0.1.2"
 description = "Closed expressions for shot noise processes."
 optional = false
-python-versions = ">=3.9,<4.0"
-files = [
-    {file = "closedexpressions-0.1.2-py3-none-any.whl", hash = "sha256:bfb2749a182fe52e71eca2dccb9d128208b383b431dce8aeb911dd1ab0a8482c"},
-    {file = "closedexpressions-0.1.2.tar.gz", hash = "sha256:7fef56ea18e9841ca7deb0efe4ccce1006444e0b8f3d1fb32c1ecfd3abcc1350"},
-]
+python-versions = "^3.9"
+files = []
+develop = false
 
 [package.dependencies]
-mpmath = ">=1.2.1,<2.0.0"
-numpy = ">=1.22.2,<2.0.0"
+mpmath = "^1.2.1"
+numpy = "^1.22.2"
+
+[package.source]
+type = "git"
+url = "https://github.com/uit-cosmo/fpp-closed-expressions.git"
+reference = "fix_psd_periodic"
+resolved_reference = "f4d38bedc7fd0e806d41dcd4797c62eafee50a25"
 
 [[package]]
 name = "colorama"
@@ -3352,4 +3356,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "4d0d32bc3f8696475d6a776565ae43ca0b149accb59f902bf92a9d30e7ca2ae3"
+content-hash = "24d1c42357c0ef5052a854943a7e99dad2ec326cec2781cc5de2338bd6ce96ce"
