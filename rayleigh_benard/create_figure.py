@@ -2,11 +2,15 @@
 Figures for the Rayleigh-Bénard convection, both raw time series and power spectra, plus stochastic model fits.
 """
 
+import sys
+
+sys.path.append("..")
+
 import numpy as np
 from plasmapy.analysis.time_series.conditional_averaging import ConditionalEvents
 from scipy import signal
 import support_functions as sf
-from fppanalysis import distribution
+import fppanalysis as fa
 import matplotlib.pyplot as plt
 import cosmoplots
 
@@ -118,12 +122,14 @@ def plot_RB(fit=False):
             )
             axav[i].legend()
 
-            pdf, _, x = distribution(CoEv.peaks / np.mean(CoEv.peaks), 32, kernel=True)
+            pdf, _, x = fa.distribution(
+                CoEv.peaks / np.mean(CoEv.peaks), 32, kernel=True
+            )
             axav[2].plot(x, pdf, c=Mu.color, ls=Mu.ls)
             axav[2].set_xlabel(r"$A/\langle A\rangle$")
             axav[2].set_ylabel(r"$P(A/\langle A\rangle)$")
 
-            pdf, _, x = distribution(
+            pdf, _, x = fa.distribution(
                 CoEv.waiting_times / np.mean(CoEv.waiting_times), 32, kernel=True
             )
             axav[3].plot(x, pdf, c=Mu.color, ls=Mu.ls)
