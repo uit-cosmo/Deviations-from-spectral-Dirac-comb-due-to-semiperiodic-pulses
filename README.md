@@ -2,6 +2,12 @@ Code to generate, plot and fit data used in Manuscript *"Deviations from spectra
 
 # Description of figure generation
 
+## `create_figure_exp_lap_amp.py`
+
+Power spectral density and autocorrelation of the stochastic process with exponentially and symmetrically Laplace distributed amplitudes.
+
+Figure 3 in the manuscript.
+
 ## `create_figure asym_lap_amp.py`
 
 Power spectral density and autocorrelation of the stochastic process with asymmetrically Laplace distributed amplitudes.

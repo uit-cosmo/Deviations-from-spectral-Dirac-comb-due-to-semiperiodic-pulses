@@ -497,7 +497,7 @@ numpy = "^1.22.2"
 type = "git"
 url = "https://github.com/uit-cosmo/fpp-closed-expressions.git"
 reference = "fix_psd_periodic"
-resolved_reference = "f4d38bedc7fd0e806d41dcd4797c62eafee50a25"
+resolved_reference = "a59a787785eade6e6ab4980d9d520d971e9c33f8"
 
 [[package]]
 name = "colorama"

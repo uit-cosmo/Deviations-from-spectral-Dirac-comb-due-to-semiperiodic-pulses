@@ -1,7 +1,40 @@
 import numpy as np
 from scipy.optimize import curve_fit
 from scipy.signal import fftconvolve
+import superposedpulses.forcing as frc
 import closedexpressions as ce
+
+
+class PeriodicAsymLapPulses(frc.ForcingGenerator):
+    def __init__(self, control_parameter):
+        self.control_parameter = control_parameter
+
+    def get_forcing(self, times: np.ndarray, waiting_time: float) -> frc.Forcing:
+        total_pulses = int(max(times) / waiting_time)
+        arrival_time_indx = (
+            np.arange(start=0, stop=99994, step=5) * 100
+        )  # multiplied with inverse dt
+        amplitudes = sample_asymm_laplace(
+            alpha=0.5
+            / np.sqrt(
+                1.0 - 2.0 * self.control_parameter * (1.0 - self.control_parameter)
+            ),
+            kappa=self.control_parameter,
+            size=total_pulses,
+        )
+        durations = np.ones(shape=total_pulses)
+        return frc.Forcing(
+            total_pulses, times[arrival_time_indx], amplitudes, durations
+        )
+
+    def set_amplitude_distribution(
+        self,
+        amplitude_distribution_function,
+    ):
+        pass
+
+    def set_duration_distribution(self, duration_distribution_function):
+        pass
 
 
 def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=1, seed=None):

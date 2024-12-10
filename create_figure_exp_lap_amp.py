@@ -21,24 +21,36 @@ plt.style.use("cosmoplots.default")
 fig, ax = cosmoplots.figure_multiple_rows_columns(rows=1, columns=2)
 cosmoplots.change_log_axis_base(ax[0], "y")
 
-model = pm.PointModel(waiting_time=5, total_duration=100000, dt=0.01)
+model = pm.PointModel(waiting_time=5, total_duration=100_000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 model.set_custom_forcing_generator(sf.PeriodicAsymLapPulses(control_parameter=0.0))
 
 T, S = model.make_realization()
+print(T[-1])
 
 S_norm = (S - S.mean()) / S.std()
 
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
-ax[0].plot(f, Pxx, label=r"$A \sim \mathrm{Exp}$")
+ax[0].plot(f, Pxx, "C0")  # , label=r"$A \sim \mathrm{Exp}$")
 
-PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, T=T[-1])
+limit = 50 * np.exp(-4 * np.pi * f)
+good = (Pxx > limit) & (f < 0.9)
+ax[0].plot(f[good], Pxx[good], "o", c="C0", markersize=3)
+
+
+window_size_angular = S.size * 1e-2 / (2 * np.pi * 10)
+#
+PSD = PSD_periodic_arrivals(
+    2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=1, T=window_size_angular
+)
 ax[0].plot(
     f,
     PSD,
     "--k",
-    label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f), \, \langle A \rangle \ne 0$",
+    # label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f), \, \langle A \rangle \ne 0$",
 )
+good = (PSD > limit) & (f < 0.9)
+ax[0].plot(f[good], PSD[good], "k*")
 
 tb, R = fa.corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
 ax[1].plot(tb, R, label=r"$A \sim \mathrm{Exp}$")
@@ -49,9 +61,8 @@ ax[1].plot(
     t,
     R_an,
     "--k",
-    label=r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d}),\, \langle A \rangle \ne 0$",
+    label=r"$\langle A \rangle \ne 0$",
 )
-
 
 model = pm.PointModel(waiting_time=5, total_duration=100000, dt=0.01)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
@@ -62,14 +73,14 @@ T, S = model.make_realization()
 S_norm = (S - S.mean()) / S.std()
 
 f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
-ax[0].plot(f, Pxx, label=r"$A \sim \mathrm{Laplace}$")
+ax[0].plot(f, Pxx, "C1")  # , label=r"$A \sim \mathrm{Laplace}$")
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=0, T=T[-1])
 ax[0].plot(
     f,
     PSD,
     "--g",
-    label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f), \, \langle A \rangle = 0$",
+    # label=r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f), \, \langle A \rangle = 0$",
 )
 
 tb, R = fa.corr_fun(S_norm, S_norm, dt=0.01, norm=False, biased=True, method="auto")
@@ -80,10 +91,10 @@ ax[1].plot(
     t,
     R_an,
     "--g",
-    label=r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d}), \, \langle A \rangle = 0$",
+    label=r"$\langle A \rangle = 0$",
 )
 
-ax[0].legend()
+# ax[0].legend()
 ax[0].set_xlim(-0.03, 1)
 ax[0].set_ylim(1e-4, 1e3)
 ax[0].set_xlabel(r"$\tau_\mathrm{d} f$")
