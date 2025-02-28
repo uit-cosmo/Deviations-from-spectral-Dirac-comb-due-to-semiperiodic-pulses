@@ -31,7 +31,8 @@ class MuOpts:
             self.color = "C1"
             self.ls = "--"
             self.wait_min = 60
-            self.ts_lim = (20000, 22000, None, None)
+            self.tstart = 20000
+            self.ts_lim = (0, 2000, None, None)
             self.spectra_lim = (0, 0.1, 1e-6, None)
         elif mu == mu_list[1]:
             self.mu = mu_list[1]
@@ -40,7 +41,8 @@ class MuOpts:
             self.color = "C2"
             self.ls = ":"
             self.wait_min = 300
-            self.ts_lim = (70000, 72000, -1, 14)
+            self.tstart = 70000
+            self.ts_lim = (0, 2000, -1, 14)
             self.spectra_lim = (0, 3e-2, 1e-6, None)
 
 
@@ -60,7 +62,7 @@ def plot_RB(fit=False):
         nK = (K - np.mean(K)) / np.std(K)
         fK, PK = signal.welch(nK, 1 / dt, nperseg=len(nK) / 4)
 
-        ax[i].plot(time, nK)
+        ax[i].plot(time - Mu.tstart, nK)
         ax[i].set_xlabel(r"$t$")
         ax[i].set_ylabel(r"$\widetilde{\mathcal{K}}$")
         ax[i].axis(Mu.ts_lim)
@@ -137,7 +139,10 @@ def plot_RB(fit=False):
             axav[3].set_ylabel(r"$P(\tau_\mathrm{w}/\langle\tau_\mathrm{w}\rangle)$")
 
             ax[i].plot(
-                time + (CoEv.arrival_times[0] - time[0]), nK_fit, "--", c=Mu.color
+                time + (CoEv.arrival_times[0] - time[0]) - Mu.tstart,
+                nK_fit,
+                "--",
+                c=Mu.color,
             )
 
             f_fit, PK_fit = signal.welch(nK_fit, 1 / dt, nperseg=int(len(nK_fit) / 4))
