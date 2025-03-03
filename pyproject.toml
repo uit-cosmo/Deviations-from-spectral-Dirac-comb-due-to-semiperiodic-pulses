@@ -9,9 +9,9 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
-numba = "^0.60.0"
+numba = "^0.61.0"
 closedexpressions = {git = "https://github.com/uit-cosmo/fpp-closed-expressions.git", branch="fix_psd_periodic"}
-cosmoplots = {git = "https://github.com/uit-cosmo/cosmoplots.git", branch="tex-use"}
+cosmoplots = {git = "https://github.com/uit-cosmo/cosmoplots.git"}
 superposed-pulses = {git = "https://github.com/uit-cosmo/superposed-pulses.git"}
 fppanalysis = {git = "https://github.com/uit-cosmo/fpp-analysis-tools.git"}
 scipy = "^1.14.1"
