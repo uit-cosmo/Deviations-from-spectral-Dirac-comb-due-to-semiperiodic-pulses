@@ -17,6 +17,8 @@ plt.style.use("cosmoplots.default")
 fig, ax = cosmoplots.figure_multiple_rows_columns(1, 2)
 cosmoplots.change_log_axis_base(ax[0], "y")
 
+# Sigma is the rms-value of the normal distribution.
+# It will be denoted w_rms in the labels.
 Sigma = [0.05, 0.5, 5]
 Sigmalab = [
     r"$\langle w \rangle/100$",
@@ -40,7 +42,7 @@ for i, sigma in enumerate(Sigma):
     S_norm = S - S.mean()
 
     f, Pxx = signal.welch(x=S_norm, fs=1.0 / dt, nperseg=S.size / 30)
-    ax[0].plot(f, Pxx, label=r"$\sigma = $" + Sigmalab[i], c="C{}".format(i))
+    ax[0].plot(f, Pxx, label=r"$w_{\mathrm{rms}} = $" + Sigmalab[i], c="C{}".format(i))
 
     if i < 2:
         fitrange = signal.find_peaks(
@@ -54,7 +56,7 @@ for i, sigma in enumerate(Sigma):
     ax[1].plot(
         tb[abs(tb) < 50],
         R[abs(tb) < 50] / np.max(R),
-        label=r"$\sigma = $" + Sigmalab[i],
+        label=r"$w_{\mathrm{rms}} = $" + Sigmalab[i],
         c="C{}".format(i),
     )
 
