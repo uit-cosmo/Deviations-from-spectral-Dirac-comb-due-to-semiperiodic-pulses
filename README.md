@@ -22,6 +22,8 @@ Time series, power spectral density and conditional averaging of the Rayleigh BÃ
 
 Generates figures 1, 9 and 10 in the manuscript.
 
+Note: In the manuscript, the RB kinetic energy has changed name from $\mathcal{K}$ to $\mathcal{E}$. This name change may not be completely reflected in the code.
+
 ### [create_figure_gamma_wait.py](create_figure_gamma_wait.py)
 
 Power spectral density and autocorrelation of the stochastic process with exponentially distributed amplitudes and Gamma distributed waiting times.
@@ -78,4 +80,4 @@ The raw data of the energy integral $K$ and the according time values are availa
 
 If you prefer to run the RB-model from scratch in BOUT++ you find all necessary files in [BOUT_files](rayleigh_benard/BOUT_files). The `PhysicsModel` is defined in [rb-model.cxx](rayleigh_benard/BOUT_files/rb-model.cxx) and the simulation inputs, such as $\kappa$ and $\mu$, are defined in [BOUT.inp](rayleigh_benard/BOUT_files/BOUT.inp). The data shown in the paper is created with BOUT++ version 4.4.0. Check the BOUT++ manual for instructions for to install BOUT++ and run a custom `PhysicsModel`: <https://bout-dev.readthedocs.io/en/stable/>
 
-You can calculate $K$ from the simulation output using the [calculate_K.py](rayleigh_benard/BOUT_files/calculate_K.py) script. For this, install the `xbout` package (<https://github.com/boutproject/xBOUT>) and adjust the path to the BOUT++ output data in line 4.
+You can calculate $\mathcal{E}$ from the simulation output using the [calculate_K.py](rayleigh_benard/BOUT_files/calculate_K.py) script. For this, install the `xbout` package (<https://github.com/boutproject/xBOUT>) and adjust the path to the BOUT++ output data in line 4.

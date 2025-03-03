@@ -16,7 +16,8 @@ import cosmoplots
 
 plt.style.use("cosmoplots.default")
 
-# Match \mathcal{K} in text
+# Match \mathcal{E} in text
+# OBS! In these notes, we call the kinetic energy K, but the figure labels use E since K is taken.
 plt.rcParams["font.family"] = "serif"
 
 mu_list = ["1.6e-3", "1e-4"]
@@ -64,7 +65,7 @@ def plot_RB(fit=False):
 
         ax[i].plot(time - Mu.tstart, nK)
         ax[i].set_xlabel(r"$t$")
-        ax[i].set_ylabel(r"$\widetilde{\mathcal{K}}$")
+        ax[i].set_ylabel(r"$\widetilde{\mathcal{E}}$")
         ax[i].axis(Mu.ts_lim)
         if Mu.mu == mu_list[1]:
             ax[i].set_yticks(range(0, 15, 3))
@@ -72,7 +73,7 @@ def plot_RB(fit=False):
         cosmoplots.change_log_axis_base(ax[i + 2], "y")
         ax[i + 2].plot(fK[1:], PK[1:] * K.std() ** 2)
         ax[i + 2].set_ylabel(
-            r"$\mathcal{K}_\mathrm{rms}^2 S_{\widetilde{\mathcal{K}}}\left( f \right)$"
+            r"$\mathcal{E}_\mathrm{rms}^2 S_{\widetilde{\mathcal{E}}}\left( f \right)$"
         )
         ax[i + 2].set_xlabel(r"$f$")
         ax[i + 2].axis(Mu.spectra_lim)
@@ -120,7 +121,7 @@ def plot_RB(fit=False):
             axav[i].set_xlim([-50, 50])
             axav[i].set_xlabel(r"$t$")
             axav[i].set_ylabel(
-                r"$\langle \mathcal{K}(t-s) | \mathcal{K}(s)=\mathcal{K}_\mathrm{max}\rangle$"
+                r"$\langle \mathcal{E}(t-s) | \mathcal{E}(s)=\mathcal{E}_\mathrm{max}\rangle$"
             )
             axav[i].legend()
 
@@ -177,7 +178,7 @@ def plot_RB(fit=False):
                 label=r"$\mathrm{Normal}$",
             )
             ax[i + 4].set_ylabel(
-                r"$\mathcal{K}_\mathrm{rms}^2 S_{\widetilde{\mathcal{K}}}\left( f \right)$"
+                r"$\mathcal{E}_\mathrm{rms}^2 S_{\widetilde{\mathcal{E}}}\left( f \right)$"
             )
             ax[i + 4].set_xlabel(r"$f$")
             ax[i + 4].legend()
