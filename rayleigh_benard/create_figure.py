@@ -17,7 +17,6 @@ import cosmoplots
 plt.style.use("cosmoplots.default")
 
 # Match \mathcal{E} in text
-# OBS! In these notes, we call the kinetic energy K, but the figure labels use E since K is taken.
 plt.rcParams["font.family"] = "serif"
 
 mu_list = ["1.6e-3", "1e-4"]
@@ -56,14 +55,14 @@ def plot_RB(fit=False):
 
     for i, mu in enumerate(mu_list):
         Mu = MuOpts(mu)
-        K = np.load("./RB_data/K_" + Mu.mu + "_data.npy")
+        E = np.load("./RB_data/E_" + Mu.mu + "_data.npy")
         time = np.load("./RB_data/time_" + Mu.mu + "_data.npy")
         dt = time[1] - time[0]
 
-        nK = (K - np.mean(K)) / np.std(K)
-        fK, PK = signal.welch(nK, 1 / dt, nperseg=len(nK) / 4)
+        nE = (E - np.mean(E)) / np.std(E)
+        fE, PE = signal.welch(nE, 1 / dt, nperseg=len(nE) / 4)
 
-        ax[i].plot(time - Mu.tstart, nK)
+        ax[i].plot(time - Mu.tstart, nE)
         ax[i].set_xlabel(r"$t$")
         ax[i].set_ylabel(r"$\widetilde{\mathcal{E}}$")
         ax[i].axis(Mu.ts_lim)
@@ -71,7 +70,7 @@ def plot_RB(fit=False):
             ax[i].set_yticks(range(0, 15, 3))
 
         cosmoplots.change_log_axis_base(ax[i + 2], "y")
-        ax[i + 2].plot(fK[1:], PK[1:] * K.std() ** 2)
+        ax[i + 2].plot(fE[1:], PE[1:] * E.std() ** 2)
         ax[i + 2].set_ylabel(
             r"$\mathcal{E}_\mathrm{rms}^2 S_{\widetilde{\mathcal{E}}}\left( f \right)$"
         )
@@ -80,23 +79,23 @@ def plot_RB(fit=False):
 
         if fit:
             CoEv = ConditionalEvents(
-                signal=K,
+                signal=E,
                 time=time,
-                lower_threshold=K.mean() + K.std(),
+                lower_threshold=E.mean() + E.std(),
                 distance=Mu.wait_min,
                 remove_non_max_peaks=True,
             )
 
             fitfile = open("fitdata_" + Mu.savename + ".txt", "w")
-            fitfile.write("<K>={}, K_rms={}\n".format(np.mean(K), np.std(K)))
+            fitfile.write("<E>={}, E_rms={}\n".format(np.mean(E), np.std(E)))
 
-            K_fit, pulse = sf.create_fit(
+            E_fit, pulse = sf.create_fit(
                 dt, time, CoEv
             )  # pulse contains (time_kern, kern, (td, lam))
-            nK_fit = (K_fit - np.mean(K_fit)) / np.std(K_fit)
+            nE_fit = (E_fit - np.mean(E_fit)) / np.std(E_fit)
 
             fitfile.write(
-                "<K_fit>={}, K_fit_rms={}\n".format(np.mean(K_fit), np.std(K_fit))
+                "<E_fit>={}, E_fit_rms={}\n".format(np.mean(E_fit), np.std(E_fit))
             )
             fitfile.write(
                 "td={}, lam={}\n <tw>={},tw_rms={}\n <A>={}, A_rms={}".format(
@@ -141,13 +140,13 @@ def plot_RB(fit=False):
 
             ax[i].plot(
                 time + (CoEv.arrival_times[0] - time[0]) - Mu.tstart,
-                nK_fit,
+                nE_fit,
                 "--",
                 c=Mu.color,
             )
 
-            f_fit, PK_fit = signal.welch(nK_fit, 1 / dt, nperseg=int(len(nK_fit) / 4))
-            ax[i + 2].plot(f_fit, PK_fit * K_fit.std() ** 2, "--", c=Mu.color)
+            f_fit, PE_fit = signal.welch(nE_fit, 1 / dt, nperseg=int(len(nE_fit) / 4))
+            ax[i + 2].plot(f_fit, PE_fit * E_fit.std() ** 2, "--", c=Mu.color)
             ax[i + 2].plot(
                 f_fit,
                 sf.spectrum_gauss(
@@ -184,10 +183,10 @@ def plot_RB(fit=False):
             ax[i + 4].legend()
             ax[i + 4].set_xlim(Mu.spectra_lim[:2])
     if fit:
-        figav.savefig("Kav_fit.eps")
-        fig.savefig("K_fit.eps")
+        figav.savefig("Eav_fit.eps")
+        fig.savefig("E_fit.eps")
     else:
-        fig.savefig("K_nofit.eps")
+        fig.savefig("E_nofit.eps")
 
 
 plot_RB(False)
