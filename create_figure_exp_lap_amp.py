@@ -18,10 +18,12 @@ import cosmoplots
 
 plt.style.use("cosmoplots.default")
 
+dt = 1e-2
+
 fig, ax = cosmoplots.figure_multiple_rows_columns(rows=1, columns=2)
 cosmoplots.change_log_axis_base(ax[0], "y")
 
-model = pm.PointModel(waiting_time=5, total_duration=100_000, dt=0.01)
+model = pm.PointModel(waiting_time=5, total_duration=100_000, dt=dt)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 model.set_custom_forcing_generator(
     sf.ForcingQuasiPeriodicAsymLapAmp(sigma=0.0, beta=0.0)
@@ -32,12 +34,14 @@ print(T[-1])
 
 S_norm = (S - S.mean()) / S.std()
 
-f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
+f, Pxx = signal.welch(x=S_norm, fs=1 / dt, nperseg=S.size / 10)
 ax[0].plot(f, Pxx, "C0")  # , label=r"$A \sim \mathrm{Exp}$")
 
 limit = 50 * np.exp(-4 * np.pi * f)
-good = (Pxx > limit) & (f < 0.9)
-ax[0].plot(f[good], Pxx[good], "o", c="C0", markersize=3)
+
+peaks = signal.find_peaks(Pxx, height=limit, distance=int(0.1 / dt))[0]
+# good = (Pxx > limit) & (f < 0.9)
+ax[0].plot(f[peaks], Pxx[peaks], "o", c="C0", markersize=3)
 
 
 window_size_angular = S.size * 1e-2 / (2 * np.pi * 10)
@@ -66,7 +70,7 @@ ax[1].plot(
     label=r"$\langle A \rangle \ne 0$",
 )
 
-model = pm.PointModel(waiting_time=5, total_duration=100000, dt=0.01)
+model = pm.PointModel(waiting_time=5, total_duration=100000, dt=dt)
 model.set_pulse_shape(ps.LorentzShortPulseGenerator(tolerance=1e-5))
 model.set_custom_forcing_generator(
     sf.ForcingQuasiPeriodicAsymLapAmp(sigma=0.0, beta=0.5)
@@ -76,7 +80,7 @@ T, S = model.make_realization()
 
 S_norm = (S - S.mean()) / S.std()
 
-f, Pxx = signal.welch(x=S_norm, fs=100, nperseg=S.size / 10)
+f, Pxx = signal.welch(x=S_norm, fs=1 / dt, nperseg=S.size / 10)
 ax[0].plot(f, Pxx, "C1")  # , label=r"$A \sim \mathrm{Laplace}$")
 
 PSD = PSD_periodic_arrivals(2 * np.pi * f, td=1, gamma=0.2, A_rms=1, A_mean=0, T=T[-1])
@@ -100,7 +104,7 @@ ax[1].plot(
 
 # ax[0].legend()
 ax[0].set_xlim(-0.03, 1)
-ax[0].set_ylim(1e-4, 1e3)
+ax[0].set_ylim(1e-4, 5e3)
 ax[0].set_xlabel(r"$\tau_\mathrm{d} f$")
 ax[0].set_ylabel(r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
 
