@@ -1,52 +1,95 @@
 import numpy as np
-import scipy.signal as ssi
-from scipy.optimize import minimize
-from scipy.signal import find_peaks, fftconvolve
+from scipy.optimize import curve_fit
+from scipy.signal import fftconvolve
+import superposedpulses.forcing as frc
+import closedexpressions as ce
 
 
-def corr_fun(X, Y, dt, norm=True, biased=True, method="auto"):
+class ForcingQuasiPeriodicAsymLapAmp(frc.ForcingGenerator):
     """
-    Estimates the correlation function between X and Y using ssi.correlate.
-    For now, we require both signals to be of equal length.
-
-    Input:
-        X: First array to be correlated. ............................. (Nx1) np.array
-        Y: Second array to be correlated. ............................ (Nx1) np.array
-        dt: Time step of the time series. ............................ float
-        norm: Normalizes the correlation function to a maxima of 1 ... bool
-        biased: Trigger estimator biasing. ........................... bool
-        method: 'direct', 'fft' or 'auto'. Passed to ssi.correlate ... string
-
-    For biased=True, the result is divided by X.size.
-    For biased=False, the estimator is unbiased and returns the result
-    divided by X.size-|k|, where k is the lag.
-    The unbiased estimator diverges for large lags, and
-    for small lags and large X.size, the difference is trivial.
+    Forcing for the FPP with asymmetric laplace distributed amplitudes with shape parameter beta
+    and periodic arrival times jittered by a Gaussian with standard deviation sigma.
     """
 
-    assert X.size == Y.size
+    def __init__(self, sigma, beta):
+        self.sigma = sigma
+        self.beta = beta
 
-    if norm:
-        Xn = (X - X.mean()) / X.std()
-        Yn = (Y - Y.mean()) / Y.std()
-    else:
-        Xn = X
-        Yn = Y
+    def get_forcing(self, times: np.ndarray, waiting_time: float) -> frc.Forcing:
+        dt = times[1] - times[0]
+        total_pulses = int(max(times) / waiting_time)
+        periodic_waiting_times = np.arange(1, total_pulses + 1) * waiting_time
+        if self.sigma > 0:
+            waiting_times_jitter = np.random.normal(
+                loc=1, scale=self.sigma, size=total_pulses
+            )
+            arrival_times = periodic_waiting_times + waiting_times_jitter
+        else:
+            arrival_times = periodic_waiting_times
+        arrival_time_indx = np.rint(arrival_times / dt).astype(int)
+        arrival_time_indx -= arrival_time_indx[0]  # set first pulse to t = 0
+        # check whether events are sampled with arrival time > times[-1]
+        number_of_overshotings = len(arrival_time_indx[arrival_time_indx > times.size])
+        total_pulses -= number_of_overshotings
+        arrival_time_indx = arrival_time_indx[arrival_time_indx < times.size]
 
-    R = ssi.correlate(Xn, Yn, mode="full", method=method)
+        amplitudes = sample_asymm_laplace(
+            alpha=0.5 / np.sqrt(1.0 - 2.0 * self.beta * (1.0 - self.beta)),
+            kappa=self.beta,
+            size=total_pulses,
+        )
+        durations = np.ones(shape=total_pulses)
 
-    k = np.arange(-(X.size - 1), X.size)
-    tb = k * dt
+        return frc.Forcing(
+            total_pulses,
+            times[arrival_time_indx],
+            amplitudes,
+            durations,
+        )
 
-    if biased:
-        R /= X.size
-    else:
-        R /= X.size - np.abs(k)
+    def set_amplitude_distribution(
+        self,
+        amplitude_distribution_function,
+    ):
+        pass
 
-    return tb, R
+    def set_duration_distribution(self, duration_distribution_function):
+        pass
 
 
-def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=None, seed=None):
+class PeriodicAsymLapPulses(frc.ForcingGenerator):
+    def __init__(self, control_parameter):
+        self.control_parameter = control_parameter
+
+    def get_forcing(self, times: np.ndarray, waiting_time: float) -> frc.Forcing:
+        total_pulses = int(max(times) / waiting_time)
+        arrival_time_indx = (
+            np.arange(start=0, stop=99994, step=5) * 100
+        )  # multiplied with inverse dt
+        amplitudes = sample_asymm_laplace(
+            alpha=0.5
+            / np.sqrt(
+                1.0 - 2.0 * self.control_parameter * (1.0 - self.control_parameter)
+            ),
+            kappa=self.control_parameter,
+            size=total_pulses,
+        )
+        durations = np.ones(shape=total_pulses)
+        return frc.Forcing(
+            total_pulses, times[arrival_time_indx], amplitudes, durations
+        )
+
+    def set_amplitude_distribution(
+        self,
+        amplitude_distribution_function,
+    ):
+        pass
+
+    def set_duration_distribution(self, duration_distribution_function):
+        pass
+
+
+def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=1, seed=None):
     """
     Use:
         sample_asymm_laplace(alpha=1., kappa=0.5, size=None)
@@ -68,8 +111,6 @@ def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=None, seed=None):
 
     assert alpha > 0.0
     assert (kappa >= 0.0) & (kappa <= 1.0)
-    if size:
-        assert size > 0
     prng = np.random.RandomState(seed=seed)
     U = prng.uniform(size=size)
     X = np.zeros(size)
@@ -79,24 +120,81 @@ def sample_asymm_laplace(alpha=1.0, kappa=0.5, size=None, seed=None):
     return X
 
 
-def create_fit(dt, normalized_data, T, td, lam=0.5, distance=200):
-    """calculates fit for K time series"""
+def make_signal_convolve(T, amp, ta, pulse, dt):
+    """
+    Make a signal with prescribed amplitudes, arrival times and pulse shape by convolution.
+    """
+    S = np.zeros(T.size)
+    for i in range(ta.size):
+        S[int((ta[i] - ta[0]) / dt)] += amp[i]
+    S = fftconvolve(S, pulse, mode="same")
+    return S
 
-    kernrad = 2**18
-    time_kern = np.arange(-kernrad, kernrad + 1) * dt
 
-    peak_loc = find_peaks(normalized_data, height=1.0, distance=distance)[0]
-    forcing = np.zeros(T.size)
-    forcing[peak_loc] = normalized_data[peak_loc]
+def create_fit(dt, T, ConditionalEvents, kernrad=2**18):
+    """calculates fit for K time series using already calculated
+    conditional events and assuming exponential pulses."""
 
-    def double_exp(tkern, lam, td):
+    def double_exp(tkern, td, lam):
         kern = np.zeros(tkern.size)
         kern[tkern < 0] = np.exp(tkern[tkern < 0] / lam / td)
         kern[tkern >= 0] = np.exp(-tkern[tkern >= 0] / (1 - lam) / td)
         return kern
 
-    kern = double_exp(time_kern, lam, td)
+    opt, cov = curve_fit(
+        double_exp,
+        ConditionalEvents.time,
+        ConditionalEvents.average / max(ConditionalEvents.average),
+        p0=[12.0, 0.4],
+    )
 
-    time_series_fit = fftconvolve(forcing, kern, "same")
-    time_series_fit = (time_series_fit - time_series_fit.mean()) / time_series_fit.std()
-    return time_series_fit
+    print("[td lambda]:")
+    print(opt)
+    print("convariance:")
+    print(cov)
+    time_kern = np.arange(-kernrad, kernrad + 1) * dt
+    kern = double_exp(time_kern, opt[0], opt[1])
+
+    return make_signal_convolve(
+        T, ConditionalEvents.peaks, ConditionalEvents.arrival_times, kern, dt
+    ), (time_kern, kern, opt)
+
+
+def spectrum_gauss_renewal_part(f, tw, tw_rms):
+    # The part of the gaussian renewal spectrum due to the waiting times
+    Omega = tw * 2 * np.pi * f
+    nu = tw_rms / tw
+    return np.sinh(nu**2 * Omega**2 / 2) / (
+        np.cosh(nu**2 * Omega**2 / 2) - np.cos(Omega)
+    )
+
+
+def spectrum_gauss(f, td, lam, amean, arms, tw, tw_rms):
+    # Assumes gaussian renewal arrivals and two-sided exponential pulses
+    gamma = td / tw
+    Omega = tw * 2 * np.pi * f
+    S = (
+        td * gamma * ce.psd(gamma * Omega, 1, lam) / 2
+    )  # td = 1 here since the expression already contains td.
+    S *= arms**2 + amean**2 * spectrum_gauss_renewal_part(f, tw, tw_rms)
+    return S
+
+
+def est_wait_spectrum_ECF(f, data):
+    omega = 2 * np.pi * f
+    # Estimate the empirical CF of data at frequencies omega.
+    ECF = np.zeros(omega.size, dtype=complex)
+    for i in range(omega.size):
+        ECF[i] = np.mean(np.exp(1.0j * omega[i] * data))
+
+    return np.real((1 + ECF) / (1 - ECF))
+
+
+def spectrum_renewal(f, td, lam, amean, arms, tw_data):
+    # Use waiting time data to estimate spectrum for renewal arrivals and two-sided exponential pulses
+    gamma = td / tw_data.mean()
+    omega = 2 * np.pi * f
+
+    S = td * gamma * ce.psd(td * omega, 1, lam) / 2
+    S *= arms**2 + amean**2 * est_wait_spectrum_ECF(f, tw_data)
+    return S
