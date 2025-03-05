@@ -1,6 +1,6 @@
-# Deviations from spectral Dirac comb in Rayleigh Bénard turbulent bursting
+# Deviations from spectral Dirac comb due to semiperiodic pulses
 
-Code to generate, plot and fit data used in Manuscript *"Deviations from spectral dirac comb in Rayleigh-Benard turbulent bursting"*.
+Code to generate, plot and fit data used in Manuscript *"Deviations from spectral Dirac comb due to semiperiodic pulses"*.
 
 ## Reproducing the environment
 
