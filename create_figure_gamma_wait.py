@@ -142,4 +142,4 @@ ax[1].set_xlabel(r"$t/\tau_\mathrm{d}$")
 ax[1].set_ylabel(r"$R_{\widetilde{\Phi}}(t/\tau_\mathrm{d})$")
 ax[1].legend()
 
-fig.savefig("gamma_wait.eps")
+fig.savefig("gammawait.eps")

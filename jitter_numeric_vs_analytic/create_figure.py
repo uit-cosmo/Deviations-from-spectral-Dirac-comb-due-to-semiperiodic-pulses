@@ -87,4 +87,4 @@ for row in range(rows):
 ax[1].legend()
 
 
-fig.savefig("PSD_compare_jitter.eps")
+fig.savefig("psdcomparejitter.eps")

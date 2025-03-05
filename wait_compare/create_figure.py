@@ -111,7 +111,7 @@ for row in range(rows * columns):
 ax[1].legend()
 
 
-fig.savefig("PSD_compare_wdist.eps")
+fig.savefig("psdcomparewdist.eps")
 
 Wrms = [1e-3, 1e-2]
 for wrms in Wrms:

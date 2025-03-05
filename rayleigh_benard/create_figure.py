@@ -183,10 +183,10 @@ def plot_RB(fit=False):
             ax[i + 4].legend()
             ax[i + 4].set_xlim(Mu.spectra_lim[:2])
     if fit:
-        figav.savefig("Eav_fit.eps")
-        fig.savefig("E_fit.eps")
+        figav.savefig("eavfit.eps")
+        fig.savefig("efit.eps")
     else:
-        fig.savefig("E_nofit.eps")
+        fig.savefig("enofit.eps")
 
 
 plot_RB(False)
