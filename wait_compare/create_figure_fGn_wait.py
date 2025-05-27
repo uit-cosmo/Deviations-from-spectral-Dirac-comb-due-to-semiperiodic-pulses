@@ -36,8 +36,7 @@ H = [0.1, 0.5, 0.9]
 
 tw = 1.0
 
-dt = 0.001
-f = np.arange(1, int(10 / dt) + 1) * dt
+f = psd_fGn_num(0.5)[0]
 omega = 2 * np.pi * f
 
 rows = 1
@@ -70,10 +69,10 @@ ax[0].semilogy(
 )  # , label=r"$f^{4/5}$")
 ax[0].set_ylabel(r"$\mathrm{Re}\left[ (1 + \psi_w)/(1-\psi_w) \right]$")
 ax[0].set_xlabel(r"$\langle w \rangle f$")
-ax[0].set_xlim(1e-3, 2)
-ax[0].set_ylim(1e-3, 1e3)
+ax[0].set_xlim(1e-4, 2)
+# ax[0].set_ylim(1e-4, 1e3)
 cosmoplots.change_log_axis_base(ax[0], base=10)
-ax[0].legend()
+ax[0].legend(loc=1, ncols=2)
 
 
 fig.savefig("psdcomparefgn.eps")

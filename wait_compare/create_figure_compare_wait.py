@@ -58,8 +58,7 @@ Wrms = [1e-1, 1, 5]
 
 tw = 1.0
 
-dt = 0.01
-f = np.arange(1, int(10 / dt) + 1) * dt
+f = psd_norm_num(Wrms[0])[0]
 omega = 2 * np.pi * f
 
 rows = 3
