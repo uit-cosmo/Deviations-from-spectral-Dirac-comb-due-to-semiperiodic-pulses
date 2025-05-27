@@ -33,7 +33,7 @@ Wrms = [5, 1, 1e-1]
 T = 10_000
 repeat = 1000
 
-freq = np.linspace(1e-2, 5, 100)
+freq = np.linspace(1e-2, 5, 1000)
 
 for i in range(len(Wrms)):
     psd = average_psd(freq, T, tw, Wrms[i], repeat=repeat)
