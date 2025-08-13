@@ -1,8 +1,6 @@
 """
 Power spectral density and autocorrelation function
 of asymetrically laplace distributed amplitudes with different asymmetry parameters.
-
-Creates fig. 4 in the most recent manuscript.
 """
 
 import numpy as np

@@ -1,5 +1,5 @@
 """
-Power spectrum and autocorrelation of a process with waiting_time distributed waiting times.
+Power spectrum and autocorrelation of a process with gamma distributed waiting times.
 """
 
 import numpy as np

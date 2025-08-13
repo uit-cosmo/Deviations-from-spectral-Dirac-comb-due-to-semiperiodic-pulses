@@ -1,5 +1,7 @@
 """
 Figures for the Rayleigh-Bénard convection, both raw time series and power spectra, plus stochastic model fits.
+
+Also allows for plotting time series and spectra without fits. Not currently used.
 """
 
 import sys
@@ -189,5 +191,5 @@ def plot_RB(fit=False):
         fig.savefig("enofit.eps")
 
 
-plot_RB(False)
+# plot_RB(False)
 plot_RB(True)

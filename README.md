@@ -20,37 +20,31 @@ The top-level scripts may be run without any extra preparation.
 
 Time series, power spectral density and conditional averaging of the Rayleigh Bénard data. [create_figure.py](rayleigh_benard/create_figure.py) may be run directly. See the section below for simulation details.
 
-Generates figures 1, 10 and 11 in the manuscript.
+Generates figures 8 and 9 in the manuscript.
 
 ### [create_figure_gamma_wait.py](create_figure_gamma_wait.py)
 
 Power spectral density and autocorrelation of the stochastic process with exponentially distributed amplitudes and Gamma distributed waiting times.
 
-Generates figure 2 in the manuscript.
+Generates figure 1 in the manuscript.
 
-### [create_figure_exp_lap_amp.py](create_figure_exp_lap_amp.py)
-
-Power spectral density and autocorrelation of the stochastic process with exponentially and symmetrically Laplace distributed amplitudes.
-
-Generates figure 3 in the manuscript.
-
-### [create_figure_asym_lap_amp.py](create_figure_asym_lap_amp.py)
+### [create_figure_amp.py](create_figure_amp.py)
 
 Power spectral density and autocorrelation of the stochastic process with asymmetrically Laplace distributed amplitudes.
 
-Generates figure 4 in the manuscript.
+Generates figure 2 in the manuscript.
 
 ### [create_figure_gaussian_jitter_wait.py](create_figure_gaussian_jitter_wait.py)
 
 Power spectral density and autocorrelation of the stochastic process with periodic arrivals with Gaussian jitter.
 
-Generates figure 5 in the manuscript.
+Generates figure 3 in the manuscript.
 
 ### [create_figure_gaussian_waiting_times.py](create_figure_gaussian_waiting_times.py)
 
 Power spectral density and autocorrelation of the stochastic process with Gaussian waiting times.
 
-Generates figure 6 in the manuscript.
+Generates figure 4 in the manuscript.
 
 ### [wait_compare](wait_compare)
 
@@ -60,13 +54,13 @@ Compares the parts due to renewal waiting times in several different cases.
 
 Run [gen_gammainv_cf.py](wait_compare/gen_gammainv_cf.py) and [gen_norm_wait_num_psd.py](wait_compare/gen_norm_wait_num_psd.py) first, then [create_figure_compare_wait.py](wait_compare/create_figure_compare_wait.py).
 
-Generates figure 7 in the manuscript.
+Generates figure 5 in the manuscript.
 
 #### Comparison of PSD for correlated waiting times driven by fractional Gaussian noise.
 
 Run [gen_fGn_wait_num_psd.py](wait_compare/gen_fGn_wait_num_psd.py) first, then [create_figure_fGn_wait.py](wait_compare/create_figure_fGn_wait.py).
 
-Generates figure 8 in the manuscript.
+Generates figure 6 in the manuscript.
 
 ### [jitter_numeric_vs_analytic](jitter_numeric_vs_analytic)
 
@@ -74,7 +68,7 @@ Compares the parts due to jittered waiting times in the PSD for normal jitter ti
 
 Run [gen_norm_jitter_num_psd.py](jitter_numeric_vs_analytic/gen_norm_jitter_num_psd.py) first, then [create_figure.py](jitter_numeric_vs_analytic/create_figure.py).
 
-Generates figure 9 in the manuscript.
+Generates figure 7 in the manuscript.
 
 ## Generating Rayleigh-Bénard data
 
