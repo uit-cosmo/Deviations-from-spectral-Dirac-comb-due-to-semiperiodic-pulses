@@ -83,7 +83,7 @@ def spectra_analytical(omega, gamma, A_rms, A_mean, sigma, T):
     )
 
     tmp = np.zeros(omega.size)
-    for n in range(-1000, 1000):
+    for n in range(1, 10):
         index = 2 * np.pi * n * gamma
         tmp = np.where(np.abs(omega - find_nearest(omega, index)) > 0.001, tmp, 1)
 
@@ -101,7 +101,7 @@ def spectra_analytical(omega, gamma, A_rms, A_mean, sigma, T):
 
 window_size = 1e5 / (2 * np.pi * 30)
 for label, ls, symb, sigma in zip(
-    [r"$S_{{\Phi}}(\tau_\mathrm{d} f)$", None, None],
+    [r"$\mathcal{S}_{{\Phi}-\left< \Phi \right>}(\tau_\mathrm{d} f)$", None, None],
     ["--", "-.", ":"],
     ["o", "d", "*"],
     Sigma,
@@ -127,7 +127,7 @@ tb = np.linspace(0, 50, 1000)
 ax[1].plot(tb, Lorentz_AC_basic(tb), ":k", label=r"$\rho_\phi(t/\tau_\mathrm{d})$")
 
 ax[0].set_xlabel(r"$\tau_\mathrm{d} f$")
-ax[0].set_ylabel(r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
+ax[0].set_ylabel(r"$\mathcal{S}_{{\Phi}-\left< \Phi \right>}(\tau_\mathrm{d} f)$")
 ax[0].set_xlim(-0.03, 0.8)
 ax[0].set_ylim(1e-4, 1e2)
 ax[0].legend()

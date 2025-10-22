@@ -110,7 +110,9 @@ def spectra_analytical(omega, gamma, A_rms, A_mean, sigma):
 
 
 for label, ls, sigma in zip(
-    [r"$S_{{\Phi}}(\tau_\mathrm{d} f)$", None, None], ["--", "-.", ":"], Sigma
+    [r"$\mathcal{S}_{{\Phi}-\left< \Phi \right>}(\tau_\mathrm{d} f)$", None, None],
+    ["--", "-.", ":"],
+    Sigma,
 ):
     PSD = spectra_analytical(
         2 * np.pi * f, gamma=1 / waiting_time, A_rms=1, A_mean=1, sigma=sigma
@@ -126,7 +128,7 @@ tb = np.linspace(0, 50, 1000)
 ax[1].plot(tb, Lorentz_AC_basic(tb), ":k", label=r"$\rho_\phi(t/\tau_\mathrm{d})$")
 
 ax[0].set_xlabel(r"$\tau_\mathrm{d} f$")
-ax[0].set_ylabel(r"$S_{{\Phi}}(\tau_\mathrm{d} f)$")
+ax[0].set_ylabel(r"$\mathcal{S}_{{\Phi}-\left< \Phi \right>}(\tau_\mathrm{d} f)$")
 ax[0].set_xlim(-0.03, 0.8)
 ax[0].set_ylim(1e-4, 1e1)
 ax[0].legend()

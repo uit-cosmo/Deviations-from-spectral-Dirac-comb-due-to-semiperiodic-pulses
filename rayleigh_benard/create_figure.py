@@ -61,8 +61,9 @@ def plot_RB(fit=False):
         time = np.load("./RB_data/time_" + Mu.mu + "_data.npy")
         dt = time[1] - time[0]
 
-        nE = (E - np.mean(E)) / np.std(E)
-        fE, PE = signal.welch(nE, 1 / dt, nperseg=len(nE) / 4)
+        m0E = E - np.mean(E)  # For consistency with labels and analytic computations.
+        nE = m0E / np.std(E)
+        fE, PE = signal.welch(m0E, 1 / dt, nperseg=len(nE) / 4)
 
         ax[i].plot(time - Mu.tstart, nE)
         ax[i].set_xlabel(r"$t$")
@@ -72,9 +73,9 @@ def plot_RB(fit=False):
             ax[i].set_yticks(range(0, 15, 3))
 
         cosmoplots.change_log_axis_base(ax[i + 2], "y")
-        ax[i + 2].plot(fE[1:], PE[1:] * E.std() ** 2)
+        ax[i + 2].plot(fE[1:], PE[1:])
         ax[i + 2].set_ylabel(
-            r"$\mathcal{E}_\mathrm{rms}^2 S_{\widetilde{\mathcal{E}}}\left( f \right)$"
+            r"$\mathcal{S}_{\mathcal{E}-\langle \mathcal{E}\rangle}\left( f \right)$"
         )
         ax[i + 2].set_xlabel(r"$f$")
         ax[i + 2].axis(Mu.spectra_lim)
@@ -94,7 +95,9 @@ def plot_RB(fit=False):
             E_fit, pulse = sf.create_fit(
                 dt, time, CoEv
             )  # pulse contains (time_kern, kern, (td, lam))
-            nE_fit = (E_fit - np.mean(E_fit)) / np.std(E_fit)
+
+            m0E_fit = E_fit - np.mean(E_fit)
+            nE_fit = m0E_fit / np.std(E_fit)
 
             fitfile.write(
                 "<E_fit>={}, E_fit_rms={}\n".format(np.mean(E_fit), np.std(E_fit))
@@ -111,10 +114,10 @@ def plot_RB(fit=False):
             )
             fitfile.close()
 
-            axav[i].plot(pulse[0], pulse[1], "k")
+            axav[i].plot(pulse[0], pulse[1] * max(CoEv.average), "k")
             axav[i].plot(
                 CoEv.time,
-                CoEv.average / max(CoEv.average),
+                CoEv.average,
                 c=Mu.color,
                 ls=Mu.ls,
                 label=r"$\mu=$" + Mu.label,
@@ -147,8 +150,8 @@ def plot_RB(fit=False):
                 c=Mu.color,
             )
 
-            f_fit, PE_fit = signal.welch(nE_fit, 1 / dt, nperseg=int(len(nE_fit) / 4))
-            ax[i + 2].plot(f_fit, PE_fit * E_fit.std() ** 2, "--", c=Mu.color)
+            f_fit, PE_fit = signal.welch(m0E_fit, 1 / dt, nperseg=int(len(nE_fit) / 4))
+            ax[i + 2].plot(f_fit, PE_fit, "--", c=Mu.color)
             ax[i + 2].plot(
                 f_fit,
                 sf.spectrum_gauss(
@@ -178,9 +181,7 @@ def plot_RB(fit=False):
                 "k--",
                 label=r"$\mathrm{Normal}$",
             )
-            ax[i + 4].set_ylabel(
-                r"$\mathcal{E}_\mathrm{rms}^2 S_{\widetilde{\mathcal{E}}}\left( f \right)$"
-            )
+            ax[i + 4].set_ylabel(r"$\mathrm{Re}\left[(1+\psi_w)/(1-\psi_w)\right]$")
             ax[i + 4].set_xlabel(r"$f$")
             ax[i + 4].legend()
             ax[i + 4].set_xlim(Mu.spectra_lim[:2])

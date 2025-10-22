@@ -60,7 +60,9 @@ for ind, control_parameter, label in zip(
 
 
 window_size_angular = S.size * 1e-2 / (2 * np.pi)
-for A_mean, label, ls in zip([1, 0], [r"$0$", r"$1/2$"], ["--k", ":C7"]):
+for A_mean, label, ls, col in zip(
+    [1, 0], [r"$0$", r"$1/2$"], ["--", ":"], ["k", "darkslategray"]
+):
     PSD = PSD_periodic_arrivals(
         2 * np.pi * f,
         td=1,
@@ -73,6 +75,7 @@ for A_mean, label, ls in zip([1, 0], [r"$0$", r"$1/2$"], ["--k", ":C7"]):
         f,
         PSD,
         ls,
+        c=col,
         # label=r"$",
     )
     good = (PSD > height(f)) & (f < 0.9)
@@ -85,6 +88,7 @@ for A_mean, label, ls in zip([1, 0], [r"$0$", r"$1/2$"], ["--k", ":C7"]):
         t,
         R_an,
         ls,
+        c=col,
         label=r"$\lambda = $" + label + r"$\,\mathrm{an.}$",
     )
 
@@ -92,7 +96,7 @@ for A_mean, label, ls in zip([1, 0], [r"$0$", r"$1/2$"], ["--k", ":C7"]):
 ax[0].set_xlim(-0.03, 1)
 ax[0].set_ylim(1e-4, 1e3)
 ax[0].set_xlabel(r"$\tau_\mathrm{d} f$")
-ax[0].set_ylabel(r"$S_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
+ax[0].set_ylabel(r"$\mathcal{S}_{\widetilde{\Phi}}(\tau_\mathrm{d} f)$")
 
 ax[1].set_xlim(0, 50)
 ax[1].set_xlabel(r"$t/\tau_\mathrm{d}$")
