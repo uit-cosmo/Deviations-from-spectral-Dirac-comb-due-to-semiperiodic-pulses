@@ -1,6 +1,12 @@
 # Deviations from spectral Dirac comb due to semiperiodic pulses
 
-Code to generate, plot and fit data used in manuscript *"Deviations from spectral Dirac comb due to semiperiodic pulses"*, [arXiv.2106.15904](https://doi.org/10.48550/arXiv.2106.15904)
+Code to generate, plot and fit data used in the paper *"Deviations from spectral Dirac comb due to semiperiodic pulses"*, 
+
+[doi 10.1103/ps5v-1ph3](https://doi.org/10.1103/ps5v-1ph3) 
+
+[arXiv 2106.15904](https://doi.org/10.48550/arXiv.2106.15904)
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17413946.svg)](https://doi.org/10.5281/zenodo.17413946)
 
 ## Reproducing the environment
 
